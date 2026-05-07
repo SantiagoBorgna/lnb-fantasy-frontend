@@ -1,7 +1,7 @@
 import axiosClient from './axiosClient'
 
 export const getMe = () =>
-    axiosClient.get('/auth/me').then(r => r.data)
+    axiosClient.get('/api/auth/me').then(r => r.data)
 
 export const setEquipoFavorito = (equipoId) =>
     axiosClient.patch(`/auth/equipo-favorito/${equipoId}`).then(r => r.data)
