@@ -5,6 +5,7 @@ const axiosClient = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
     headers: {
         'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true' // <-- El pase VIP para saltar la pantalla de ngrok
     },
     timeout: 10000, // 10 segundos
 })
