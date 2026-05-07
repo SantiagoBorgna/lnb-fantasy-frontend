@@ -1,0 +1,79 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+
+  html,
+  body,
+  #root {
+    @apply h-full bg-surface text-textMain;
+    /* Evita el bounce scroll en iOS */
+    overscroll-behavior: none;
+  }
+
+  /* Scrollbar discreta para desktop */
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-surface;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full;
+  }
+}
+
+@layer components {
+
+  /* Clases reutilizables que vamos a usar en toda la app */
+  .btn-primary {
+    @apply bg-primary text-white font-semibold px-4 py-2 rounded-xl active:scale-95 transition-transform;
+  }
+
+  .btn-accent {
+    @apply bg-accent text-white font-semibold px-4 py-2 rounded-xl active:scale-95 transition-transform;
+  }
+
+  .card {
+    @apply bg-card border border-border rounded-2xl p-4;
+  }
+
+  /* Píldora de filtro — usada en el Mercado */
+  .pill {
+    @apply px-3 py-1 rounded-full text-sm font-medium border border-border text-textMuted transition-colors cursor-pointer;
+  }
+
+  .pill-active {
+    @apply bg-primary border-primary text-white;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  @keyframes slide-up {
+    from {
+      transform: translateY(100%);
+    }
+
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  .animate-slide-up {
+    animation: slide-up 0.25s ease-out;
+  }
+}
