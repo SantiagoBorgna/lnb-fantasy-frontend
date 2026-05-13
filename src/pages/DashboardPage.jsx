@@ -156,7 +156,7 @@ export default function DashboardPage() {
                                 valor={`${plantel.presupuestoRestante?.toFixed(1)} cr`}
                             />
                             <StatCard
-                                label="Jornada"
+                                label={`Jornada ${plantel.jornadaNumero}`}
                                 valor={plantel.puntajeObtenidoFecha?.toFixed(1) ?? '—'}
                             />
                             <StatCard

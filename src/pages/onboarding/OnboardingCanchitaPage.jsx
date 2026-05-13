@@ -317,6 +317,7 @@ function SlotLleno({ slot, onTap }) {
     const { jugador, rol } = slot
     const esCap = rol === 'CAPITAN'
     const esSexto = rol === 'SEXTO_HOMBRE'
+    const esSuplente = rol === 'SUPLENTE' // <-- Agregamos esta validación
 
     const partes = jugador.nombreCompleto?.split(',') ?? ['?']
     const apellido = partes[0].trim()
@@ -325,11 +326,26 @@ function SlotLleno({ slot, onTap }) {
 
     return (
         <div onClick={onTap} className={clsx('relative w-[90px] h-[105px] rounded-2xl flex flex-col items-center justify-between p-2 cursor-pointer', esSexto ? 'bg-accent/25 ring-1 ring-accent/60' : 'bg-white/15')}>
+            
             {esCap && (
                 <div className="absolute -top-1.5 -right-1.5 z-10 w-6 h-6 rounded-full bg-yellow-500 flex items-center justify-center ring-2 ring-surface shadow-md">
                     <span className="text-surface text-xs font-black">C</span>
                 </div>
             )}
+            
+            {/* --- NUEVAS PASTILLAS AGREGADAS --- */}
+            {esSexto && (
+                <div className="absolute -top-1.5 -right-1.5 z-10 w-6 h-6 rounded-full bg-accent flex items-center justify-center ring-2 ring-surface shadow-md">
+                    <span className="text-white text-xs font-black">6</span>
+                </div>
+            )}
+            {esSuplente && (
+                <div className="absolute -top-1.5 -right-1.5 z-10 w-6 h-6 rounded-full bg-border flex items-center justify-center ring-2 ring-surface shadow-md">
+                    <span className="text-white text-xs font-black">S</span>
+                </div>
+            )}
+            {/* ---------------------------------- */}
+
             <CamisetaSVG
                 colorPrincipal={jugador.colorPrincipal}
                 colorSecundario={jugador.colorSecundario}
