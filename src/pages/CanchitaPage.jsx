@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { getPlantel, guardarPlantel, getEstadisticasJornada, cambiarDt, realizarTransferencia } from '../api/plantelApi'
-import { getJornadaActiva, getJornadas, getPartidosJornada } from '../api/jornadaApi'
+import { getJornadaActiva, getJornadas, getPartidosJornada, getJornadaProxima } from '../api/jornadaApi'
 import { getDts } from '../api/dtApi'
 import SlotJugador from '../components/plantel/SlotJugador'
 import JugadorModal from '../components/jugador/JugadorModal'
@@ -98,18 +98,26 @@ export default function CanchitaPage() {
         Promise.allSettled([
             getPlantel(),
             getJornadaActiva(),
+            getJornadaProxima(), // <-- Agregamos esta llamada
             getJornadas(),
-        ]).then(([plantelRes, jornadaRes, jornadasRes]) => {
+        ]).then(([plantelRes, activaRes, proximaRes, jornadasRes]) => {
             if (plantelRes.status === 'fulfilled' && plantelRes.value) {
                 setPlantel(plantelRes.value)
                 setJugadores(plantelRes.value.jugadores ?? [])
             }
-            if (jornadaRes.status === 'fulfilled' && jornadaRes.value) {
-                setJornadaEstado(jornadaRes.value.estado)
-                setJornadaActiva(jornadaRes.value)
+            
+            // Lógica inteligente: Si no hay activa, usamos la próxima
+            const jornadaActualData = (activaRes.status === 'fulfilled' && activaRes.value)
+                ? activaRes.value
+                : (proximaRes.status === 'fulfilled' ? proximaRes.value : null);
+
+            if (jornadaActualData) {
+                setJornadaEstado(jornadaActualData.estado)
+                setJornadaActiva(jornadaActualData)
             }
+
             if (jornadasRes.status === 'fulfilled') {
-                const jActivaId = jornadaRes.value?.id
+                const jActivaId = jornadaActualData?.id
                 const anterior = jornadasRes.value
                     .filter(j => j.estado === 'FINALIZADA' && j.id !== jActivaId)
                     .sort((a, b) => b.numero - a.numero)[0]
