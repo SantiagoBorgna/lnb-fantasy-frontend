@@ -51,7 +51,7 @@ export default function TorneoDetallePage() {
         // 1. Primero buscamos el torneo (por ID o por Código)
         const fetchTorneo = codigo 
             ? getTorneoPorCodigo(codigo) 
-            : getTorneo(Number(torneoId));
+            : getTorneo(torneo.id);
 
         fetchTorneo.then(torneoData => {
             setTorneo(torneoData)
@@ -122,11 +122,11 @@ export default function TorneoDetallePage() {
     const handleGuardarAjustes = async () => {
         setGuardandoAjustes(true)
         try {
-            const actualizado = await editarTorneo(torneo.id), {
+            const actualizado = await editarTorneo(torneo.id, {
                 nombre: ajustesNombre,
                 descripcion: ajustesDesc,
                 tipo: ajustesTipo,
-            }
+            })
             setTorneo(actualizado)
             setModalAjustes(false)
         } catch (e) {
