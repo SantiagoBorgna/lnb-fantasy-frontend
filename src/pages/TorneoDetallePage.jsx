@@ -112,7 +112,7 @@ export default function TorneoDetallePage() {
 
     const handleSalir = async () => {
         try {
-            await salirDeTorneo(Number(torneoId))
+            await salirDeTorneo(torneo.id)
             navigate('/torneos', { replace: true })
         } catch (e) {
             alert(e.response?.data?.mensaje ?? 'No pudiste salir del torneo.')
@@ -122,11 +122,11 @@ export default function TorneoDetallePage() {
     const handleGuardarAjustes = async () => {
         setGuardandoAjustes(true)
         try {
-            const actualizado = await editarTorneo(Number(torneoId), {
+            const actualizado = await editarTorneo(torneo.id), {
                 nombre: ajustesNombre,
                 descripcion: ajustesDesc,
                 tipo: ajustesTipo,
-            })
+            }
             setTorneo(actualizado)
             setModalAjustes(false)
         } catch (e) {
@@ -144,10 +144,10 @@ export default function TorneoDetallePage() {
     const confirmarExpulsion = async () => {
         if (!jugadorAExpulsar) return
         try {
-            await expulsarParticipante(Number(torneoId), jugadorAExpulsar.equipoVirtualId)
+            await expulsarParticipante(torneo.id, jugadorAExpulsar.equipoVirtualId)
 
             // Recargamos la tabla
-            const tabla = await getTablaTorneo(Number(torneoId))
+            const tabla = await getTablaTorneo(torneo.id)
             setTablaGeneral(tabla)
 
             setTorneo(prev => ({
@@ -289,7 +289,7 @@ export default function TorneoDetallePage() {
                             await unirseTorneo(codigo)
 
                             // Recargar la tabla si tuvo éxito
-                            const tabla = await getTablaTorneo(Number(torneoId))
+                            const tabla = await getTablaTorneo(torneo.id);
                             setTablaGeneral(tabla)
                         } catch (e) {
                             alert(e.response?.data?.mensaje ?? e.message ?? 'No se pudo unir al torneo.')
