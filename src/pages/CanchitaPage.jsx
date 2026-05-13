@@ -426,9 +426,43 @@ export default function CanchitaPage() {
 
     // ── Render ───────────────────────────────────────────────────────────────
     if (loading) return <LoadingSpinner mensaje="Cargando tu plantel..." />
-    if (!plantelActual) return (
-        <EmptyState titulo="Sin plantel" descripcion="Todavía no armaste tu equipo." accion={{ label: 'Ir al Mercado', onClick: () => navigate('/mercado') }} />
-    )
+
+    // 1. Extraemos los Tabs a una constante para que no desaparezcan en los estados vacíos
+    const TabsJornada = jornadaAnterior && (
+        <div className="flex bg-surface rounded-xl p-1 border border-border mx-auto mb-2">
+            <button onClick={() => setJornadaVista(null)} className={clsx("flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors", !jornadaVista ? "bg-card shadow text-textMain" : "text-textMuted")}>
+                Jornada Actual
+            </button>
+            <button onClick={() => setJornadaVista(jornadaAnterior.id)} className={clsx("flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors", jornadaVista ? "bg-card shadow text-textMain" : "text-textMuted")}>
+                Última Fecha
+            </button>
+        </div>
+    );
+
+    // 2. Manejamos los estados vacíos de forma inteligente
+    if (!plantelActual) {
+        return (
+            <div className="max-w-md mx-auto w-full px-4 space-y-3 pb-6 min-h-screen pt-4">
+                {TabsJornada}
+                
+                <div className="pt-16">
+                    {jornadaVista !== null ? (
+                        <EmptyState 
+                            titulo="Sin participación" 
+                            descripcion="No jugaste en la jornada anterior." 
+                            // Sin botón de acción
+                        />
+                    ) : (
+                        <EmptyState 
+                            titulo="Sin plantel" 
+                            descripcion="Todavía no armaste tu equipo." 
+                            accion={{ label: 'Ir al Mercado', onClick: () => navigate('/mercado') }} 
+                        />
+                    )}
+                </div>
+            </div>
+        )
+    }
 
     const titulares = getTitularesOrdenados()
     const banco = jugadoresActuales.filter(j => esBanco(j.rol))
@@ -462,16 +496,7 @@ export default function CanchitaPage() {
     return (
         <div className="max-w-md mx-auto w-full px-4 space-y-3 pb-6 min-h-screen pt-4">
 
-            {jornadaAnterior && (
-                <div className="flex bg-surface rounded-xl p-1 border border-border mx-auto mb-2">
-                    <button onClick={() => setJornadaVista(null)} className={clsx("flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors", !jornadaVista ? "bg-card shadow text-textMain" : "text-textMuted")}>
-                        Jornada Actual
-                    </button>
-                    <button onClick={() => setJornadaVista(jornadaAnterior.id)} className={clsx("flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors", jornadaVista ? "bg-card shadow text-textMain" : "text-textMuted")}>
-                        Última Fecha
-                    </button>
-                </div>
-            )}
+            {TabsJornada}
 
             <div className="flex items-center justify-between">
                 <div>
