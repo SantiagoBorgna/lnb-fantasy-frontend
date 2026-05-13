@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { getPlantel, guardarPlantel, getEstadisticasJornada, cambiarDt, realizarTransferencia } from '../api/plantelApi'
-import { getJornadaActiva, getJornadas } from '../api/jornadaApi'
+import { getJornadaActiva, getJornadas, getPartidosJornada } from '../api/jornadaApi'
 import { getDts } from '../api/dtApi'
 import SlotJugador from '../components/plantel/SlotJugador'
 import JugadorModal from '../components/jugador/JugadorModal'
@@ -53,6 +53,8 @@ export default function CanchitaPage() {
 
     const { pendienteEntrada, cancelarEntrada } = useTransferenciaStore()
     const { abierto, abrir, cerrar } = useAyuda('canchita')
+
+    const [partidosFixture, setPartidosFixture] = useState([])
 
     const handleTransferenciaDesdeEntrada = async (jugadorSale) => {
         if (!pendienteEntrada) return
@@ -129,6 +131,8 @@ export default function CanchitaPage() {
     useEffect(() => {
         const jid = jornadaVista ?? jornadaActiva?.id
         if (!jid) return
+
+        // Traer estadísticas
         if (jornadaEstado !== 'ABIERTA_A_CAMBIOS' || jornadaVista !== null) {
             getEstadisticasJornada(jid).then(lista => {
                 const mapa = {}
@@ -136,6 +140,12 @@ export default function CanchitaPage() {
                 setEstadisticas(mapa)
             }).catch(() => { })
         }
+
+        // Traer el fixture de esta jornada
+        getPartidosJornada(jid)
+            .then(setPartidosFixture)
+            .catch(() => setPartidosFixture([]))
+            
     }, [jornadaVista, jornadaActiva, jornadaEstado])
 
     useEffect(() => {
@@ -691,6 +701,52 @@ export default function CanchitaPage() {
                     )}
                 </div>
             </div>
+
+            {/* ── Fixture de la Jornada ── */}
+            {partidosFixture.length > 0 && (
+                <div className="mt-8 mb-6">
+                    <h2 className="text-textMuted text-xs font-semibold uppercase tracking-wider mb-4 pl-2 text-center">
+                        Fixture de la Jornada {jornadaVista ? jornadaAnterior?.numero : (plantelActual.jornadaNumero ?? '')}
+                    </h2>
+                    <div className="space-y-2">
+                        {partidosFixture.map(partido => {
+                            const fecha = new Date(partido.fechaHora)
+                            const diaStr = fecha.toLocaleDateString('es-AR', { weekday: 'short', day: '2-digit', month: '2-digit' }).replace(',', '')
+                            const horaStr = fecha.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
+                            
+                            const terminado = partido.estado === 'FINALIZADO' || partido.estado === 'PROCESADO'
+
+                            return (
+                                <div key={partido.id} className="bg-surface border border-border rounded-xl p-3 flex flex-col gap-2">
+                                    <div className="flex justify-between items-center text-[10px] font-bold text-textMuted uppercase tracking-wider">
+                                        <span>{diaStr} - {horaStr} hs</span>
+                                        <span className={terminado ? 'text-accent' : 'text-primary'}>
+                                            {terminado ? 'Finalizado' : 'Programado'}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center justify-between mt-1">
+                                        <div className="flex-1 flex justify-end gap-3 items-center">
+                                            <span className="text-sm font-semibold text-textMain">{partido.siglaLocal}</span>
+                                        </div>
+                                        <div className="w-16 text-center shrink-0">
+                                            {terminado ? (
+                                                <span className="text-sm font-black text-accent tracking-widest">
+                                                    {partido.puntosLocal} - {partido.puntosVisitante}
+                                                </span>
+                                            ) : (
+                                                <span className="text-xs font-bold text-textMuted px-2 py-1 bg-card rounded-md">VS</span>
+                                            )}
+                                        </div>
+                                        <div className="flex-1 flex justify-start gap-3 items-center">
+                                            <span className="text-sm font-semibold text-textMain">{partido.siglaVisitante}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            )
+                        })}
+                    </div>
+                </div>
+            )}
 
             {error && <div className="bg-red-900/40 border border-red-700 text-red-400 rounded-2xl px-4 py-3 text-sm text-center">{error}</div>}
 

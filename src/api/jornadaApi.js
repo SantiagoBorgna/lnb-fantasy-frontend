@@ -8,3 +8,8 @@ export const getJornadaProxima = () =>
 
 export const getJornadas = () =>
     axiosClient.get('/jornadas').then(r => r.data)
+
+export const getPartidosJornada = async (jornadaId) => {
+    const res = await api.get(`/jornadas/${jornadaId}/partidos`)
+    return res.data
+}
