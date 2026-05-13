@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 
 import LoginPage from '../pages/LoginPage'
@@ -17,7 +17,14 @@ import TorneoDetallePage from '../pages/TorneoDetallePage'
 
 function PrivateRoute({ children }) {
     const token = useAuthStore(state => state.token)
-    return token ? children : <Navigate to="/login" replace />
+    const location = useLocation()
+
+    if (!token) {
+        // Guardamos la URL en la "memoria" antes de patearlo al login
+        localStorage.setItem('redirectUrl', location.pathname + location.search)
+        return <Navigate to="/login" replace />
+    }
+    return children
 }
 
 /**
@@ -77,6 +84,7 @@ export default function AppRouter() {
                     <Route path="mercado" element={<MercadoPage />} />
                     <Route path="torneos" element={<TorneosPage />} />
                     <Route path="torneos/:torneoId" element={<TorneoDetallePage />} />
+                    <Route path="torneos/unirse/:codigo" element={<TorneoDetallePage />} />
                     <Route path="lideres" element={<LideresPage />} />
                 </Route>
 

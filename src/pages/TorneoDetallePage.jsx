@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
-import { getTorneo, getTablaTorneo, salirDeTorneo, unirseTorneo, editarTorneo, expulsarParticipante } from '../api/torneoApi'
+import { getTorneo, getTorneoPorCodigo, getTablaTorneo, salirDeTorneo, unirseTorneo, editarTorneo, expulsarParticipante } from '../api/torneoApi'
 import { getRankingJornada } from '../api/rankingApi'
 import { getJornadas } from '../api/jornadaApi'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
@@ -9,8 +9,8 @@ import { createPortal } from 'react-dom'
 import clsx from 'clsx'
 
 export default function TorneoDetallePage() {
-    const { torneoId } = useParams()
-    const navigate = useNavigate() // <-- Vuelve a la normalidad
+    const { torneoId, codigo } = useParams()
+    const navigate = useNavigate()
     const usuario = useAuthStore(state => state.usuario)
 
     const [torneo, setTorneo] = useState(null)
@@ -46,22 +46,39 @@ export default function TorneoDetallePage() {
     }
 
     useEffect(() => {
-        Promise.allSettled([
-            getTorneo(Number(torneoId)),
-            getTablaTorneo(Number(torneoId)),
-            getJornadas(),
-        ]).then(([torneoRes, tablaRes, jornadasRes]) => {
-            if (torneoRes.status === 'fulfilled') setTorneo(torneoRes.value)
-            if (tablaRes.status === 'fulfilled') setTablaGeneral(tablaRes.value)
-            if (jornadasRes.status === 'fulfilled') {
-                const finalizadas = jornadasRes.value
-                    .filter(j => j.estado === 'FINALIZADA')
-                    .sort((a, b) => b.numero - a.numero)
-                setJornadas(finalizadas)
-                if (finalizadas.length > 0) setJornadaSel(finalizadas[0].id)
-            }
-        }).finally(() => setLoading(false))
-    }, [torneoId])
+        setLoading(true)
+        
+        // 1. Primero buscamos el torneo (por ID o por Código)
+        const fetchTorneo = codigo 
+            ? getTorneoPorCodigo(codigo) 
+            : getTorneo(Number(torneoId));
+
+        fetchTorneo.then(torneoData => {
+            setTorneo(torneoData)
+            
+            // 2. Una vez que tenemos el torneo, ya sabemos su ID. 
+            // Ahora sí buscamos la tabla y las jornadas.
+            Promise.allSettled([
+                getTablaTorneo(torneoData.id),
+                getJornadas()
+            ]).then(([tablaRes, jornadasRes]) => {
+                if (tablaRes.status === 'fulfilled') setTablaGeneral(tablaRes.value)
+                if (jornadasRes.status === 'fulfilled') {
+                    const finalizadas = jornadasRes.value
+                        .filter(j => j.estado === 'FINALIZADA')
+                        .sort((a, b) => b.numero - a.numero)
+                    setJornadas(finalizadas)
+                    if (finalizadas.length > 0) setJornadaSel(finalizadas[0].id)
+                }
+                setLoading(false)
+            })
+        }).catch((e) => {
+            console.error(e)
+            setLoading(false)
+            // Si el link es inválido, lo pateamos a la lista de torneos
+            navigate('/torneos', { replace: true }) 
+        })
+    }, [torneoId, codigo, navigate])
 
     // Cargar ranking de jornada cuando cambia el selector
     useEffect(() => {

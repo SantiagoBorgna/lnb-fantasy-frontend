@@ -3,16 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { getMe } from '../api/authApi'
 
-/**
- * El backend redirige aquí tras el login exitoso:
- * http://localhost:5173/auth/callback#token=eyJ...
- *
- * Esta página:
- * 1. Lee el token del fragment (#) de la URL
- * 2. Llama a /api/auth/me para obtener los datos del usuario
- * 3. Guarda token + usuario en el store de Zustand
- * 4. Redirige al Dashboard
- */
 export default function AuthCallbackPage() {
     const setAuth = useAuthStore(state => state.setAuth)
     const navigate = useNavigate()
@@ -35,14 +25,17 @@ export default function AuthCallbackPage() {
         getMe()
             .then(usuario => {
                 setAuth(token, usuario)
-                navigate('/', { replace: true })
+                
+                const redirectTarget = localStorage.getItem('redirectUrl') || '/';
+                localStorage.removeItem('redirectUrl'); // Limpiamos la memoria
+                navigate(redirectTarget, { replace: true });
             })
             .catch(() => {
                 // Token inválido o expirado
                 setAuth(null, null)
                 navigate('/login', { replace: true })
             })
-    }, [])
+    }, [navigate, setAuth])
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-surface">

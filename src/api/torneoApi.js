@@ -27,3 +27,8 @@ export const editarTorneo = (torneoId, body) =>
 export const expulsarParticipante = (torneoId, equipoVirtualId) =>
     axiosClient.delete(`/torneos/${torneoId}/participantes/${equipoVirtualId}`)
         .then(r => r.data)
+
+export const getTorneoPorCodigo = async (codigo) => {
+    const res = await axiosClient.get(`/torneos/codigo/${codigo}`)
+    return res.data
+}
