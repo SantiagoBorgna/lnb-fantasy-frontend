@@ -51,7 +51,7 @@ export default function TorneoDetallePage() {
         // 1. Primero buscamos el torneo (por ID o por Código)
         const fetchTorneo = codigo 
             ? getTorneoPorCodigo(codigo) 
-            : getTorneo(torneo.id);
+            : getTorneo(Number(torneoId));
 
         fetchTorneo.then(torneoData => {
             setTorneo(torneoData)
