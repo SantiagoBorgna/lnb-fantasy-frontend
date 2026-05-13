@@ -254,7 +254,8 @@ export default function CanchitaPage() {
     }
 
     // ── Funciones Core ───────────────────────────────────────────────────────
-    const modoLectura = jornadaEstado !== 'ABIERTA_A_CAMBIOS' || jornadaVista !== null
+    const esPlantelAdelantado = plantel && jornadaActiva && plantel.jornadaNumero > jornadaActiva.numero;
+    const modoLectura = (jornadaEstado !== 'ABIERTA_A_CAMBIOS' && !esPlantelAdelantado) || jornadaVista !== null;
     const plantelActual = jornadaVista !== null ? plantelVista : plantel
     const jugadoresActuales = jornadaVista !== null ? (plantelVista?.jugadores ?? []) : jugadores
 
@@ -543,9 +544,22 @@ export default function CanchitaPage() {
                 <BotonAyuda onClick={abrir} />
             </div>
 
-            {modoLectura && (
-                <div className={clsx('rounded-2xl px-4 py-2.5 text-sm font-semibold text-center mt-2', jornadaEstado === 'EN_JUEGO' && !jornadaVista ? 'bg-red-900/30 border border-red-700/50 text-red-400' : 'bg-surface border border-border text-textMuted')}>
-                    {jornadaEstado === 'EN_JUEGO' && !jornadaVista ? '🔴 Jornada en juego — no se permiten cambios' : `📋 Jornada ${jornadaAnterior?.numero ?? ''}`}
+            {/* ── Banners de estado de la jornada ── */}
+            {modoLectura && jornadaVista === null && (
+                <div className="rounded-2xl px-4 py-2.5 text-sm font-semibold text-center mt-2 bg-red-900/30 border border-red-700/50 text-red-400">
+                    🔴 Jornada en juego — no se permiten cambios
+                </div>
+            )}
+
+            {modoLectura && jornadaVista !== null && (
+                <div className="rounded-2xl px-4 py-2.5 text-sm font-semibold text-center mt-2 bg-surface border border-border text-textMuted">
+                    📋 Mostrando estadísticas de la Jornada {jornadaAnterior?.numero ?? ''}
+                </div>
+            )}
+
+            {!modoLectura && esPlantelAdelantado && jornadaVista === null && (
+                <div className="rounded-2xl px-4 py-2.5 text-sm font-semibold text-center mt-2 bg-green-900/30 border border-green-700/50 text-green-400">
+                    🟢 Mercado abierto para tu debut (Jornada {plantel.jornadaNumero})
                 </div>
             )}
 

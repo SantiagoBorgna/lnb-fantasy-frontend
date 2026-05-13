@@ -201,13 +201,13 @@ export default function DashboardPage() {
                 ) : (
                     <div className="text-center py-4 space-y-3">
                         <p className="text-textMuted text-sm">
-                            Todavía no armaste tu equipo para esta jornada.
+                            Comenzarás a jugar en la siguiente jornada.
                         </p>
                         <button
-                            onClick={() => navigate('/mercado')}
+                            onClick={() => navigate('/canchita')}
                             className="btn-accent w-full"
                         >
-                            Ir al Mercado
+                            Ver Equipo
                         </button>
                     </div>
                 )}
