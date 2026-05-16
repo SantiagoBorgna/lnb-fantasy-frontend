@@ -160,15 +160,7 @@ export default function MercadoPage() {
     )
 
     useEffect(() => {
-        setLoading(true)
-        fetchYFiltrar({ posicion: posicion ?? undefined })
-            .then(setJugadores)
-            .catch(console.error)
-            .finally(() => setLoading(false))
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [posicion])
-
-    useEffect(() => {
+        // Si la barra de búsqueda está vacía, disparamos la petición directo sin esperar
         if (busqueda.trim() === '') {
             setLoading(true)
             fetchYFiltrar({ posicion: posicion ?? undefined })
@@ -177,8 +169,9 @@ export default function MercadoPage() {
                 .finally(() => setLoading(false))
             return
         }
-        if (busqueda.trim().length < 1) return
 
+        // Si el usuario está escribiendo un nombre, esperamos 400ms (Debounce) 
+        // para no saturar al servidor en cada pulsación de tecla
         const timer = setTimeout(() => {
             setBuscando(true)
             fetchYFiltrar({
@@ -189,6 +182,7 @@ export default function MercadoPage() {
                 .catch(console.error)
                 .finally(() => setBuscando(false))
         }, 400)
+
         return () => clearTimeout(timer)
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [busqueda, posicion])
