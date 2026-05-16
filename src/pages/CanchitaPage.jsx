@@ -105,7 +105,7 @@ export default function CanchitaPage() {
                 setPlantel(plantelRes.value)
                 setJugadores(plantelRes.value.jugadores ?? [])
             }
-            
+
             // Lógica inteligente: Si no hay activa, usamos la próxima
             const jornadaActualData = (activaRes.status === 'fulfilled' && activaRes.value)
                 ? activaRes.value
@@ -153,7 +153,7 @@ export default function CanchitaPage() {
         getPartidosJornada(jid)
             .then(setPartidosFixture)
             .catch(() => setPartidosFixture([]))
-            
+
     }, [jornadaVista, jornadaActiva, jornadaEstado])
 
     useEffect(() => {
@@ -463,19 +463,19 @@ export default function CanchitaPage() {
         return (
             <div className="max-w-md mx-auto w-full px-4 space-y-3 pb-6 min-h-screen pt-4">
                 {TabsJornada}
-                
+
                 <div className="pt-16">
                     {jornadaVista !== null ? (
-                        <EmptyState 
-                            titulo="Sin participación" 
-                            descripcion="No jugaste en la jornada anterior." 
-                            // Sin botón de acción
+                        <EmptyState
+                            titulo="Sin participación"
+                            descripcion="No jugaste en la jornada anterior."
+                        // Sin botón de acción
                         />
                     ) : (
-                        <EmptyState 
-                            titulo="Sin plantel" 
-                            descripcion="Todavía no armaste tu equipo." 
-                            accion={{ label: 'Ir al Mercado', onClick: () => navigate('/mercado') }} 
+                        <EmptyState
+                            titulo="Sin plantel"
+                            descripcion="Todavía no armaste tu equipo."
+                            accion={{ label: 'Ir al Mercado', onClick: () => navigate('/mercado') }}
                         />
                     )}
                 </div>
@@ -712,16 +712,23 @@ export default function CanchitaPage() {
 
             {/* ── Fixture de la Jornada ── */}
             {partidosFixture.length > 0 && (
-                <div className="mt-8 mb-6">
-                    <h2 className="text-textMuted text-xs font-semibold uppercase tracking-wider mb-4 pl-2 text-center">
+                <div className="mt-12 mb-6">
+                    <h2 className="text-textMuted text-sm font-bold uppercase tracking-wider mb-5 pl-2 text-center">
                         Fixture de la Jornada {jornadaVista ? jornadaAnterior?.numero : (plantelActual.jornadaNumero ?? '')}
                     </h2>
                     <div className="space-y-2">
                         {partidosFixture.map(partido => {
+                            // 1. Creamos la fecha base tal cual viene de la DB
                             const fecha = new Date(partido.fechaHora)
+
+                            // 2. Le sumamos las 3 horas de desfasaje de tu servidor
+                            fecha.setHours(fecha.getHours() + 3)
+
                             const diaStr = fecha.toLocaleDateString('es-AR', { weekday: 'short', day: '2-digit', month: '2-digit' }).replace(',', '')
-                            const horaStr = fecha.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
-                            
+
+                            // 3. Forzamos formato 24hs apagando el 'hour12'
+                            const horaStr = fecha.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false })
+
                             const terminado = partido.estado === 'FINALIZADO' || partido.estado === 'PROCESADO'
 
                             return (
