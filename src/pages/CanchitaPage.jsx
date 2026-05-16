@@ -713,7 +713,7 @@ export default function CanchitaPage() {
             {/* ── Fixture de la Jornada ── */}
             {partidosFixture.length > 0 && (
                 <div className="mt-24 mb-6">
-                    <h2 className="text-textMuted text-sm font-bold uppercase tracking-wider mb-5 pl-2 text-center">
+                    <h2 className="text-textMuted text-sm font-bold uppercase tracking-wider mb-5 pl-2 text-center mt-24">
                         Fixture de la Jornada {jornadaVista ? jornadaAnterior?.numero : (plantelActual.jornadaNumero ?? '')}
                     </h2>
                     <div className="space-y-2">
