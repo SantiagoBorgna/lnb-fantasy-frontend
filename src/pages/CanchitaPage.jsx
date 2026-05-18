@@ -39,6 +39,7 @@ export default function CanchitaPage() {
     const [jugadorStats, setJugadorStats] = useState(null)
     const [dtModal, setDtModal] = useState(false)
     const [selectorDtAberto, setSelectorDtAberto] = useState(false)
+    const [dtStatsAbierto, setDtStatsAbierto] = useState(false)
 
     // ── Switch de jornada (Última Fecha) ─────────────────────────────────────
     const [jornadaAnterior, setJornadaAnterior] = useState(null)
@@ -583,8 +584,8 @@ export default function CanchitaPage() {
 
             {plantelActual.dt && (
                 <div
-                    className={clsx("card flex items-center gap-3 py-2", !modoLectura && "cursor-pointer active:scale-95 transition-transform hover:border-primary")}
-                    onClick={() => !modoLectura && setDtModal(true)}
+                    className="card flex items-center gap-3 py-2 cursor-pointer active:scale-95 transition-transform hover:border-primary"
+                    onClick={() => modoLectura ? setDtStatsAbierto(true) : setDtModal(true)}
                 >
                     <div className="w-9 h-9 bg-primary rounded-full flex items-center justify-center text-white font-bold text-xs shrink-0">DT</div>
                     <div className="flex-1 min-w-0">
@@ -593,8 +594,7 @@ export default function CanchitaPage() {
                     </div>
                     {modoLectura && plantelActual?.puntajeDt != null && (
                         <div className="flex flex-col items-end shrink-0">
-                            <span className={`font-black text-lg tabular-nums ${plantelActual.puntajeDt >= 0 ? 'text-accent' : 'text-red-400'
-                                }`}>
+                            <span className={`font-black text-lg tabular-nums ${plantelActual.puntajeDt >= 0 ? 'text-accent' : 'text-red-400'}`}>
                                 {plantelActual.puntajeDt > 0 ? '+' : ''}
                                 {plantelActual.puntajeDt?.toFixed(1)}
                             </span>
@@ -800,6 +800,15 @@ export default function CanchitaPage() {
                 <ListaDtsModal dtActualId={plantel.dt?.dtId} onElegir={handleCambiarDt} onCerrar={() => setSelectorDtAberto(false)} />
             )}
 
+            {dtStatsAbierto && (
+                <DtStatsModal
+                    dt={plantelActual.dt}
+                    puntaje={plantelActual.puntajeDt}
+                    partidos={partidosFixture}
+                    onCerrar={() => setDtStatsAbierto(false)}
+                />
+            )}
+
             <ModalAyuda pagina="canchita" contenido={AYUDA.canchita} onCerrar={cerrar} abierto={abierto} />
         </div>
     )
@@ -871,7 +880,7 @@ function DtOpcionesModal({ dt, onCerrar, onTransferir }) { /* ... código intact
     )
 }
 
-function ListaDtsModal({ dtActualId, onElegir, onCerrar }) { /* ... código intacto ... */
+function ListaDtsModal({ dtActualId, onElegir, onCerrar }) {
     const [dts, setDts] = useState([])
     const [loading, setLoading] = useState(true)
 
@@ -899,6 +908,63 @@ function ListaDtsModal({ dtActualId, onElegir, onCerrar }) { /* ... código inta
                     ))}
                 </div>
                 <div className="shrink-0 pt-2 border-t border-border"><button onClick={onCerrar} className="w-full py-2 text-textMuted text-sm font-medium">Cancelar</button></div>
+            </div>
+        </>,
+        document.body
+    )
+}
+
+function DtStatsModal({ dt, puntaje, partidos, onCerrar }) {
+    if (!dt) return null;
+
+    // Buscamos el partido donde jugó el equipo del DT
+    const partido = partidos.find(p => p.siglaLocal === dt.equipoSigla || p.siglaVisitante === dt.equipoSigla);
+
+    return createPortal(
+        <>
+            <div className="fixed inset-0 bg-black/60 z-40" onClick={onCerrar} />
+            <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-card border-t border-border rounded-t-3xl z-50 p-6 space-y-5 animate-slide-up" onClick={e => e.stopPropagation()}>
+                <div className="w-10 h-1 bg-border rounded-full mx-auto" />
+
+                <div className="text-center space-y-2">
+                    <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center text-white font-bold text-xl mx-auto shadow-md">DT</div>
+                    <h3 className="text-textMain font-bold text-lg">{dt.nombreCompleto}</h3>
+                    <p className="text-textMuted text-sm">{dt.equipoSigla}</p>
+                </div>
+
+                <div className="bg-surface border border-border rounded-2xl p-4 text-center space-y-3">
+                    <p className="text-textMuted text-xs font-bold uppercase tracking-wider">Puntaje de la Jornada</p>
+                    <p className={clsx("font-black text-4xl tabular-nums", puntaje >= 0 ? "text-accent" : "text-red-400")}>
+                        {puntaje > 0 ? '+' : ''}{puntaje?.toFixed(1)} <span className="text-lg font-medium text-textMuted">pts</span>
+                    </p>
+
+                    <div className="pt-4 border-t border-border">
+                        {partido ? (
+                            <div className="space-y-2">
+                                <p className="text-textMuted text-[10px] uppercase tracking-wider mb-2">Resultado del Partido</p>
+                                <div className="flex justify-center items-center gap-4">
+                                    <span className={clsx("font-bold text-sm", partido.siglaLocal === dt.equipoSigla ? "text-textMain" : "text-textMuted")}>
+                                        {partido.siglaLocal}
+                                    </span>
+                                    <span className="font-black text-accent tracking-widest bg-card px-3 py-1.5 rounded-lg border border-border shadow-sm">
+                                        {partido.puntosLocal} - {partido.puntosVisitante}
+                                    </span>
+                                    <span className={clsx("font-bold text-sm", partido.siglaVisitante === dt.equipoSigla ? "text-textMain" : "text-textMuted")}>
+                                        {partido.siglaVisitante}
+                                    </span>
+                                </div>
+                            </div>
+                        ) : (
+                            <p className="text-textMuted text-xs py-2">No se encontró el partido en esta jornada.</p>
+                        )}
+                    </div>
+                </div>
+
+                <div className="pt-2">
+                    <button onClick={onCerrar} className="w-full py-3 bg-surface border border-border rounded-xl text-textMain text-sm font-bold active:scale-95 transition-transform">
+                        Cerrar
+                    </button>
+                </div>
             </div>
         </>,
         document.body
