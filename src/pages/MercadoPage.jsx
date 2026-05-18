@@ -46,6 +46,7 @@ export default function MercadoPage() {
     const [loading, setLoading] = useState(true)
     const [busqueda, setBusqueda] = useState('')
     const [buscando, setBuscando] = useState(false)
+    const [orden, setOrden] = useState('precio_desc')
 
     const [plantelActivo, setPlantelActivo] = useState(null)
     const [idsPlantelActivo, setIdsPlantelActivo] = useState([])
@@ -160,23 +161,22 @@ export default function MercadoPage() {
     )
 
     useEffect(() => {
-        // Si la barra de búsqueda está vacía, disparamos la petición directo sin esperar
         if (busqueda.trim() === '') {
             setLoading(true)
-            fetchYFiltrar({ posicion: posicion ?? undefined })
+            // Agregamos 'orden' a los parámetros
+            fetchYFiltrar({ posicion: posicion ?? undefined, orden })
                 .then(setJugadores)
                 .catch(console.error)
                 .finally(() => setLoading(false))
             return
         }
 
-        // Si el usuario está escribiendo un nombre, esperamos 400ms (Debounce) 
-        // para no saturar al servidor en cada pulsación de tecla
         const timer = setTimeout(() => {
             setBuscando(true)
             fetchYFiltrar({
                 nombre: busqueda.trim(),
-                posicion: posicion ?? undefined
+                posicion: posicion ?? undefined,
+                orden
             })
                 .then(setJugadores)
                 .catch(console.error)
@@ -184,8 +184,7 @@ export default function MercadoPage() {
         }, 400)
 
         return () => clearTimeout(timer)
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [busqueda, posicion])
+    }, [busqueda, posicion, orden])
 
     const limpiarBusqueda = useCallback(() => {
         setBusqueda('')
@@ -342,6 +341,23 @@ export default function MercadoPage() {
                     ))}
                 </div>
             )}
+
+            {/* ── Selector de Orden ── */}
+            <div className="flex justify-end mb-3">
+                <select
+                    value={orden}
+                    onChange={(e) => setOrden(e.target.value)}
+                    className="bg-surface border border-border text-textMuted text-xs rounded-xl pl-3 pr-8 py-2 outline-none focus:border-primary cursor-pointer shadow-sm appearance-none"
+                    style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%23888\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E")', backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.2em 1.2em' }}
+                >
+                    <option value="precio_desc">💰 Precio (Mayor a menor)</option>
+                    <option value="precio_asc">💰 Precio (Menor a mayor)</option>
+                    <option value="promedio_desc">🔥 Promedio Fantasy (Mayor a menor)</option>
+                    <option value="promedio_asc">❄️ Promedio Fantasy (Menor a mayor)</option>
+                    <option value="nombre_asc">🔤 Alfabético (A-Z)</option>
+                </select>
+            </div>
+            {/* ────────────────────────────── */}
 
             {loading || buscando ? (
                 <LoadingSpinner mensaje="Buscando jugadores..." />
