@@ -350,10 +350,10 @@ export default function MercadoPage() {
                     className="bg-surface border border-border text-textMuted text-xs rounded-xl pl-3 pr-8 py-2 outline-none focus:border-primary cursor-pointer shadow-sm appearance-none"
                     style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%23888\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E")', backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.2em 1.2em' }}
                 >
-                    <option value="precio_desc">💰 Precio (Mayor a menor)</option>
-                    <option value="precio_asc">💰 Precio (Menor a mayor)</option>
-                    <option value="promedio_desc">🔥 Promedio Fantasy (Mayor a menor)</option>
-                    <option value="promedio_asc">❄️ Promedio Fantasy (Menor a mayor)</option>
+                    <option value="precio_desc">💰 Precio Descendiente</option>
+                    <option value="precio_asc">💰 Precio Ascendente</option>
+                    <option value="promedio_desc">🔥 Promedio Fantasy Descendiente</option>
+                    <option value="promedio_asc">❄️ Promedio Fantasy Ascendente</option>
                     <option value="nombre_asc">🔤 Alfabético (A-Z)</option>
                 </select>
             </div>
