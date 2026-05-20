@@ -4,6 +4,8 @@ import BottomNav from './BottomNav'
 import { useAuthStore } from '../../store/authStore'
 import { getMe, logout } from '../../api/authApi'
 import { createPortal } from 'react-dom'
+// 1. Importamos el componente nuevo
+import NotificacionesPrompt from './NotificacionesPrompt' 
 
 export default function AppShell() {
     const { token, setAuth, logout: logoutStore } = useAuthStore()
@@ -30,7 +32,12 @@ export default function AppShell() {
             <main className="flex-1 overflow-y-auto pb-20 px-4 pt-4">
                 <Outlet />
             </main>
+            
             <BottomNav onLogout={() => setModalLogout(true)} />
+            
+            {/* 2. Lo inyectamos acá, como tiene 'fixed' flotará sobre todo */}
+            <NotificacionesPrompt />
+
             {modalLogout && createPortal(
                 <>
                     <div

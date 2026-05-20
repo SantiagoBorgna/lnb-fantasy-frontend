@@ -10,6 +10,7 @@ export default defineConfig({
       includeAssets: ['icons/*.png', 'screenshots/*.png'],
       manifest: false,  // Usamos nuestro manifest.json manual
       workbox: {
+        importScripts: ['/push-sw.js'],
         // Cachear assets estáticos
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
 
