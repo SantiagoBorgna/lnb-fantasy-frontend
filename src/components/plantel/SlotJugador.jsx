@@ -11,6 +11,7 @@ export default function SlotJugador({
     onDragStart,
     onDragOver,
     onDrop,
+    readonly = false, // <-- Prop de solo lectura
 }) {
     const esCap = jugador.rol === 'CAPITAN'
 
@@ -43,7 +44,7 @@ export default function SlotJugador({
 
     return (
         <div
-            draggable
+            draggable={!readonly}
             onDragStart={handleDragStart}
             onDragOver={(e) => { e.preventDefault(); onDragOver?.() }}
             onDrop={(e) => { e.preventDefault(); onDrop?.() }}

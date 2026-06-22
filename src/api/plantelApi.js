@@ -17,3 +17,9 @@ export const getEstadisticasJornada = (jornadaId) =>
 
 export const getPlantelJornada = (jornadaId) =>
     axiosClient.get(`/plantel/jornada/${jornadaId}`).then(r => r.data)
+
+export const getPlantelAjeno = (equipoVirtualId, jornadaId) =>
+    axiosClient.get(`/plantel/equipo/${equipoVirtualId}/jornada/${jornadaId}`).then(r => r.data)
+
+export const getEstadisticasAjenas = (equipoVirtualId, jornadaId) =>
+    axiosClient.get(`/plantel/equipo/${equipoVirtualId}/estadisticas/${jornadaId}`).then(r => r.data)

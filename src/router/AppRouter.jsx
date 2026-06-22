@@ -13,6 +13,7 @@ import TorneosPage from '../pages/TorneosPage'
 import LideresPage from '../pages/LideresPage'
 import AppShell from '../components/ui/AppShell'
 import TorneoDetallePage from '../pages/TorneoDetallePage'
+import CanchitaAjenaPage from '../pages/CanchitaAjenaPage'
 
 
 function PrivateRoute({ children }) {
@@ -84,6 +85,7 @@ export default function AppRouter() {
                     <Route path="mercado" element={<MercadoPage />} />
                     <Route path="torneos" element={<TorneosPage />} />
                     <Route path="torneos/:torneoId" element={<TorneoDetallePage />} />
+                    <Route path="torneos/:torneoId/equipo/:equipoVirtualId/jornada/:jornadaId" element={<CanchitaAjenaPage />} />
                     <Route path="torneos/unirse/:codigo" element={<TorneoDetallePage />} />
                     <Route path="lideres" element={<LideresPage />} />
                 </Route>

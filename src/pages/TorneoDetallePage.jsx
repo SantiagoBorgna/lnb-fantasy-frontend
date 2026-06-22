@@ -380,12 +380,22 @@ export default function TorneoDetallePage() {
                         Sin resultados.
                     </p>
                 ) : (
-                    tablaFiltrada.map(fila => (
+                    tablaFiltrada.map(fila => {
+                        const esMiEquipo = fila.nombreUsuario === usuario?.nombreDisplay;
+                        const esClickeable = jornadaSel != null && !esMiEquipo;
+                        
+                        return (
                         <div
                             key={fila.equipoVirtualId}
+                            onClick={() => {
+                                if (esClickeable) {
+                                    navigate(`/torneos/${torneo.id}/equipo/${fila.equipoVirtualId}/jornada/${jornadaSel}`);
+                                }
+                            }}
                             className={clsx(
                                 'flex items-center gap-3 p-3 rounded-2xl border',
-                                fila.nombreUsuario === usuario?.nombreDisplay
+                                esClickeable ? 'cursor-pointer hover:border-primary/50 transition-colors' : '',
+                                esMiEquipo
                                     ? 'bg-primary/15 border-primary/40'
                                     : 'bg-card border-border'
                             )}
@@ -400,10 +410,10 @@ export default function TorneoDetallePage() {
                                 </p>
                             </div>
                             <span className="text-accent font-black text-base tabular-nums shrink-0">
-                                {fila.puntajeGlobal?.toFixed(1)}
+                                {fila.puntajeGlobal !== undefined ? fila.puntajeGlobal.toFixed(1) : (fila.puntos !== undefined ? fila.puntos.toFixed(1) : '0.0')}
                             </span>
                         </div>
-                    ))
+                    )})
                 )}
             </div>
 
