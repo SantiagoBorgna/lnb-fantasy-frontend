@@ -5,8 +5,8 @@ self.addEventListener('push', function (event) {
         
         const options = {
             body: data.body,
-            icon: '/logo.png', // ¡Usamos el logo que configuraste recién!
-            badge: '/logo.png',
+            icon: '/icons/icon-192.png', // Usamos el ícono optimizado (el logo grande puede hacer fallar Chrome)
+            badge: '/icons/icon-192.png',
             vibrate: [200, 100, 200, 100, 200, 100, 200], // Vibración copada
             data: { url: '/canchita' } // A dónde ir si tocan la notificación
         };
