@@ -107,6 +107,22 @@ export default function MercadoPage() {
         ? (plantelActivo?.presupuestoRestante || 0) + (transferenciaPendiente?.valorSale || 0)
         : (100.0 - presupuestoGastadoDraft); // 100 cr iniciales para el Onboarding
 
+    const limitesEquipo = useMemo(() => {
+        const counts = {}
+        const jugadoresAContar = (modoAsignacion && !plantelActivo) 
+            ? jugadoresDraft.filter(Boolean).map(j => j.jugador || j) 
+            : (plantelActivo?.jugadores || []).map(j => ({ equipoSigla: j.equipoSigla, id: String(j.jugadorRealId || j.id) }))
+
+        jugadoresAContar.forEach(j => {
+            if (modoTransferencia && String(transferenciaPendiente?.jugadorSaleId) === String(j.id || j.jugadorRealId)) {
+                return // Excluimos al que sale
+            }
+            if (!j.equipoSigla) return
+            counts[j.equipoSigla] = (counts[j.equipoSigla] || 0) + 1
+        })
+        return counts
+    }, [modoAsignacion, plantelActivo, jugadoresDraft, modoTransferencia, transferenciaPendiente])
+
     const idsElegidosDraft = jugadoresDraft
         .map(j => {
             if (!j) return null
@@ -375,6 +391,7 @@ export default function MercadoPage() {
                             presupuestoMaximo={poderDeCompra}
                             modoTransferencia={modoTransferencia}
                             modoAsignacion={modoAsignacion}
+                            limitesEquipo={limitesEquipo}
                             onElegir={
                                 modoAsignacion
                                     ? (j) => {
@@ -470,19 +487,28 @@ export default function MercadoPage() {
                         )}
 
                         {/* Botón transferir */}
-                        <button
-                            onClick={() => {
-                                setModalJugador(null)
-                                setStatsModal(null)
-                                // Iniciar flujo de transferencia inverso
-                                iniciarTransferenciaDesdeEntrada(modalJugador)
-                            }}
-                            className="w-full py-3 rounded-xl font-semibold
-                           border border-primary text-primary
-                           active:scale-95 transition-transform"
-                        >
-                            Transferir al equipo
-                        </button>
+                        {(() => {
+                            const superaLimiteModal = limitesEquipo[modalJugador?.equipoSigla] >= 2;
+                            return (
+                                <button
+                                    onClick={() => {
+                                        if (superaLimiteModal) return;
+                                        setModalJugador(null)
+                                        setStatsModal(null)
+                                        iniciarTransferenciaDesdeEntrada(modalJugador)
+                                    }}
+                                    disabled={superaLimiteModal}
+                                    className={clsx(
+                                        "w-full py-3 rounded-xl font-semibold border transition-transform",
+                                        superaLimiteModal 
+                                            ? "border-red-500/50 text-red-400 bg-red-950/30 opacity-50 cursor-not-allowed" 
+                                            : "border-primary text-primary active:scale-95"
+                                    )}
+                                >
+                                    {superaLimiteModal ? "Límite de equipo alcanzado" : "Transferir al equipo"}
+                                </button>
+                            );
+                        })()}
 
                         <button
                             onClick={() => { setModalJugador(null); setStatsModal(null) }}
@@ -504,19 +530,22 @@ export default function MercadoPage() {
     )
 }
 
-function TarjetaJugador({ jugador, onElegir, presupuestoMaximo, modoTransferencia, modoAsignacion }) {
+function TarjetaJugador({ jugador, onElegir, presupuestoMaximo, modoTransferencia, modoAsignacion, limitesEquipo }) {
     const estado = ESTADO_CONFIG[jugador.estado] ?? ESTADO_CONFIG.DISPONIBLE
 
     // Bloqueamos si supera el presupuesto tanto armando el equipo como haciendo un cambio
     const superaPresupuesto = (modoTransferencia || modoAsignacion) && (jugador.valorMercadoActual > presupuestoMaximo);
+    
+    const superaLimiteEquipo = (modoTransferencia || modoAsignacion) && (limitesEquipo?.[jugador.equipoSigla] >= 2);
+    const estaBloqueado = superaPresupuesto || superaLimiteEquipo;
 
     return (
         <div
             className={clsx(
                 "card flex items-center gap-3 transition-transform",
-                superaPresupuesto ? "opacity-50 grayscale" : "cursor-pointer active:scale-95 hover:border-primary/50"
+                estaBloqueado ? "opacity-50 grayscale" : "cursor-pointer active:scale-95 hover:border-primary/50"
             )}
-            onClick={() => !superaPresupuesto && onElegir ? onElegir(jugador) : null}
+            onClick={() => !estaBloqueado && onElegir ? onElegir(jugador) : null}
         >
             <div className="shrink-0">
                 <CamisetaSVG
@@ -548,12 +577,15 @@ function TarjetaJugador({ jugador, onElegir, presupuestoMaximo, modoTransferenci
                 )}
             </div>
             <div className="shrink-0 text-right flex flex-col items-end">
-                <p className={clsx("font-bold text-base", superaPresupuesto ? "text-red-400 line-through" : "text-textMain")}>
+                <p className={clsx("font-bold text-base", estaBloqueado ? "text-red-400 line-through" : "text-textMain")}>
                     {jugador.valorMercadoActual?.toFixed(1)}
                 </p>
                 <p className="text-textMuted text-xs">créditos</p>
                 {superaPresupuesto && (
                     <span className="text-[10px] text-red-400 font-bold mt-1 bg-red-950/50 px-2 py-0.5 rounded">Muy caro</span>
+                )}
+                {superaLimiteEquipo && (
+                    <span className="text-[10px] text-red-400 font-bold mt-1 bg-red-950/50 px-2 py-0.5 rounded">Cupo lleno</span>
                 )}
             </div>
         </div>

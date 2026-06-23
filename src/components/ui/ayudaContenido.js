@@ -5,7 +5,7 @@ export const AYUDA = {
             {
                 icono: '📅',
                 titulo: 'Jornadas',
-                texto: 'Cada jornada dura 3-4 días. El countdown te muestra cuánto tiempo tenés para hacer cambios antes de que empiece.',
+                texto: 'Cada jornada dura 3-4 días. La cuenta regresiva te muestra cuánto tiempo tenés para hacer cambios antes de que empiece.',
             },
             {
                 icono: '📊',
@@ -14,8 +14,8 @@ export const AYUDA = {
             },
             {
                 icono: '💰',
-                titulo: 'Presupuesto',
-                texto: 'Tenés 100 créditos para armar tu equipo. El precio de los jugadores varía según su rendimiento.',
+                titulo: 'Armado del Equipo',
+                texto: 'Tenés 100 créditos para fichar 10 jugadores. Podés elegir un máximo de 2 jugadores por cada club.',
             },
         ],
     },
@@ -41,7 +41,7 @@ export const AYUDA = {
             {
                 icono: '🔄',
                 titulo: 'Transferencias',
-                texto: 'Tenés 3 transferencias por jornada. Cambiar el DT también consume una transferencia.',
+                texto: 'Tenés 3 transferencias por jornada. El DT consume una. Límite: 2 jugadores del mismo club por equipo.',
             },
         ],
     },
@@ -94,7 +94,7 @@ export const AYUDA = {
             {
                 icono: '🏀',
                 titulo: 'Estadísticas reales',
-                texto: 'Los líderes muestran los jugadores de la LNB con mejores promedios en cada categoría estadística.',
+                texto: 'Los líderes muestran los jugadores de la LNB con mejores promedios en cada estadística.',
             },
             {
                 icono: '👆',

@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom'
 const REGLAS = [
     {
         icono: '💰',
-        titulo: 'Presupuesto',
-        texto: 'Tenés 100 créditos para armar tu equipo de 10 jugadores y 1 DT.',
+        titulo: 'Presupuesto Inicial',
+        texto: 'Tenés 100 créditos para armar tu equipo de 10 jugadores y 1 DT, con un máximo de 2 jugadores por club.',
     },
     {
         icono: '📊',
@@ -13,8 +13,8 @@ const REGLAS = [
     },
     {
         icono: '👑',
-        titulo: 'Capitán',
-        texto: 'El capitán suma x1.5. Elegí bien — puede marcar la diferencia.',
+        titulo: 'El Capitán',
+        texto: 'El capitán suma x1.5. Elegí bien, puede marcar la diferencia.',
     },
     {
         icono: '🔄',
