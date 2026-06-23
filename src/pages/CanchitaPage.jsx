@@ -20,6 +20,7 @@ import { useAyuda } from '../hooks/useAyuda'
 import ModalAyuda from '../components/ui/ModalAyuda'
 import BotonAyuda from '../components/ui/BotonAyuda'
 import { AYUDA } from '../components/ui/ayudaContenido'
+import MercadoPanel from '../components/mercado/MercadoPanel'
 
 export default function CanchitaPage() {
     const navigate = useNavigate()
@@ -441,7 +442,9 @@ export default function CanchitaPage() {
             nombreSale: jugador.nombreCompleto,
             valorSale: jugador.valorMercadoActual
         })
-        navigate('/mercado')
+        if (window.innerWidth < 768) {
+            navigate('/mercado')
+        }
     }
 
     // ── Render ───────────────────────────────────────────────────────────────
@@ -476,7 +479,7 @@ export default function CanchitaPage() {
                         <EmptyState
                             titulo="Sin plantel"
                             descripcion="Todavía no armaste tu equipo."
-                            accion={{ label: 'Ir al Mercado', onClick: () => navigate('/mercado') }}
+                            accion={{ label: 'Ir al Mercado', onClick: () => { if (window.innerWidth < 768) navigate('/mercado') } }}
                         />
                     )}
                 </div>
@@ -488,8 +491,7 @@ export default function CanchitaPage() {
     const banco = jugadoresActuales.filter(j => esBanco(j.rol))
     const sexto = banco.find(j => j.rol === 'SEXTO_HOMBRE')
     const suplentes = banco.filter(j => j.rol === 'SUPLENTE')
-    const bancofila1 = [sexto, ...suplentes.slice(0, 2)].filter(Boolean)
-    const bancofila2 = suplentes.slice(2, 4)
+    const bancoCompleto = [sexto, ...suplentes].filter(Boolean)
 
     const filas = []
     let cursor = 0
@@ -514,15 +516,14 @@ export default function CanchitaPage() {
     }
 
     return (
-        <div className="max-w-md md:max-w-none mx-auto w-full px-4 space-y-3 pb-6 min-h-screen pt-4">
-
-            {TabsJornada}
+        <div className="max-w-md md:max-w-none mx-auto w-full px-4 space-y-3 pb-6 min-h-screen pt-4 overflow-x-hidden">
 
             {/* WRAPPER COLUMNAS DESKTOP */}
-            <div className="flex flex-col md:flex-row gap-8">
+            <div className="flex flex-col md:flex-row gap-4 md:gap-6 lg:gap-8">
                 
                 {/* COLUMNA IZQUIERDA */}
                 <div className="flex-1 space-y-4">
+                    {TabsJornada}
                     <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-textMain font-bold text-xl truncate max-w-[180px]">
@@ -551,24 +552,27 @@ export default function CanchitaPage() {
                         )}
                     </div>
                 </div>
-                <div className="text-right md:hidden">
-                    {modoLectura ? (
-                        <div className="text-right">
+                <div className="flex items-center justify-end gap-3">
+                    <div className="text-right">
+                        {modoLectura ? (
                             <p className="text-accent font-bold text-lg">
                                 {puntajeEnVivo.toFixed(1)} pts
                             </p>
-                        </div>
-                    ) : (
-                        <>
-                            <p className="text-accent font-bold text-lg">{plantel?.presupuestoRestante?.toFixed(1)} cr</p>
-                            <p className="text-textMuted text-xs">disponibles</p>
-                        </>
-                    )}
-                </div>
-                <div className="md:hidden">
-                    <BotonAyuda onClick={abrir} />
+                        ) : (
+                            <>
+                                <p className="text-accent font-bold text-lg">{plantel?.presupuestoRestante?.toFixed(1)} cr</p>
+                                <p className="text-textMuted text-xs">disponibles</p>
+                            </>
+                        )}
+                    </div>
+                    <div className="md:hidden">
+                        <BotonAyuda onClick={abrir} />
+                    </div>
                 </div>
             </div>
+
+            {/* ── Cartel de Error ── */}
+            {error && <div className="bg-red-900/40 border border-red-700 text-red-400 rounded-2xl px-4 py-3 text-sm text-center animate-slide-up">{error}</div>}
 
             {/* ── Banners de estado de la jornada ── */}
             {modoLectura && jornadaVista === null && (
@@ -634,7 +638,7 @@ export default function CanchitaPage() {
             )}
 
             {loadingVista ? <LoadingSpinner mensaje="Cargando jornada..." /> : (
-                <div className="relative rounded-3xl overflow-hidden shadow-inner border border-black/10" style={{ backgroundColor: '#e29b5a', backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(0,0,0,0.06) 40px, rgba(0,0,0,0.06) 80px)' }}>
+                <div className="relative rounded-3xl overflow-hidden shadow-inner border border-black/10 w-full max-w-[400px] md:max-w-[440px] xl:max-w-[480px] mx-auto" style={{ backgroundColor: '#e29b5a', backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(0,0,0,0.06) 40px, rgba(0,0,0,0.06) 80px)' }}>
 
                     <div className="absolute inset-0 pointer-events-none border-2 border-black/50 m-2">
                         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[88%] max-w-[340px] h-[280px] border-x-2 border-t-2 border-black/50 rounded-t-[150px]" />
@@ -645,9 +649,9 @@ export default function CanchitaPage() {
                         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[140px] h-[70px] border-x-2 border-b-2 border-black/50 rounded-b-[70px]" />
                     </div>
 
-                    <div className="relative z-10 py-6 md:py-12 px-1 flex flex-col justify-between h-[500px] md:h-[650px]">
+                    <div className="relative z-10 py-6 md:py-8 px-1 flex flex-col justify-between h-[440px] md:h-[540px] xl:h-[600px]">
                         {filas.map((fila, filaIdx) => (
-                            <div key={filaIdx} className="flex justify-center gap-x-8 items-start">
+                            <div key={filaIdx} className="flex justify-center gap-x-2 md:gap-x-8 items-start">
                                 {fila.map((jugador) => {
                                     const stats = estadisticas[jugador.jugadorRealId]
                                     return (
@@ -659,7 +663,7 @@ export default function CanchitaPage() {
                                                 ? (stats?.jugó ? (stats.puntajeFantasy * jugador.multiplicador) : null)
                                                 : undefined
                                             }
-                                            onClick={() => handleClickSlot(jugador)} // <-- ¡ACÁ ESTÁ EL FIX MÓVIL!
+                                            onClick={() => handleClickSlot(jugador)}
                                             onDragStart={() => handleDragStart(jugador.jugadorRealId)}
                                             onDrop={() => handleDrop(jugador.jugadorRealId)}
                                         />
@@ -674,8 +678,8 @@ export default function CanchitaPage() {
             <div>
                 <h2 className="text-textMuted text-xs font-semibold uppercase tracking-wider mb-4 pl-2 text-center">Banco de Suplentes</h2>
                 <div className="space-y-6">
-                    <div className="flex justify-center gap-x-8">
-                        {bancofila1.map((jugador) => {
+                    {(() => {
+                        const renderSlot = (jugador) => {
                             const stats = estadisticas[jugador.jugadorRealId]
                             return (
                                 <SlotJugador
@@ -687,33 +691,32 @@ export default function CanchitaPage() {
                                         ? (stats?.jugó ? (stats.puntajeFantasy * jugador.multiplicador) : null)
                                         : undefined
                                     }
-                                    onClick={() => handleClickSlot(jugador)} // <-- ¡ACÁ TAMBIÉN!
+                                    onClick={() => handleClickSlot(jugador)}
                                     onDragStart={() => handleDragStart(jugador.jugadorRealId)}
                                     onDrop={() => handleDrop(jugador.jugadorRealId)}
-                                />)
-                        })}
-                    </div>
-                    {bancofila2.length > 0 && (
-                        <div className="flex justify-center gap-x-8">
-                            {bancofila2.map((jugador) => {
-                                const stats = estadisticas[jugador.jugadorRealId]
-                                return (
-                                    <SlotJugador
-                                        key={jugador.jugadorRealId}
-                                        jugador={jugador}
-                                        esSexto={jugador.rol === 'SEXTO_HOMBRE'}
-                                        opaco={debeOpacar(jugador.jugadorRealId)}
-                                        puntosJornada={modoLectura
-                                            ? (stats?.jugó ? (stats.puntajeFantasy * jugador.multiplicador) : null)
-                                            : undefined
-                                        }
-                                        onClick={() => handleClickSlot(jugador)} // <-- ¡Y ACÁ!
-                                        onDragStart={() => handleDragStart(jugador.jugadorRealId)}
-                                        onDrop={() => handleDrop(jugador.jugadorRealId)}
-                                    />)
-                            })}
-                        </div>
-                    )}
+                                />
+                            )
+                        }
+
+                        return (
+                            <>
+                                {/* VISTA MÓVIL (2 filas explícitas: 3 y 2) */}
+                                <div className="md:hidden flex flex-col gap-y-4 items-center">
+                                    <div className="flex justify-center gap-x-2 w-full">
+                                        {bancoCompleto.slice(0, 3).map(renderSlot)}
+                                    </div>
+                                    <div className="flex justify-center gap-x-2 w-full">
+                                        {bancoCompleto.slice(3, 5).map(renderSlot)}
+                                    </div>
+                                </div>
+
+                                {/* VISTA PC/TABLET (1 fila) */}
+                                <div className="hidden md:flex justify-center gap-x-4">
+                                    {bancoCompleto.map(renderSlot)}
+                                </div>
+                            </>
+                        )
+                    })()}
                 </div>
             </div>
 
@@ -765,9 +768,13 @@ export default function CanchitaPage() {
             )}
 
             </div> {/* Fin COLUMNA IZQUIERDA */}
-            </div> {/* Fin WRAPPER COLUMNAS */}
+            
+            {/* COLUMNA DERECHA (Mercado, solo en Tablet/Desktop) */}
+            <div id="mercado-scroll-container" className="hidden md:block w-1/2 shrink-0 border-l border-border pl-4 md:pl-6 lg:pl-8 h-[calc(100vh-2rem)] sticky top-4 overflow-y-auto pb-8 scrollbar-hide">
+                <MercadoPanel layout="panel" onActionComplete={cargarDatos} />
+            </div>
 
-            {error && <div className="bg-red-900/40 border border-red-700 text-red-400 rounded-2xl px-4 py-3 text-sm text-center">{error}</div>}
+            </div> {/* Fin WRAPPER COLUMNAS */}
 
             <JugadorModal
                 jugador={jugadorModal}
@@ -959,7 +966,10 @@ function DtStatsModal({ dt, puntaje, partidos, onCerrar }) {
                                 </div>
                             </div>
                         ) : (
-                            <p className="text-textMuted text-xs py-2">No se encontró el partido en esta jornada.</p>
+                            <div className="py-6 text-center text-textMuted flex flex-col items-center gap-2">
+                                <span className="text-3xl">⏳</span>
+                                <p className="font-medium text-sm">Todavía no jugó en esta jornada.</p>
+                            </div>
                         )}
                     </div>
                 </div>
