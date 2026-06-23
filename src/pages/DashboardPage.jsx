@@ -81,7 +81,7 @@ export default function DashboardPage() {
                 <div className="w-12 h-12 rounded-full bg-primary flex items-center
                         justify-center text-white font-bold text-lg shrink-0 overflow-hidden">
                     {usuario?.avatarUrl ? (
-                        <img src={usuario.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                        <img src={usuario.avatarUrl} alt="Avatar" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                     ) : (
                         usuario?.nombreDisplay?.charAt(0).toUpperCase() ?? '?'
                     )}

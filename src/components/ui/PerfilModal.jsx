@@ -102,7 +102,7 @@ export default function PerfilModal({ isOpen, onClose }) {
                 <div className="flex flex-col items-center text-center gap-2">
                     <div className="relative">
                         {usuario.avatarUrl ? (
-                            <img src={usuario.avatarUrl} alt="Avatar" className="w-20 h-20 rounded-full border-4 border-surface object-cover" />
+                            <img src={usuario.avatarUrl} alt="Avatar" className="w-20 h-20 rounded-full border-4 border-surface object-cover" referrerPolicy="no-referrer" />
                         ) : (
                             <div className="w-20 h-20 rounded-full bg-primary flex items-center justify-center text-white font-bold text-3xl border-4 border-surface shadow-xl">
                                 {usuario.nombreDisplay?.charAt(0).toUpperCase() ?? '?'}
