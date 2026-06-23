@@ -12,6 +12,7 @@ import CamisetaSVG from '../components/jugador/CamisetaSVG'
 import { useAyuda } from '../hooks/useAyuda'
 import ModalAyuda from '../components/ui/ModalAyuda'
 import BotonAyuda from '../components/ui/BotonAyuda'
+import PerfilModal from '../components/ui/PerfilModal'
 import { AYUDA } from '../components/ui/ayudaContenido'
 
 export default function DashboardPage() {
@@ -28,6 +29,7 @@ export default function DashboardPage() {
     const [jornadaSel, setJornadaSel] = useState(null)
     const [loading, setLoading] = useState(true)
     const { abierto, abrir, cerrar } = useAyuda('dashboard')
+    const [modalPerfilAbierto, setModalPerfilAbierto] = useState(false)
 
     const countdown = useCountdown(jornada?.fechaInicio)
 
@@ -75,12 +77,16 @@ export default function DashboardPage() {
         <div className="space-y-4">
 
             {/* ── Header ─────────────────────────────────────────────── */}
-            <div className="flex items-center gap-3 pt-2">
+            <div className="flex items-center gap-3 pt-2 cursor-pointer hover:opacity-80 active:scale-95 transition-all" onClick={() => setModalPerfilAbierto(true)}>
                 <div className="w-12 h-12 rounded-full bg-primary flex items-center
-                        justify-center text-white font-bold text-lg shrink-0">
-                    {usuario?.nombreDisplay?.charAt(0).toUpperCase() ?? '?'}
+                        justify-center text-white font-bold text-lg shrink-0 overflow-hidden">
+                    {usuario?.avatarUrl ? (
+                        <img src={usuario.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                    ) : (
+                        usuario?.nombreDisplay?.charAt(0).toUpperCase() ?? '?'
+                    )}
                 </div>
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                     <p className="text-textMuted text-xs">Bienvenido</p>
                     <h2 className="text-textMain font-bold text-lg truncate">
                         {usuario?.nombreDisplay ?? 'Mánager'}
@@ -97,7 +103,9 @@ export default function DashboardPage() {
                         />
                     </div>
                 )}
-                <BotonAyuda onClick={abrir} />
+                <div className="pl-2" onClick={e => e.stopPropagation()}>
+                    <BotonAyuda onClick={abrir} />
+                </div>
             </div>
 
             {/* ── Jornada + Countdown ──────────────────────────────────── */}
@@ -292,7 +300,12 @@ export default function DashboardPage() {
                 pagina="dashboard"
                 contenido={AYUDA.dashboard}
                 onCerrar={cerrar}
-                abierto={abierto}  // el modal lo usás condicionalmente:
+                abierto={abierto}
+            />
+
+            <PerfilModal 
+                isOpen={modalPerfilAbierto} 
+                onClose={() => setModalPerfilAbierto(false)} 
             />
         </div>
     )

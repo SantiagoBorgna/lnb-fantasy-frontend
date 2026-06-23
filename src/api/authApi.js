@@ -12,6 +12,9 @@ export const logout = () =>
 export const getPerfil = () =>
     axiosClient.get('/onboarding/perfil').then(r => r.data)
 
+export const actualizarPerfil = (body) =>
+    axiosClient.put('/auth/perfil', body).then(r => r.data)
+
 export const completarPerfil = (body) =>
     axiosClient.post('/onboarding/completar-perfil', body).then(r => r.data)
 
