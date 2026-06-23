@@ -4,7 +4,7 @@ import BottomNav from './BottomNav'
 import { useAuthStore } from '../../store/authStore'
 import { getMe, logout } from '../../api/authApi'
 import { createPortal } from 'react-dom'
-// 1. Importamos el componente nuevo
+import TopNav from './TopNav'
 import NotificacionesPrompt from './NotificacionesPrompt' 
 
 export default function AppShell() {
@@ -28,14 +28,17 @@ export default function AppShell() {
     }
 
     return (
-        <div className="flex flex-col h-full max-w-md mx-auto relative">
-            <main className="flex-1 overflow-y-auto pb-20 px-4 pt-4">
+        <div className="flex flex-col h-full relative bg-surface overflow-hidden">
+            {/* Nav superior en desktop */}
+            <TopNav className="hidden md:flex" onLogout={() => setModalLogout(true)} />
+
+            <main className="flex-1 overflow-y-auto pb-20 px-4 pt-4 md:pb-8 md:px-8 xl:px-16 max-w-md md:max-w-none mx-auto w-full">
                 <Outlet />
             </main>
             
-            <BottomNav onLogout={() => setModalLogout(true)} />
+            <BottomNav className="md:hidden" onLogout={() => setModalLogout(true)} />
             
-            {/* 2. Lo inyectamos acá, como tiene 'fixed' flotará sobre todo */}
+            {/* Lo inyectamos acá, como tiene 'fixed' flotará sobre todo */}
             <NotificacionesPrompt />
 
             {modalLogout && createPortal(
@@ -45,12 +48,12 @@ export default function AppShell() {
                         onClick={() => setModalLogout(false)}
                     />
                     <div
-                        className="fixed bottom-0 left-0 right-0 max-w-md mx-auto
-                 bg-card border-t border-border rounded-t-3xl
-                 z-50 p-6 space-y-4 animate-slide-up"
+                        className="fixed bottom-0 md:top-1/2 md:-translate-y-1/2 md:bottom-auto left-0 right-0 max-w-md mx-auto
+                 bg-card border-t border-border rounded-t-3xl md:rounded-3xl
+                 z-50 p-6 space-y-4 animate-slide-up md:animate-none"
                         onClick={e => e.stopPropagation()}
                     >
-                        <div className="w-10 h-1 bg-border rounded-full mx-auto" />
+                        <div className="w-10 h-1 bg-border rounded-full mx-auto md:hidden" />
                         <h3 className="text-textMain font-bold text-lg">¿Cerrar sesión?</h3>
                         <p className="text-textMuted text-sm">
                             Vas a tener que volver a iniciar sesión con Google para entrar.

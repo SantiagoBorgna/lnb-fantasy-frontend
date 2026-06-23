@@ -257,8 +257,8 @@ export default function OnboardingCanchitaPage() {
             {modalJugador && createPortal(
                 <>
                     <div className="fixed inset-0 bg-black/60 z-40" onClick={() => setModalJugador(null)} />
-                    <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-card border-t border-border rounded-t-3xl z-50 p-6 space-y-4 animate-slide-up" onClick={e => e.stopPropagation()}>
-                        <div className="w-10 h-1 bg-border rounded-full mx-auto" />
+                    <div className="fixed bottom-0 md:top-1/2 md:-translate-y-1/2 md:bottom-auto left-0 right-0 max-w-md mx-auto bg-card border-t border-border rounded-t-3xl md:rounded-3xl z-50 p-6 space-y-4 animate-slide-up md:animate-none" onClick={e => e.stopPropagation()}>
+                        <div className="w-10 h-1 bg-border rounded-full mx-auto md:hidden" />
                         <div className="flex items-center gap-4">
                             <CamisetaSVG
                                 colorPrincipal={modalJugador.jugador.colorPrincipal}
@@ -374,8 +374,8 @@ function ModalDt({ onElegir, onCerrar }) {
     return createPortal(
         <>
             <div className="fixed inset-0 bg-black/60 z-40" onClick={onCerrar} />
-            <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-card border-t border-border rounded-t-3xl z-50 p-6 space-y-4 animate-slide-up max-h-[70vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-                <div className="w-10 h-1 bg-border rounded-full mx-auto" />
+            <div className="fixed bottom-0 md:top-1/2 md:-translate-y-1/2 md:bottom-auto left-0 right-0 max-w-md mx-auto bg-card border-t border-border rounded-t-3xl md:rounded-3xl z-50 p-6 space-y-4 animate-slide-up md:animate-none max-h-[70vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+                <div className="w-10 h-1 bg-border rounded-full mx-auto md:hidden" />
                 <h3 className="text-textMain font-bold text-lg">Elegir Director Técnico</h3>
                 {loading ? <LoadingSpinner /> : (
                     <div className="space-y-2">

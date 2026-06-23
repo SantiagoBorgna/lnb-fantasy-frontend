@@ -32,19 +32,12 @@ const NAV_ITEMS = [
     },
 ]
 
-export default function BottomNav({ onLogout }) {
+export default function BottomNav({ onLogout, className }) {
     const navigate = useNavigate()
     const { setAuth } = useAuthStore()
 
     return (
-        <nav className="
-      fixed bottom-0 left-0 right-0
-      max-w-md mx-auto
-      bg-card border-t border-border
-      flex items-center justify-around
-      h-16 px-2
-      z-50
-    ">
+        <nav className={clsx("fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-card border-t border-border flex items-center justify-around h-16 px-2 z-50", className)}>
             {NAV_ITEMS.map(({ to, label, icon: Icon, exact }) => (
                 <NavLink
                     key={to}
@@ -62,13 +55,12 @@ export default function BottomNav({ onLogout }) {
                     <span>{label}</span>
                 </NavLink>
             ))}
-
         </nav>
     )
 }
 
 // ── Íconos SVG inline (sin dependencia de librería de íconos) ───────────────
-function HomeIcon({ className }) {
+export function HomeIcon({ className }) {
     return (
         <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round"
@@ -77,7 +69,7 @@ function HomeIcon({ className }) {
     )
 }
 
-function CourtIcon({ className }) {
+export function CourtIcon({ className }) {
     return (
         <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <rect x="3" y="5" width="18" height="14" rx="1" strokeLinecap="round" />
@@ -87,7 +79,7 @@ function CourtIcon({ className }) {
     )
 }
 
-function MarketIcon({ className }) {
+export function MarketIcon({ className }) {
     return (
         <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round"
@@ -96,7 +88,7 @@ function MarketIcon({ className }) {
     )
 }
 
-function TrophyIcon({ className }) {
+export function TrophyIcon({ className }) {
     return (
         <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round"
@@ -105,7 +97,7 @@ function TrophyIcon({ className }) {
     )
 }
 
-function StatsIcon({ className }) {
+export function StatsIcon({ className }) {
     return (
         <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round"
@@ -114,7 +106,7 @@ function StatsIcon({ className }) {
     )
 }
 
-function LogoutIcon({ className }) {
+export function LogoutIcon({ className }) {
     return (
         <svg className={className} fill="none" viewBox="0 0 24 24"
             stroke="currentColor" strokeWidth={2}>

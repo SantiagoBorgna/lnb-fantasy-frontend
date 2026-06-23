@@ -261,7 +261,7 @@ export default function MercadoPage() {
     }
 
     return (
-        <div className="max-w-md mx-auto w-full px-4 space-y-4 pb-6 min-h-screen">
+        <div className="w-full space-y-4 min-h-screen relative pb-12 pt-4 px-4">
             <div className="flex items-center justify-between">
                 <h1 className="text-textMain font-bold text-2xl pt-2">Mercado</h1>
                 <BotonAyuda onClick={abrir} />
@@ -345,35 +345,36 @@ export default function MercadoPage() {
             </div>
 
             {!busqueda && (
-                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide w-full">
-                    {POSICIONES.map(({ label, valor }) => (
-                        <button
-                            key={label}
-                            onClick={() => setPosicion(valor)}
-                            className={clsx('pill shrink-0 whitespace-nowrap', posicion === valor && 'pill-active')}
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+                    <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide w-full md:w-auto">
+                        {POSICIONES.map(({ label, valor }) => (
+                            <button
+                                key={label}
+                                onClick={() => setPosicion(valor)}
+                                className={clsx('pill shrink-0 whitespace-nowrap', posicion === valor && 'pill-active')}
+                            >
+                                {label}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* ── Selector de Orden ── */}
+                    <div className="shrink-0 w-full md:w-auto">
+                        <select
+                            value={orden}
+                            onChange={(e) => setOrden(e.target.value)}
+                            className="w-full bg-surface border border-border text-textMuted text-xs rounded-xl pl-3 pr-8 py-2 md:py-2.5 outline-none focus:border-primary cursor-pointer shadow-sm appearance-none"
+                            style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%23888\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E")', backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.2em 1.2em' }}
                         >
-                            {label}
-                        </button>
-                    ))}
+                            <option value="precio_desc">💰 Precio Descendiente</option>
+                            <option value="precio_asc">💰 Precio Ascendente</option>
+                            <option value="promedio_desc">🔥 Promedio Fantasy Descendiente</option>
+                            <option value="promedio_asc">❄️ Promedio Fantasy Ascendente</option>
+                            <option value="nombre_asc">🔤 Alfabético (A-Z)</option>
+                        </select>
+                    </div>
                 </div>
             )}
-
-            {/* ── Selector de Orden ── */}
-            <div className="flex justify-end mb-3">
-                <select
-                    value={orden}
-                    onChange={(e) => setOrden(e.target.value)}
-                    className="bg-surface border border-border text-textMuted text-xs rounded-xl pl-3 pr-8 py-2 outline-none focus:border-primary cursor-pointer shadow-sm appearance-none"
-                    style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%23888\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E")', backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.2em 1.2em' }}
-                >
-                    <option value="precio_desc">💰 Precio Descendiente</option>
-                    <option value="precio_asc">💰 Precio Ascendente</option>
-                    <option value="promedio_desc">🔥 Promedio Fantasy Descendiente</option>
-                    <option value="promedio_asc">❄️ Promedio Fantasy Ascendente</option>
-                    <option value="nombre_asc">🔤 Alfabético (A-Z)</option>
-                </select>
-            </div>
-            {/* ────────────────────────────── */}
 
             {loading || buscando ? (
                 <LoadingSpinner mensaje="Buscando jugadores..." />
@@ -383,7 +384,7 @@ export default function MercadoPage() {
                     descripcion="No encontramos jugadores con ese criterio (o ya los elegiste a todos)."
                 />
             ) : (
-                <div className="space-y-2 pb-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pb-4">
                     {jugadoresVisibles.map(jugador => (
                         <TarjetaJugador
                             key={jugador.id || jugador.jugadorRealId}
@@ -413,12 +414,12 @@ export default function MercadoPage() {
                     <div className="fixed inset-0 bg-black/60 z-40"
                         onClick={() => { setModalJugador(null); setStatsModal(null) }} />
                     <div
-                        className="fixed bottom-0 left-0 right-0 max-w-md mx-auto
-                 bg-card border-t border-border rounded-t-3xl
-                 z-50 p-6 space-y-4 animate-slide-up"
+                        className="fixed bottom-0 md:top-1/2 md:-translate-y-1/2 md:bottom-auto left-0 right-0 max-w-md mx-auto
+                 bg-card border-t border-border rounded-t-3xl md:rounded-3xl
+                 z-50 p-6 space-y-4 animate-slide-up md:animate-none"
                         onClick={e => e.stopPropagation()}
                     >
-                        <div className="w-10 h-1 bg-border rounded-full mx-auto" />
+                        <div className="w-10 h-1 bg-border rounded-full mx-auto md:hidden" />
 
                         {/* Header jugador */}
                         <div className="flex items-center gap-4">
@@ -542,7 +543,7 @@ function TarjetaJugador({ jugador, onElegir, presupuestoMaximo, modoTransferenci
     return (
         <div
             className={clsx(
-                "card flex items-center gap-3 transition-transform",
+                "card flex items-center gap-3 transition-transform py-4 md:py-5",
                 estaBloqueado ? "opacity-50 grayscale" : "cursor-pointer active:scale-95 hover:border-primary/50"
             )}
             onClick={() => !estaBloqueado && onElegir ? onElegir(jugador) : null}

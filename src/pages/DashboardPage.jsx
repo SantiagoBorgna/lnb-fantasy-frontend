@@ -77,7 +77,7 @@ export default function DashboardPage() {
         <div className="space-y-4">
 
             {/* ── Header ─────────────────────────────────────────────── */}
-            <div className="flex items-center gap-3 pt-2 cursor-pointer hover:opacity-80 active:scale-95 transition-all" onClick={() => setModalPerfilAbierto(true)}>
+            <div className="flex items-center gap-3 pt-2 cursor-pointer md:hover:opacity-80" onClick={() => setModalPerfilAbierto(true)}>
                 <div className="w-12 h-12 rounded-full bg-primary flex items-center
                         justify-center text-white font-bold text-lg shrink-0 overflow-hidden">
                     {usuario?.avatarUrl ? (
@@ -108,192 +108,220 @@ export default function DashboardPage() {
                 </div>
             </div>
 
-            {/* ── Jornada + Countdown ──────────────────────────────────── */}
+            {/* ── Jornada + Countdown (Full Width) ─────────────────────── */}
             {jornada ? (
-                <div className="card space-y-3">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-textMuted text-xs uppercase tracking-wide">
-                                {jornada.estado === 'EN_JUEGO' ? '🔴 En juego' : '⏳ Próxima jornada'}
-                            </p>
-                            <h3 className="text-textMain font-bold text-lg">
-                                Jornada {jornada.numero}
-                            </h3>
+                <div className="card space-y-4 py-8">
+                    <div className="flex flex-col lg:flex-row items-center justify-center gap-6">
+                        <div className="text-center lg:text-right">
+                            <h2 className="text-textMain font-black text-lg md:text-xl lg:text-3xl uppercase tracking-wider">
+                                {jornada.estado === 'EN_JUEGO' ? `SE ESTÁ JUGANDO LA JORNADA ${jornada.numero}` : `LA PRÓXIMA JORNADA COMIENZA EN:`}
+                            </h2>
                         </div>
-                        <EstadoBadge estado={jornada.estado} />
-                    </div>
 
-                    {jornada.estado === 'ABIERTA_A_CAMBIOS' && countdown && (
-                        <div className="grid grid-cols-4 gap-2">
-                            {[
-                                { valor: countdown.dias, label: 'días' },
-                                { valor: countdown.horas, label: 'horas' },
-                                { valor: countdown.minutos, label: 'min' },
-                                { valor: countdown.segundos, label: 'seg' },
-                            ].map(({ valor, label }) => (
-                                <div key={label} className="bg-surface rounded-xl py-2
-                                            flex flex-col items-center
-                                            border border-border">
-                                    <span className="text-accent font-bold text-xl tabular-nums">
-                                        {String(valor).padStart(2, '0')}
-                                    </span>
-                                    <span className="text-textMuted text-xs">{label}</span>
+                        {jornada.estado === 'EN_JUEGO' ? (
+                            <div className="text-center lg:text-left flex items-baseline gap-2">
+                                <p className="text-accent font-black text-3xl lg:text-4xl tabular-nums">
+                                    {puntajeEnVivo.toFixed(1)}
+                                </p>
+                                <p className="text-textMuted text-xl lg:text-2xl font-semibold uppercase">Puntos</p>
+                            </div>
+                        ) : (
+                            countdown && (
+                                <div className="flex items-center gap-4">
+                                    {[
+                                        { valor: countdown.dias, label: 'd' },
+                                        { valor: countdown.horas, label: 'h' },
+                                        { valor: countdown.minutos, label: 'm' },
+                                        { valor: countdown.segundos, label: 's' },
+                                    ].map(({ valor, label }) => (
+                                        <div key={label} className="flex items-baseline gap-1">
+                                            <span className="text-accent font-black text-3xl lg:text-4xl tabular-nums">
+                                                {String(valor).padStart(2, '0')}
+                                            </span>
+                                            <span className="text-accent font-bold text-xl lg:text-2xl">{label}</span>
+                                        </div>
+                                    ))}
                                 </div>
-                            ))}
-                        </div>
-                    )}
+                            )
+                        )}
+                    </div>
                 </div>
             ) : (
                 <div className="card text-center py-6">
-                    <p className="text-textMuted text-sm">
-                        No hay jornadas programadas por el momento.
-                    </p>
+                    <h2 className="text-textMain font-bold">No hay próximas jornadas</h2>
+                    <p className="text-textMuted text-sm">El torneo aún no comenzó o ya finalizó.</p>
                 </div>
             )}
 
-            {/* ── Mi equipo ────────────────────────────────────────────── */}
-            <div className="card space-y-3">
-                <h3 className="text-textMain font-semibold">Mi Equipo</h3>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div className="space-y-4">
 
-                {plantel ? (
-                    <>
-                        {/* Stats del plantel */}
-                        <div className="grid grid-cols-3 gap-2">
-                            <StatCard
-                                label="Presupuesto"
-                                valor={`${plantel.presupuestoRestante?.toFixed(1)} cr`}
-                            />
-                            <StatCard
-                                label={`Jornada ${plantel.jornadaNumero}`}
-                                valor={plantel.puntajeObtenidoFecha?.toFixed(1) ?? '—'}
-                            />
-                            <StatCard
-                                label="Transferencias"
-                                valor={`${plantel.transferenciasRestantes}/3`}
-                            />
-                        </div>
+                    {/* ── Mi equipo ────────────────────────────────────────────── */}
+                    <div className="card space-y-3">
+                        <h3 className="text-textMain font-semibold">Mi Equipo</h3>
 
-                        {/* Mi posición en el ranking */}
-                        {miPosicion && (
-                            <div className="bg-surface rounded-2xl p-3 border border-border
-                              flex items-center gap-3">
-                                <div className={`
-                  w-8 h-8 rounded-full flex items-center justify-center
-                  text-sm font-black shrink-0
-                  ${miPosicion.posicion === 1 ? 'bg-yellow-500 text-white' : ''}
-                  ${miPosicion.posicion === 2 ? 'bg-gray-400 text-white' : ''}
-                  ${miPosicion.posicion === 3 ? 'bg-amber-700 text-white' : ''}
-                  ${miPosicion.posicion >= 4 ? 'bg-border text-textMuted' : ''}
-                `}>
-                                    {miPosicion.posicion}
+                        {plantel ? (
+                            <>
+                                {/* Stats del plantel */}
+                                <div className="grid grid-cols-3 gap-2">
+                                    <StatCard
+                                        label="Presupuesto"
+                                        valor={`${plantel.presupuestoRestante?.toFixed(1)} cr`}
+                                    />
+                                    <StatCard
+                                        label={`Jornada ${plantel.jornadaNumero}`}
+                                        valor={plantel.puntajeObtenidoFecha?.toFixed(1) ?? '—'}
+                                    />
+                                    <StatCard
+                                        label="Transferencias"
+                                        valor={`${plantel.transferenciasRestantes}/3`}
+                                    />
                                 </div>
-                                <div className="flex-1 min-w-0">
-                                    <p className="text-textMain text-sm font-semibold truncate">
-                                        {miPosicion.nombreEquipo}
-                                    </p>
-                                    <p className="text-textMuted text-xs">Ranking general</p>
-                                </div>
-                                <span className="text-accent font-bold tabular-nums">
-                                    {miPosicion.puntajeGlobal?.toFixed(1)} pts
-                                </span>
+
+                                {/* Mi posición en el ranking */}
+                                {miPosicion && (
+                                    <div className="bg-surface rounded-2xl p-3 border border-border
+                                      flex items-center gap-3">
+                                        <div className={`
+                          w-8 h-8 rounded-full flex items-center justify-center
+                          text-sm font-black shrink-0
+                          ${miPosicion.posicion === 1 ? 'bg-yellow-500 text-white' : ''}
+                          ${miPosicion.posicion === 2 ? 'bg-gray-400 text-white' : ''}
+                          ${miPosicion.posicion === 3 ? 'bg-amber-700 text-white' : ''}
+                          ${miPosicion.posicion >= 4 ? 'bg-border text-textMuted' : ''}
+                        `}>
+                                            {miPosicion.posicion}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-textMain text-[15px] font-semibold truncate">
+                                                {miPosicion.nombreEquipo}
+                                            </p>
+                                            <p className="text-textMuted text-xs">Ranking general</p>
+                                        </div>
+                                        <span className="text-accent font-bold tabular-nums text-[15px]">
+                                            {miPosicion.puntajeGlobal?.toFixed(1)} pts
+                                        </span>
+                                    </div>
+                                )}
+
+                                <button
+                                    onClick={() => navigate('/canchita')}
+                                    className="btn-primary w-full"
+                                >
+                                    Ver Equipo
+                                </button>
+                            </>
+                        ) : (
+                            <div className="text-center py-4 space-y-3">
+                                <p className="text-textMuted text-sm">
+                                    Comenzarás a jugar en la siguiente jornada.
+                                </p>
+                                <button
+                                    onClick={() => navigate('/canchita')}
+                                    className="btn-accent w-full"
+                                >
+                                    Ver Equipo
+                                </button>
                             </div>
                         )}
-
-                        <button
-                            onClick={() => navigate('/canchita')}
-                            className="btn-primary w-full"
-                        >
-                            Ver Equipo
-                        </button>
-                    </>
-                ) : (
-                    <div className="text-center py-4 space-y-3">
-                        <p className="text-textMuted text-sm">
-                            Comenzarás a jugar en la siguiente jornada.
-                        </p>
-                        <button
-                            onClick={() => navigate('/canchita')}
-                            className="btn-accent w-full"
-                        >
-                            Ver Equipo
-                        </button>
                     </div>
-                )}
-            </div>
-
-            {/* ── Rankings ─────────────────────────────────────────────── */}
-            <div className="card space-y-3">
-
-                {/* Tabs global / jornada */}
-                <div className="flex gap-2 bg-surface rounded-2xl p-1">
-                    {[
-                        { key: 'global', label: '🏆 General' },
-                        { key: 'jornada', label: '📅 Jornada' },
-                    ].map(({ key, label }) => (
-                        <button
-                            key={key}
-                            onClick={() => setJornadaTab(key)}
-                            className={`flex-1 py-1.5 rounded-xl text-xs font-semibold
-                transition-colors
-                ${jornadaTab === key
-                                    ? 'bg-primary text-white'
-                                    : 'text-textMuted hover:text-textMain'}`}
-                        >
-                            {label}
-                        </button>
-                    ))}
                 </div>
 
-                {/* Selector de jornada (solo en tab jornada) */}
-                {jornadaTab === 'jornada' && jornadas.length > 0 && (
-                    <select
-                        value={jornadaSel ?? ''}
-                        onChange={e => setJornadaSel(Number(e.target.value))}
-                        className="w-full bg-surface border border-border rounded-xl
-                       px-3 py-2 text-textMain text-sm
-                       focus:outline-none focus:border-primary"
-                    >
-                        {jornadas.map(j => (
-                            <option key={j.id} value={j.id}>
-                                Jornada {j.numero}
-                            </option>
-                        ))}
-                    </select>
-                )}
+                {/* ── Rankings (Desktop / Mobile) ───────────────────────── */}
+                <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Vista Desktop (md+): Mostramos ambos rankings separados */}
+                    <div className="hidden md:block card space-y-3 h-fit">
+                        <h3 className="text-textMain font-bold">🏆 Ranking General</h3>
+                        <div className="space-y-2">
+                            {rankingGlobal.map(fila => (
+                                <div key={`global-${fila.equipoVirtualId}`} className="flex items-center gap-3">
+                                    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-black shrink-0 ${fila.posicion === 1 ? 'bg-yellow-500 text-white' : fila.posicion === 2 ? 'bg-gray-400 text-white' : fila.posicion === 3 ? 'bg-amber-700 text-white' : 'bg-border text-textMuted'}`}>
+                                        {fila.posicion}
+                                    </span>
+                                    <p className="flex-1 text-textMain font-medium text-[15px] truncate">{fila.nombreEquipo}</p>
+                                    <span className="text-accent font-bold text-[15px] tabular-nums shrink-0">{fila.puntajeGlobal?.toFixed(1)}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
 
-                {/* Lista del ranking */}
-                <div className="space-y-2">
-                    {(jornadaTab === 'global' ? rankingGlobal : rankingFecha)
-                        .map(fila => (
-                            <div key={fila.equipoVirtualId}
-                                className="flex items-center gap-3">
-                                <span className={`
-                  w-6 h-6 rounded-full flex items-center justify-center
-                  text-xs font-black shrink-0
-                  ${fila.posicion === 1 ? 'bg-yellow-500 text-white' : ''}
-                  ${fila.posicion === 2 ? 'bg-gray-400 text-white' : ''}
-                  ${fila.posicion === 3 ? 'bg-amber-700 text-white' : ''}
-                  ${fila.posicion >= 4 ? 'bg-border text-textMuted' : ''}
-                `}>
-                                    {fila.posicion}
-                                </span>
-                                <p className="flex-1 text-textMain text-sm truncate">
-                                    {fila.nombreEquipo}
-                                </p>
-                                <span className="text-accent font-bold text-sm tabular-nums shrink-0">
-                                    {fila.puntajeGlobal?.toFixed(1)}
-                                </span>
-                            </div>
-                        ))
-                    }
+                    <div className="hidden md:flex flex-col card space-y-3 h-fit">
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-textMain font-bold">📅 Ranking Jornada</h3>
+                            {jornadas.length > 0 && (
+                                <select
+                                    value={jornadaSel ?? ''}
+                                    onChange={e => setJornadaSel(Number(e.target.value))}
+                                    className="bg-surface border border-border rounded-xl px-4 py-2 min-w-[160px] text-textMain text-sm font-semibold focus:outline-none focus:border-primary cursor-pointer"
+                                >
+                                    {jornadas.map(j => (
+                                        <option key={j.id} value={j.id}>Jornada {j.numero}</option>
+                                    ))}
+                                </select>
+                            )}
+                        </div>
+                        <div className="space-y-2">
+                            {rankingFecha.length === 0 ? (
+                                <p className="text-textMuted text-xs text-center py-3">No hay datos para esta jornada.</p>
+                            ) : (
+                                rankingFecha.map(fila => (
+                                    <div key={`jornada-${fila.equipoVirtualId}`} className="flex items-center gap-3">
+                                        <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-black shrink-0 ${fila.posicion === 1 ? 'bg-yellow-500 text-white' : fila.posicion === 2 ? 'bg-gray-400 text-white' : fila.posicion === 3 ? 'bg-amber-700 text-white' : 'bg-border text-textMuted'}`}>
+                                            {fila.posicion}
+                                        </span>
+                                        <p className="flex-1 text-textMain font-medium text-[15px] truncate">{fila.nombreEquipo}</p>
+                                        <span className="text-accent font-bold text-[15px] tabular-nums shrink-0">{fila.puntajeGlobal?.toFixed(1)}</span>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
 
-                    {jornadaTab === 'jornada' && rankingFecha.length === 0 && (
-                        <p className="text-textMuted text-xs text-center py-3">
-                            No hay datos para esta jornada todavía.
-                        </p>
-                    )}
+                    {/* Vista Móvil (hasta md): Usamos las Tabs */}
+                    <div className="md:hidden card space-y-3 h-fit">
+                        <div className="flex gap-2 bg-surface rounded-2xl p-1">
+                            {[
+                                { key: 'global', label: '🏆 General' },
+                                { key: 'jornada', label: '📅 Jornada' },
+                            ].map(({ key, label }) => (
+                                <button
+                                    key={key}
+                                    onClick={() => setJornadaTab(key)}
+                                    className={`flex-1 py-1.5 rounded-xl text-xs font-semibold transition-colors ${jornadaTab === key ? 'bg-primary text-white' : 'text-textMuted hover:text-textMain'}`}
+                                >
+                                    {label}
+                                </button>
+                            ))}
+                        </div>
+
+                        {jornadaTab === 'jornada' && jornadas.length > 0 && (
+                            <select
+                                value={jornadaSel ?? ''}
+                                onChange={e => setJornadaSel(Number(e.target.value))}
+                                className="w-full bg-surface border border-border rounded-xl px-3 py-2 text-textMain text-sm focus:outline-none focus:border-primary"
+                            >
+                                {jornadas.map(j => (
+                                    <option key={j.id} value={j.id}>Jornada {j.numero}</option>
+                                ))}
+                            </select>
+                        )}
+
+                        <div className="space-y-2">
+                            {(jornadaTab === 'global' ? rankingGlobal : rankingFecha).map(fila => (
+                                <div key={fila.equipoVirtualId} className="flex items-center gap-3">
+                                    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-black shrink-0 ${fila.posicion === 1 ? 'bg-yellow-500 text-white' : fila.posicion === 2 ? 'bg-gray-400 text-white' : fila.posicion === 3 ? 'bg-amber-700 text-white' : 'bg-border text-textMuted'}`}>
+                                        {fila.posicion}
+                                    </span>
+                                    <p className="flex-1 text-textMain font-medium text-[15px] truncate">{fila.nombreEquipo}</p>
+                                    <span className="text-accent font-bold text-[15px] tabular-nums shrink-0">{fila.puntajeGlobal?.toFixed(1)}</span>
+                                </div>
+                            ))}
+                            {jornadaTab === 'jornada' && rankingFecha.length === 0 && (
+                                <p className="text-textMuted text-xs text-center py-3">No hay datos para esta jornada.</p>
+                            )}
+                        </div>
+                    </div>
                 </div>
-
             </div>
 
             <ModalAyuda

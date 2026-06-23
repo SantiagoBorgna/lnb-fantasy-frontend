@@ -514,11 +514,16 @@ export default function CanchitaPage() {
     }
 
     return (
-        <div className="max-w-md mx-auto w-full px-4 space-y-3 pb-6 min-h-screen pt-4">
+        <div className="max-w-md md:max-w-none mx-auto w-full px-4 space-y-3 pb-6 min-h-screen pt-4">
 
             {TabsJornada}
 
-            <div className="flex items-center justify-between">
+            {/* WRAPPER COLUMNAS DESKTOP */}
+            <div className="flex flex-col md:flex-row gap-8">
+                
+                {/* COLUMNA IZQUIERDA */}
+                <div className="flex-1 space-y-4">
+                    <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-textMain font-bold text-xl truncate max-w-[180px]">
                         {plantelActual.nombreEquipo ?? 'Mi Equipo'}
@@ -546,7 +551,7 @@ export default function CanchitaPage() {
                         )}
                     </div>
                 </div>
-                <div className="text-right">
+                <div className="text-right md:hidden">
                     {modoLectura ? (
                         <div className="text-right">
                             <p className="text-accent font-bold text-lg">
@@ -560,7 +565,9 @@ export default function CanchitaPage() {
                         </>
                     )}
                 </div>
-                <BotonAyuda onClick={abrir} />
+                <div className="md:hidden">
+                    <BotonAyuda onClick={abrir} />
+                </div>
             </div>
 
             {/* ── Banners de estado de la jornada ── */}
@@ -638,7 +645,7 @@ export default function CanchitaPage() {
                         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[140px] h-[70px] border-x-2 border-b-2 border-black/50 rounded-b-[70px]" />
                     </div>
 
-                    <div className="relative z-10 py-6 px-1 flex flex-col justify-between h-[500px]">
+                    <div className="relative z-10 py-6 md:py-12 px-1 flex flex-col justify-between h-[500px] md:h-[650px]">
                         {filas.map((fila, filaIdx) => (
                             <div key={filaIdx} className="flex justify-center gap-x-8 items-start">
                                 {fila.map((jugador) => {
@@ -720,15 +727,9 @@ export default function CanchitaPage() {
                         {partidosFixture.map(partido => {
                             // 1. Creamos la fecha base tal cual viene de la DB
                             const fecha = new Date(partido.fechaHora)
-
-                            // 2. Le sumamos las 3 horas de desfasaje de tu servidor
                             fecha.setHours(fecha.getHours() + 3)
-
                             const diaStr = fecha.toLocaleDateString('es-AR', { weekday: 'short', day: '2-digit', month: '2-digit' }).replace(',', '')
-
-                            // 3. Forzamos formato 24hs apagando el 'hour12'
                             const horaStr = fecha.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false })
-
                             const terminado = partido.estado === 'FINALIZADO' || partido.estado === 'PROCESADO'
 
                             return (
@@ -762,6 +763,9 @@ export default function CanchitaPage() {
                     </div>
                 </div>
             )}
+
+            </div> {/* Fin COLUMNA IZQUIERDA */}
+            </div> {/* Fin WRAPPER COLUMNAS */}
 
             {error && <div className="bg-red-900/40 border border-red-700 text-red-400 rounded-2xl px-4 py-3 text-sm text-center">{error}</div>}
 
@@ -831,8 +835,8 @@ function CambioModal({ jugadorOrigen, titulares, banco, onElegir, onCerrar }) {
     return (
         <>
             <div className="fixed inset-0 bg-black/60 z-40" onClick={onCerrar} />
-            <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-card border-t border-border rounded-t-3xl z-50 p-6 space-y-4 animate-slide-up">
-                <div className="w-10 h-1 bg-border rounded-full mx-auto" />
+            <div className="fixed bottom-0 md:top-1/2 md:-translate-y-1/2 md:bottom-auto left-0 right-0 max-w-md mx-auto bg-card border-t border-border rounded-t-3xl md:rounded-3xl z-50 p-6 space-y-4 animate-slide-up md:animate-none">
+                <div className="w-10 h-1 bg-border rounded-full mx-auto md:hidden" />
                 <h3 className="text-textMain font-bold text-lg">Cambiar a {jugadorOrigen.nombreCompleto.split(',')[0]}</h3>
                 {compatibles.length === 0 ? (
                     <p className="text-textMuted text-sm text-center py-4">No hay jugadores compatibles para este cambio.</p>
@@ -861,8 +865,8 @@ function DtOpcionesModal({ dt, onCerrar, onTransferir }) { /* ... código intact
     return (
         <>
             <div className="fixed inset-0 bg-black/60 z-40" onClick={onCerrar} />
-            <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-card border-t border-border rounded-t-3xl z-50 p-6 space-y-5 animate-slide-up">
-                <div className="w-10 h-1 bg-border rounded-full mx-auto" />
+            <div className="fixed bottom-0 md:top-1/2 md:-translate-y-1/2 md:bottom-auto left-0 right-0 max-w-md mx-auto bg-card border-t border-border rounded-t-3xl md:rounded-3xl z-50 p-6 space-y-5 animate-slide-up md:animate-none">
+                <div className="w-10 h-1 bg-border rounded-full mx-auto md:hidden" />
                 <div className="text-center space-y-2">
                     <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center text-white font-bold text-xl mx-auto shadow-md">DT</div>
                     <h3 className="text-textMain font-bold text-lg">{dt?.nombreCompleto}</h3>
@@ -893,9 +897,9 @@ function ListaDtsModal({ dtActualId, onElegir, onCerrar }) {
     return createPortal(
         <>
             <div className="fixed inset-0 bg-black/60 z-40" onClick={onCerrar} />
-            <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-card border-t border-border rounded-t-3xl z-50 p-6 space-y-4 animate-slide-up max-h-[85vh] flex flex-col" onClick={e => e.stopPropagation()}>
+            <div className="fixed bottom-0 md:top-1/2 md:-translate-y-1/2 md:bottom-auto left-0 right-0 max-w-md mx-auto bg-card border-t border-border rounded-t-3xl md:rounded-3xl z-50 p-6 space-y-4 animate-slide-up md:animate-none max-h-[85vh] flex flex-col" onClick={e => e.stopPropagation()}>
                 <div className="shrink-0 space-y-4 pb-2 border-b border-border">
-                    <div className="w-10 h-1 bg-border rounded-full mx-auto" />
+                    <div className="w-10 h-1 bg-border rounded-full mx-auto md:hidden" />
                     <div><h3 className="text-textMain font-bold text-lg">Elegir reemplazo</h3><p className="text-textMuted text-xs">Seleccioná un nuevo DT para tu equipo.</p></div>
                 </div>
                 <div className="flex-1 overflow-y-auto min-h-0 space-y-2 py-2 pr-1">
@@ -923,8 +927,8 @@ function DtStatsModal({ dt, puntaje, partidos, onCerrar }) {
     return createPortal(
         <>
             <div className="fixed inset-0 bg-black/60 z-40" onClick={onCerrar} />
-            <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-card border-t border-border rounded-t-3xl z-50 p-6 space-y-5 animate-slide-up" onClick={e => e.stopPropagation()}>
-                <div className="w-10 h-1 bg-border rounded-full mx-auto" />
+            <div className="fixed bottom-0 md:top-1/2 md:-translate-y-1/2 md:bottom-auto left-0 right-0 max-w-md mx-auto bg-card border-t border-border rounded-t-3xl md:rounded-3xl z-50 p-6 space-y-5 animate-slide-up md:animate-none" onClick={e => e.stopPropagation()}>
+                <div className="w-10 h-1 bg-border rounded-full mx-auto md:hidden" />
 
                 <div className="text-center space-y-2">
                     <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center text-white font-bold text-xl mx-auto shadow-md">DT</div>

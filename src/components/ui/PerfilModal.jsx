@@ -91,12 +91,12 @@ export default function PerfilModal({ isOpen, onClose }) {
         <>
             <div className="fixed inset-0 bg-black/60 z-[60] backdrop-blur-sm" onClick={onClose} />
             <div
-                className="fixed bottom-0 left-0 right-0 max-w-md mx-auto
-                 bg-card border-t border-border rounded-t-3xl
-                 z-[70] p-6 space-y-5 animate-slide-up"
+                className="fixed bottom-0 md:top-1/2 md:-translate-y-1/2 md:bottom-auto left-0 right-0 max-w-md mx-auto
+                 bg-card border-t border-border rounded-t-3xl md:rounded-3xl
+                 z-[70] p-6 space-y-5 animate-slide-up md:animate-none"
                 onClick={e => e.stopPropagation()}
             >
-                <div className="w-10 h-1 bg-border rounded-full mx-auto" />
+                <div className="w-10 h-1 bg-border rounded-full mx-auto md:hidden" />
 
                 {/* Header Perfil */}
                 <div className="flex flex-col items-center text-center gap-2">

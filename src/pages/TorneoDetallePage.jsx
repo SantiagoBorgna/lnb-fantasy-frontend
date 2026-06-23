@@ -93,18 +93,26 @@ export default function TorneoDetallePage() {
         }).catch(() => { })
     }, [jornadaSel, tablaGeneral])
 
-    // Busqueda en la tabla activa
-    const tablaFiltrada = useMemo(() => {
-        const tabla = tab === 'general' ? tablaGeneral : tablaJornada
-        if (!busqueda.trim()) return tabla
+    // Busqueda en las tablas
+    const tablaGeneralFiltrada = useMemo(() => {
+        if (!busqueda.trim()) return tablaGeneral
         const q = busqueda.toLowerCase()
-        return tabla.filter(f =>
+        return tablaGeneral.filter(f =>
             f.nombreEquipo.toLowerCase().includes(q) ||
             f.nombreUsuario.toLowerCase().includes(q)
         )
-    }, [tab, tablaGeneral, tablaJornada, busqueda])
+    }, [tablaGeneral, busqueda])
 
-    // Mi fila en la tabla activa
+    const tablaJornadaFiltrada = useMemo(() => {
+        if (!busqueda.trim()) return tablaJornada
+        const q = busqueda.toLowerCase()
+        return tablaJornada.filter(f =>
+            f.nombreEquipo.toLowerCase().includes(q) ||
+            f.nombreUsuario.toLowerCase().includes(q)
+        )
+    }, [tablaJornada, busqueda])
+
+    // Mi fila en la tabla activa (solo para mostrar el banner de posición, se basará en el tab en movil o general en PC)
     const miFila = useMemo(() => {
         const tabla = tab === 'general' ? tablaGeneral : tablaJornada
         return tabla.find(f => f.nombreUsuario === usuario?.nombreDisplay)
@@ -172,6 +180,52 @@ export default function TorneoDetallePage() {
     if (!torneo) return (
         <div className="flex items-center justify-center h-full">
             <p className="text-textMuted">Torneo no encontrado.</p>
+        </div>
+    )
+
+    const renderTabla = (tablaArr, isJornada) => (
+        <div className="space-y-2">
+            {tablaArr.length === 0 ? (
+                <p className="text-textMuted text-xs text-center py-6">
+                    Sin resultados.
+                </p>
+            ) : (
+                tablaArr.map(fila => {
+                    const esMiEquipo = fila.nombreUsuario === usuario?.nombreDisplay;
+                    const esClickeable = isJornada && jornadaSel != null && !esMiEquipo;
+                    
+                    return (
+                        <div
+                            key={fila.equipoVirtualId}
+                            onClick={() => {
+                                if (esClickeable) {
+                                    navigate(`/torneos/${torneo.id}/equipo/${fila.equipoVirtualId}/jornada/${jornadaSel}`);
+                                }
+                            }}
+                            className={clsx(
+                                'flex items-center gap-3 p-3 rounded-2xl border',
+                                esClickeable ? 'cursor-pointer hover:border-primary/50 transition-colors' : '',
+                                esMiEquipo
+                                    ? 'bg-primary/15 border-primary/40'
+                                    : 'bg-card border-border'
+                            )}
+                        >
+                            <PodioIcon posicion={fila.posicion} size="sm" />
+                            <div className="flex-1 min-w-0">
+                                <p className="text-textMain font-semibold text-sm truncate">
+                                    {fila.nombreEquipo}
+                                </p>
+                                <p className="text-textMuted text-xs truncate">
+                                    {fila.nombreUsuario}
+                                </p>
+                            </div>
+                            <span className="text-accent font-black text-base tabular-nums shrink-0">
+                                {fila.puntajeGlobal !== undefined ? fila.puntajeGlobal.toFixed(1) : (fila.puntos !== undefined ? fila.puntos.toFixed(1) : '0.0')}
+                            </span>
+                        </div>
+                    )
+                })
+            )}
         </div>
     )
 
@@ -318,8 +372,8 @@ export default function TorneoDetallePage() {
                 </div>
             )}
 
-            {/* ── Tabs General / Jornada ───────────────────────────────── */}
-            <div className="flex gap-2 bg-card rounded-2xl p-1">
+            {/* ── Tabs General / Jornada (Solo Móvil) ──────────────────── */}
+            <div className="flex gap-2 bg-card rounded-2xl p-1 md:hidden">
                 {[
                     { key: 'general', label: '🏆 General' },
                     { key: 'jornada', label: '📅 Jornada' },
@@ -339,29 +393,6 @@ export default function TorneoDetallePage() {
                 ))}
             </div>
 
-            {/* Selector de jornada */}
-            {tab === 'jornada' && jornadas.length > 0 && (
-                <select
-                    value={jornadaSel ?? ''}
-                    onChange={e => setJornadaSel(Number(e.target.value))}
-                    className="w-full bg-card border border-border rounded-xl
-                     px-3 py-2 text-textMain text-sm
-                     focus:outline-none focus:border-primary"
-                >
-                    {jornadas.map(j => (
-                        <option key={j.id} value={j.id}>
-                            Jornada {j.numero}
-                        </option>
-                    ))}
-                </select>
-            )}
-
-            {tab === 'jornada' && jornadas.length === 0 && (
-                <p className="text-textMuted text-xs text-center py-3">
-                    No hay jornadas finalizadas todavía.
-                </p>
-            )}
-
             {/* ── Buscador ─────────────────────────────────────────────── */}
             <input
                 type="text"
@@ -370,51 +401,43 @@ export default function TorneoDetallePage() {
                 onChange={e => setBusqueda(e.target.value)}
                 className="w-full bg-card border border-border rounded-xl
                    px-4 py-2.5 text-textMain text-sm
-                   placeholder-textMuted focus:outline-none focus:border-primary"
+                   placeholder-textMuted focus:outline-none focus:border-primary mb-2"
             />
 
-            {/* ── Tabla ────────────────────────────────────────────────── */}
-            <div className="space-y-2">
-                {tablaFiltrada.length === 0 ? (
-                    <p className="text-textMuted text-xs text-center py-6">
-                        Sin resultados.
-                    </p>
-                ) : (
-                    tablaFiltrada.map(fila => {
-                        const esMiEquipo = fila.nombreUsuario === usuario?.nombreDisplay;
-                        const esClickeable = jornadaSel != null && !esMiEquipo;
-                        
-                        return (
-                        <div
-                            key={fila.equipoVirtualId}
-                            onClick={() => {
-                                if (esClickeable) {
-                                    navigate(`/torneos/${torneo.id}/equipo/${fila.equipoVirtualId}/jornada/${jornadaSel}`);
-                                }
-                            }}
-                            className={clsx(
-                                'flex items-center gap-3 p-3 rounded-2xl border',
-                                esClickeable ? 'cursor-pointer hover:border-primary/50 transition-colors' : '',
-                                esMiEquipo
-                                    ? 'bg-primary/15 border-primary/40'
-                                    : 'bg-card border-border'
-                            )}
+            {/* ── Rankings (Desktop 2 col / Mobile Tabs) ───────────────── */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                
+                {/* Columna General */}
+                <div className={clsx("space-y-3", tab === 'general' ? 'block' : 'hidden md:block')}>
+                    <h2 className="hidden md:block text-textMain font-bold text-lg px-1">🏆 Ranking General</h2>
+                    {renderTabla(tablaGeneralFiltrada, false)}
+                </div>
+
+                {/* Columna Jornada */}
+                <div className={clsx("space-y-3", tab === 'jornada' ? 'block' : 'hidden md:block')}>
+                    <h2 className="hidden md:block text-textMain font-bold text-lg px-1">📅 Ranking Jornada</h2>
+                    {jornadas.length > 0 ? (
+                        <select
+                            value={jornadaSel ?? ''}
+                            onChange={e => setJornadaSel(Number(e.target.value))}
+                            className="w-full bg-card border border-border rounded-xl
+                             px-3 py-2 text-textMain text-sm
+                             focus:outline-none focus:border-primary"
                         >
-                            <PodioIcon posicion={fila.posicion} size="sm" />
-                            <div className="flex-1 min-w-0">
-                                <p className="text-textMain font-semibold text-sm truncate">
-                                    {fila.nombreEquipo}
-                                </p>
-                                <p className="text-textMuted text-xs truncate">
-                                    {fila.nombreUsuario}
-                                </p>
-                            </div>
-                            <span className="text-accent font-black text-base tabular-nums shrink-0">
-                                {fila.puntajeGlobal !== undefined ? fila.puntajeGlobal.toFixed(1) : (fila.puntos !== undefined ? fila.puntos.toFixed(1) : '0.0')}
-                            </span>
-                        </div>
-                    )})
-                )}
+                            {jornadas.map(j => (
+                                <option key={j.id} value={j.id}>
+                                    Jornada {j.numero}
+                                </option>
+                            ))}
+                        </select>
+                    ) : (
+                        <p className="text-textMuted text-xs text-center py-3">
+                            No hay jornadas finalizadas todavía.
+                        </p>
+                    )}
+                    {renderTabla(tablaJornadaFiltrada, true)}
+                </div>
+
             </div>
 
             {/* ── Modal: Confirmar salir ───────────────────────────────── */}
@@ -422,11 +445,11 @@ export default function TorneoDetallePage() {
                 <>
                     <div className="fixed inset-0 bg-black/60 z-40"
                         onClick={() => setModalSalir(false)} />
-                    <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto
-                          bg-card border-t border-border rounded-t-3xl
-                          z-50 p-6 space-y-4 animate-slide-up"
+                    <div className="fixed bottom-0 md:top-1/2 md:-translate-y-1/2 md:bottom-auto left-0 right-0 max-w-md mx-auto
+                          bg-card border-t border-border rounded-t-3xl md:rounded-3xl
+                          z-50 p-6 space-y-4 animate-slide-up md:animate-none"
                         onClick={e => e.stopPropagation()}>
-                        <div className="w-10 h-1 bg-border rounded-full mx-auto" />
+                        <div className="w-10 h-1 bg-border rounded-full mx-auto md:hidden" />
                         <h3 className="text-textMain font-bold text-lg">¿Salir del torneo?</h3>
                         <p className="text-textMuted text-sm">
                             Vas a dejar de participar en <strong className="text-textMain">
@@ -457,11 +480,11 @@ export default function TorneoDetallePage() {
                 <>
                     <div className="fixed inset-0 bg-black/60 z-40"
                         onClick={() => setModalInvitar(false)} />
-                    <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto
-                          bg-card border-t border-border rounded-t-3xl
-                          z-50 p-6 space-y-4 animate-slide-up"
+                    <div className="fixed bottom-0 md:top-1/2 md:-translate-y-1/2 md:bottom-auto left-0 right-0 max-w-md mx-auto
+                          bg-card border-t border-border rounded-t-3xl md:rounded-3xl
+                          z-50 p-6 space-y-4 animate-slide-up md:animate-none"
                         onClick={e => e.stopPropagation()}>
-                        <div className="w-10 h-1 bg-border rounded-full mx-auto" />
+                        <div className="w-10 h-1 bg-border rounded-full mx-auto md:hidden" />
                         <h3 className="text-textMain font-bold text-lg">Invitar amigos</h3>
                         <p className="text-textMuted text-sm">
                             Compartí este link para que se unan al torneo.
@@ -495,12 +518,12 @@ export default function TorneoDetallePage() {
                     <div className="fixed inset-0 bg-black/60 z-40"
                         onClick={() => setModalAjustes(false)} />
                     <div
-                        className="fixed bottom-0 left-0 right-0 max-w-md mx-auto
-                 bg-card border-t border-border rounded-t-3xl
-                 z-50 p-6 space-y-4 animate-slide-up"
+                        className="fixed bottom-0 md:top-1/2 md:-translate-y-1/2 md:bottom-auto left-0 right-0 max-w-md mx-auto
+                 bg-card border-t border-border rounded-t-3xl md:rounded-3xl
+                 z-50 p-6 space-y-4 animate-slide-up md:animate-none"
                         onClick={e => e.stopPropagation()}
                     >
-                        <div className="w-10 h-1 bg-border rounded-full mx-auto" />
+                        <div className="w-10 h-1 bg-border rounded-full mx-auto md:hidden" />
                         <h3 className="text-textMain font-bold text-lg">Ajustes del torneo</h3>
 
                         {/* Editar datos */}
@@ -605,11 +628,11 @@ export default function TorneoDetallePage() {
                 <>
                     <div className="fixed inset-0 bg-black/70 z-[60]"
                         onClick={() => setModalExpulsar(false)} />
-                    <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto
-                          bg-card border-t border-border rounded-t-3xl
-                          z-[70] p-6 space-y-4 animate-slide-up"
+                    <div className="fixed bottom-0 md:top-1/2 md:-translate-y-1/2 md:bottom-auto left-0 right-0 max-w-md mx-auto
+                          bg-card border-t border-border rounded-t-3xl md:rounded-3xl
+                          z-[70] p-6 space-y-4 animate-slide-up md:animate-none"
                         onClick={e => e.stopPropagation()}>
-                        <div className="w-10 h-1 bg-border rounded-full mx-auto" />
+                        <div className="w-10 h-1 bg-border rounded-full mx-auto md:hidden" />
                         <h3 className="text-textMain font-bold text-lg">¿Expulsar participante?</h3>
                         <p className="text-textMuted text-sm">
                             Estás por eliminar a <strong className="text-textMain">{jugadorAExpulsar.nombreEquipo}</strong> del torneo. Esta acción no se puede deshacer.

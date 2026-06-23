@@ -131,42 +131,44 @@ export default function TorneosPage() {
                             descripcion="Creá uno nuevo o unite con un código de invitación."
                         />
                     ) : (
-
-                        misTorneos.map(t => (
-                            <button
-                                key={t.id}
-                                onClick={() => navigate(`/torneos/${t.id}`)}
-                                className="card w-full text-left space-y-1 active:scale-95
-               transition-transform hover:border-primary"
-                            >
-                                <div className="flex items-start justify-between gap-2">
-                                    <p className="text-textMain font-bold text-sm truncate flex-1">
-                                        {t.nombre}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                            {misTorneos.map(t => (
+                                <button
+                                    key={t.id}
+                                    onClick={() => navigate(`/torneos/${t.id}`)}
+                                    className="card w-full text-left space-y-1 active:scale-95
+                   transition-transform hover:border-primary"
+                                >
+                                    <div className="flex items-start justify-between gap-2">
+                                        <p className="text-textMain font-bold text-sm truncate flex-1">
+                                            {t.nombre}
+                                        </p>
+                                        <span className={clsx(
+                                            'text-xs font-semibold shrink-0',
+                                            t.tipo === 'PRIVADO' ? 'text-accent' : 'text-green-400'
+                                        )}>
+                                            {t.tipo === 'PRIVADO' ? '🔒' : '🌐'}
+                                        </span>
+                                    </div>
+                                    <p className="text-textMuted text-xs">
+                                        {t.cantidadParticipantes} participante{t.cantidadParticipantes !== 1 ? 's' : ''}
                                     </p>
-                                    <span className={clsx(
-                                        'text-xs font-semibold shrink-0',
-                                        t.tipo === 'PRIVADO' ? 'text-accent' : 'text-green-400'
-                                    )}>
-                                        {t.tipo === 'PRIVADO' ? '🔒' : '🌐'}
-                                    </span>
-                                </div>
-                                <p className="text-textMuted text-xs">
-                                    {t.cantidadParticipantes} participante{t.cantidadParticipantes !== 1 ? 's' : ''}
-                                </p>
-                                {t.descripcion && (
-                                    <p className="text-textMuted text-xs line-clamp-1">{t.descripcion}</p>
-                                )}
-                            </button>
-                        ))
-
+                                    {t.descripcion && (
+                                        <p className="text-textMuted text-xs line-clamp-1">{t.descripcion}</p>
+                                    )}
+                                </button>
+                            ))}
+                        </div>
                     )}
 
-                    <button
-                        onClick={() => setModalCrear(true)}
-                        className="btn-accent w-full"
-                    >
-                        + Crear torneo
-                    </button>
+                    <div className="flex justify-center pt-2">
+                        <button
+                            onClick={() => setModalCrear(true)}
+                            className="btn-accent w-full md:w-auto px-8"
+                        >
+                            + Crear torneo
+                        </button>
+                    </div>
                 </div>
             )}
 
@@ -185,30 +187,31 @@ export default function TorneosPage() {
                     {publicos.length === 0 ? (
                         <EmptyState titulo="Sin resultados" />
                     ) : (
-                        publicos.map(t => (
-                            <button
-                                key={t.id}
-                                onClick={() => navigate(`/torneos/${t.id}`)}
-                                className="card w-full text-left space-y-1 active:scale-95
-               transition-transform hover:border-primary"
-                            >
-                                <div className="flex items-start justify-between gap-2">
-                                    <p className="text-textMain font-bold text-sm truncate flex-1">
-                                        {t.nombre}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                            {publicos.map(t => (
+                                <button
+                                    key={t.id}
+                                    onClick={() => navigate(`/torneos/${t.id}`)}
+                                    className="card w-full text-left space-y-1 active:scale-95
+                   transition-transform hover:border-primary"
+                                >
+                                    <div className="flex items-start justify-between gap-2">
+                                        <p className="text-textMain font-bold text-sm truncate flex-1">
+                                            {t.nombre}
+                                        </p>
+                                        <span className="text-green-400 text-xs font-semibold shrink-0">
+                                            🌐 Público
+                                        </span>
+                                    </div>
+                                    <p className="text-textMuted text-xs">
+                                        {t.cantidadParticipantes} participante{t.cantidadParticipantes !== 1 ? 's' : ''}
                                     </p>
-                                    <span className="text-green-400 text-xs font-semibold shrink-0">
-                                        🌐 Público
-                                    </span>
-                                </div>
-                                <p className="text-textMuted text-xs">
-                                    {t.cantidadParticipantes} participante{t.cantidadParticipantes !== 1 ? 's' : ''}
-                                </p>
-                                {t.descripcion && (
-                                    <p className="text-textMuted text-xs line-clamp-1">{t.descripcion}</p>
-                                )}
-                            </button>
-                        ))
-
+                                    {t.descripcion && (
+                                        <p className="text-textMuted text-xs line-clamp-1">{t.descripcion}</p>
+                                    )}
+                                </button>
+                            ))}
+                        </div>
                     )}
                 </div>
             )}
@@ -233,13 +236,13 @@ export default function TorneosPage() {
                         onClick={() => setTablaModal(null)}
                     />
                     <div
-                        className="fixed bottom-0 left-0 right-0 max-w-md mx-auto
-                       bg-card border-t border-border rounded-t-3xl
-                       z-50 p-6 space-y-4 animate-slide-up max-h-[80vh]
+                        className="fixed bottom-0 md:top-1/2 md:-translate-y-1/2 md:bottom-auto left-0 right-0 max-w-md mx-auto
+                       bg-card border-t border-border rounded-t-3xl md:rounded-3xl
+                       z-50 p-6 space-y-4 animate-slide-up md:animate-none max-h-[80vh]
                        overflow-y-auto"
                         onClick={e => e.stopPropagation()}
                     >
-                        <div className="w-10 h-1 bg-border rounded-full mx-auto" />
+                        <div className="w-10 h-1 bg-border rounded-full mx-auto md:hidden" />
                         <h3 className="text-textMain font-bold text-lg">
                             {tablaModal.torneo.nombre}
                         </h3>
@@ -379,12 +382,12 @@ function ModalCrearTorneo({ onCreado, onCerrar }) {
         <>
             <div className="fixed inset-0 bg-black/60 z-40" onClick={onCerrar} />
             <div
-                className="fixed bottom-0 left-0 right-0 max-w-md mx-auto
-                   bg-card border-t border-border rounded-t-3xl
-                   z-50 p-6 space-y-4 animate-slide-up"
+                className="fixed bottom-0 md:top-1/2 md:-translate-y-1/2 md:bottom-auto left-0 right-0 max-w-md mx-auto
+                   bg-card border-t border-border rounded-t-3xl md:rounded-3xl
+                   z-50 p-6 space-y-4 animate-slide-up md:animate-none"
                 onClick={e => e.stopPropagation()}
             >
-                <div className="w-10 h-1 bg-border rounded-full mx-auto" />
+                <div className="w-10 h-1 bg-border rounded-full mx-auto md:hidden" />
                 <h3 className="text-textMain font-bold text-lg">Nuevo Torneo</h3>
 
                 <div className="space-y-3">

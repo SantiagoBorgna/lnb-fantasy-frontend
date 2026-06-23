@@ -59,7 +59,7 @@ export default function LideresPage() {
     if (loading) return <LoadingSpinner mensaje="Cargando líderes..." />
 
     return (
-        <div className="space-y-4 pb-6">
+        <div className="w-full space-y-4 pb-6">
             <div className="flex items-center justify-between">
                 <h1 className="text-textMain font-bold text-2xl pt-2">Líderes</h1>
                 <BotonAyuda onClick={abrir} />
@@ -73,7 +73,7 @@ export default function LideresPage() {
                         descripcion="Los líderes se actualizarán automáticamente cuando se procesen los primeros partidos de la temporada."
                     />
                 </div>
-            ) : (<div className="grid grid-cols-2 gap-3">
+            ) : (<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {categorias.map(({ categoria, lider }) => (
                     <button
                         key={categoria}
@@ -137,12 +137,12 @@ export default function LideresPage() {
                         className="fixed inset-0 bg-black/60 z-40"
                         onClick={() => setCategoriaAbierta(null)}
                     />
-                    <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto
-                          bg-card border-t border-border rounded-t-3xl
-                          z-50 p-6 space-y-4 animate-slide-up"
+                    <div className="fixed bottom-0 md:top-1/2 md:-translate-y-1/2 md:bottom-auto left-0 right-0 max-w-md mx-auto
+                          bg-card border-t border-border rounded-t-3xl md:rounded-3xl
+                          z-50 p-6 space-y-4 animate-slide-up md:animate-none"
                         onClick={e => e.stopPropagation()}>
 
-                        <div className="w-10 h-1 bg-border rounded-full mx-auto" />
+                        <div className="w-10 h-1 bg-border rounded-full mx-auto md:hidden" />
                         <div className="flex items-center justify-between">
                             <h3 className="text-textMain font-bold text-lg">
                                 {ICONO_CATEGORIA[categoriaAbierta]} Top 5 — {categoriaAbierta}
