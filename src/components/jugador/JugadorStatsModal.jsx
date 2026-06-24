@@ -10,20 +10,22 @@ export default function JugadorStatsModal({ jugador, stats, onCerrar }) {
     return createPortal(
         <>
             <div className="fixed inset-0 bg-black/60 z-40" onClick={onCerrar} />
-            <div className="fixed bottom-0 md:top-1/2 md:-translate-y-1/2 md:bottom-auto left-0 right-0 max-w-md mx-auto bg-card border-t border-border rounded-t-3xl md:rounded-3xl z-50 p-6 space-y-5 animate-slide-up md:animate-none" onClick={e => e.stopPropagation()} onPointerDown={e => e.stopPropagation()}>
+            <div className="fixed bottom-0 md:top-1/2 md:-translate-y-1/2 md:bottom-auto left-0 right-0 max-w-md md:max-w-lg mx-auto bg-card border-t border-border rounded-t-3xl md:rounded-3xl z-50 p-6 md:p-8 space-y-5 md:space-y-6 animate-slide-up md:animate-none" onClick={e => e.stopPropagation()} onPointerDown={e => e.stopPropagation()}>
                 <div className="w-10 h-1 bg-border rounded-full mx-auto md:hidden" />
 
                 {/* Cabecera */}
-                <div className="flex items-center gap-4">
-                    <CamisetaSVG colorPrincipal={jugador.colorPrincipal} colorSecundario={jugador.colorSecundario} numero={jugador.numeroCamiseta} estado={jugador.estado} modelo={jugador.modeloCamiseta} size={64} />
+                <div className="flex items-center gap-4 md:gap-6">
+                    <div className="md:scale-125 md:origin-left transition-transform">
+                        <CamisetaSVG colorPrincipal={jugador.colorPrincipal} colorSecundario={jugador.colorSecundario} numero={jugador.numeroCamiseta} estado={jugador.estado} modelo={jugador.modeloCamiseta} size={64} />
+                    </div>
                     <div className="flex-1">
-                        <h3 className="text-textMain font-bold text-lg leading-tight">{jugador.nombreCompleto}</h3>
-                        <p className="text-textMuted text-sm">{jugador.equipoSigla} · {jugador.posicion}</p>
-                        <p className="text-textMuted text-xs mt-0.5">{jugador.valorMercadoActual?.toFixed(1)} cr</p>
+                        <h3 className="text-textMain font-bold text-lg md:text-xl leading-tight">{jugador.nombreCompleto}</h3>
+                        <p className="text-textMuted text-sm md:text-base">{jugador.equipoSigla} · {jugador.posicion}</p>
+                        <p className="text-textMuted text-xs md:text-sm mt-0.5">{jugador.valorMercadoActual?.toFixed(1)} cr</p>
                     </div>
                     {/* Puntaje Principal */}
                     <div className="text-right">
-                        <p className={clsx("font-black text-3xl", jugoHoy ? "text-accent" : "text-textMuted")}>
+                        <p className={clsx("font-black text-3xl md:text-4xl", jugoHoy ? "text-accent" : "text-textMuted")}>
                             {jugoHoy ? stats.puntajeFantasy?.toFixed(1) : '--'}
                         </p>
                         <p className="text-textMuted text-[10px] uppercase font-bold tracking-wider">
@@ -39,9 +41,9 @@ export default function JugadorStatsModal({ jugador, stats, onCerrar }) {
                 </div>
 
                 {/* Estadísticas Detalladas */}
-                <div className="bg-surface rounded-2xl p-4 border border-border">
+                <div className="bg-surface rounded-2xl p-4 md:p-6 border border-border">
                     {jugoHoy ? (
-                        <div className="grid grid-cols-2 gap-y-3 gap-x-6 text-sm max-h-64 overflow-y-auto pr-1">
+                        <div className="grid grid-cols-2 gap-y-3 gap-x-6 text-sm md:text-base max-h-64 overflow-y-auto pr-1">
                             <StatRow label="Titular" value={stats.fueTitular ? 'Sí' : 'No'} />
                             <StatRow label="Victoria" value={stats.gano ? 'Sí' : 'No'} />
                             <StatRow label="Puntos" value={stats.puntos} />

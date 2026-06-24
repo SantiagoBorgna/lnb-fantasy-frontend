@@ -399,13 +399,13 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
                         <select
                             value={orden}
                             onChange={(e) => setOrden(e.target.value)}
-                            className="w-full bg-surface border border-border text-textMuted text-xs rounded-xl pl-3 pr-8 py-2 md:py-2.5 outline-none focus:border-primary cursor-pointer shadow-sm appearance-none"
+                            className="w-full bg-surface border border-border text-textMuted text-sm rounded-xl pl-3 pr-8 py-2 md:py-2.5 outline-none focus:border-primary cursor-pointer shadow-sm appearance-none"
                             style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%23888\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E")', backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.2em 1.2em' }}
                         >
-                            <option value="precio_desc">💰 Precio Descendiente</option>
-                            <option value="precio_asc">💰 Precio Ascendente</option>
-                            <option value="promedio_desc">🔥 Promedio Fantasy Descendiente</option>
-                            <option value="promedio_asc">❄️ Promedio Fantasy Ascendente</option>
+                            <option value="precio_desc">💰 Mayor Precio</option>
+                            <option value="precio_asc">💰 Menor Precio</option>
+                            <option value="promedio_desc">🔥 Mayor Promedio</option>
+                            <option value="promedio_asc">❄️ Menor Promedio</option>
                             <option value="nombre_asc">🔤 Alfabético (A-Z)</option>
                         </select>
                     </div>
@@ -421,7 +421,7 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
                 />
             ) : (
                 <>
-                    <div className={clsx("grid gap-3 pb-4", layout === 'full' ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "grid-cols-1")}>
+                    <div className={clsx("grid gap-3 pb-4", layout === 'full' ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" : "grid-cols-1")}>
                         {jugadoresVisibles.map(jugador => (
                             <TarjetaJugador
                                 key={jugador.id || jugador.jugadorRealId}
@@ -454,33 +454,35 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
                     <div className="fixed inset-0 bg-black/60 z-40"
                         onClick={() => { setModalJugador(null); setStatsModal(null) }} />
                     <div
-                        className="fixed bottom-0 md:top-1/2 md:-translate-y-1/2 md:bottom-auto left-0 right-0 max-w-md mx-auto
+                        className="fixed bottom-0 md:top-1/2 md:-translate-y-1/2 md:bottom-auto left-0 right-0 max-w-md md:max-w-lg mx-auto
                  bg-card border-t border-border rounded-t-3xl md:rounded-3xl
-                 z-50 p-6 space-y-4 animate-slide-up md:animate-none"
+                 z-50 p-6 md:p-8 space-y-4 md:space-y-6 animate-slide-up md:animate-none"
                         onClick={e => e.stopPropagation()}
                     >
                         <div className="w-10 h-1 bg-border rounded-full mx-auto md:hidden" />
 
                         {/* Header jugador */}
-                        <div className="flex items-center gap-4">
-                            <CamisetaSVG
-                                colorPrincipal={modalJugador.colorPrincipal}
-                                colorSecundario={modalJugador.colorSecundario}
-                                numero={modalJugador.numeroCamiseta}
-                                estado={modalJugador.estado}
-                                modelo={modalJugador.modeloCamiseta}
-                                size={56}
-                            />
+                        <div className="flex items-center gap-4 md:gap-6">
+                            <div className="md:scale-125 md:origin-left transition-transform">
+                                <CamisetaSVG
+                                    colorPrincipal={modalJugador.colorPrincipal}
+                                    colorSecundario={modalJugador.colorSecundario}
+                                    numero={modalJugador.numeroCamiseta}
+                                    estado={modalJugador.estado}
+                                    modelo={modalJugador.modeloCamiseta}
+                                    size={56}
+                                />
+                            </div>
                             <div className="flex-1 min-w-0">
-                                <p className="text-textMain font-bold text-base leading-tight truncate">
+                                <p className="text-textMain font-bold text-lg md:text-xl leading-tight truncate">
                                     {modalJugador.nombreCompleto}
                                 </p>
-                                <p className="text-textMuted text-sm">
+                                <p className="text-textMuted text-sm md:text-base">
                                     {modalJugador.equipoNombre} · {modalJugador.posicion}
                                 </p>
-                                <p className="text-accent font-black text-xl mt-1">
+                                <p className="text-accent font-black text-2xl md:text-3xl mt-1">
                                     {modalJugador.valorMercadoActual?.toFixed(1)}
-                                    <span className="text-sm font-normal text-textMuted ml-1">cr</span>
+                                    <span className="text-base md:text-lg font-normal text-textMuted ml-1">cr</span>
                                 </p>
                             </div>
                         </div>
@@ -491,11 +493,11 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
                                 <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                             </div>
                         ) : statsModal && statsModal.partidosJugados > 0 ? (
-                            <div className="bg-surface/50 rounded-2xl p-4 mt-2 border border-white/5">
-                                <p className="text-textMuted text-[10px] font-bold uppercase tracking-wider mb-4 text-center">
+                            <div className="bg-surface/50 rounded-2xl p-4 md:p-6 mt-2 border border-white/5">
+                                <p className="text-textMuted text-[10px] md:text-xs font-bold uppercase tracking-wider mb-4 md:mb-5 text-center">
                                     Promedios ({statsModal.partidosJugados} {statsModal.partidosJugados === 1 ? 'partido' : 'partidos'})
                                 </p>
-                                <div className="grid grid-cols-2 gap-x-6 gap-y-3">
+                                <div className="grid grid-cols-2 gap-x-6 gap-y-3 md:gap-y-4">
                                     {[
                                         { label: 'Puntos', valor: statsModal.promedioPuntos },
                                         { label: 'Asistencias', valor: statsModal.promedioAsistencias },
@@ -510,9 +512,9 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
                                         { label: 'TC Fallados', valor: statsModal.promedioTirosCampoFallados, negativo: true },
                                         { label: 'TL Fallados', valor: statsModal.promedioTirosLibresFallados, negativo: true },
                                     ].map(({ label, valor, negativo }) => (
-                                        <div key={label} className="flex justify-between items-center border-b border-white/5 pb-1">
-                                            <span className="text-textMuted text-xs">{label}</span>
-                                            <span className={clsx("font-bold text-sm tabular-nums", negativo ? "text-red-400" : "text-textMain")}>
+                                        <div key={label} className="flex justify-between items-center border-b border-white/5 pb-1 md:pb-2">
+                                            <span className="text-textMuted text-xs md:text-sm">{label}</span>
+                                            <span className={clsx("font-bold text-sm md:text-base tabular-nums", negativo ? "text-red-400" : "text-textMain")}>
                                                 {valor !== undefined && valor !== null ? valor.toFixed(1) : '—'}
                                             </span>
                                         </div>

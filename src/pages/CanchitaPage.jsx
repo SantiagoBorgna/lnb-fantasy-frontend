@@ -516,10 +516,10 @@ export default function CanchitaPage() {
     }
 
     return (
-        <div className="max-w-md md:max-w-none mx-auto w-full px-4 space-y-3 pb-6 min-h-screen pt-4 overflow-x-hidden">
+        <div className="max-w-md md:max-w-none mx-auto w-full px-2 lg:px-4 space-y-3 pb-6 min-h-screen pt-4 overflow-x-hidden">
 
             {/* WRAPPER COLUMNAS DESKTOP */}
-            <div className="flex flex-col md:flex-row gap-4 md:gap-6 lg:gap-8">
+            <div className="flex flex-col md:flex-row gap-4 md:gap-4 lg:gap-8">
                 
                 {/* COLUMNA IZQUIERDA */}
                 <div className="flex-1 space-y-4">
@@ -530,7 +530,6 @@ export default function CanchitaPage() {
                         {plantelActual.nombreEquipo ?? 'Mi Equipo'}
                     </h1>
 
-                    {/* Selector de formación con auto-alineación */}
                     <div className="flex items-center gap-2 mt-1">
                         {!modoLectura ? (
                             <select
@@ -565,7 +564,7 @@ export default function CanchitaPage() {
                             </>
                         )}
                     </div>
-                    <div className="md:hidden">
+                    <div>
                         <BotonAyuda onClick={abrir} />
                     </div>
                 </div>
@@ -770,8 +769,10 @@ export default function CanchitaPage() {
             </div> {/* Fin COLUMNA IZQUIERDA */}
             
             {/* COLUMNA DERECHA (Mercado, solo en Tablet/Desktop) */}
-            <div id="mercado-scroll-container" className="hidden md:block w-1/2 shrink-0 border-l border-border pl-4 md:pl-6 lg:pl-8 h-[calc(100vh-2rem)] sticky top-4 overflow-y-auto pb-8 scrollbar-hide">
-                <MercadoPanel layout="panel" onActionComplete={cargarDatos} />
+            <div className="hidden md:block w-[55%] lg:w-1/2 shrink-0 border-l border-border pl-4 md:pl-4 lg:pl-8">
+                <div id="mercado-scroll-container" className="h-[calc(100vh-2rem)] sticky top-4 overflow-y-auto pb-8 scrollbar-hide pr-1 lg:pr-2">
+                    <MercadoPanel layout="panel" onActionComplete={cargarDatos} />
+                </div>
             </div>
 
             </div> {/* Fin WRAPPER COLUMNAS */}
