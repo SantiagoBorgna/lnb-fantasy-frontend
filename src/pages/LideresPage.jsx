@@ -78,36 +78,38 @@ export default function LideresPage() {
                     <button
                         key={categoria}
                         onClick={() => abrirCategoria(categoria)}
-                        className="card text-left space-y-3 active:scale-95
+                        className="card text-left space-y-3 md:space-y-5 md:p-6 active:scale-95
                        transition-transform hover:border-primary"
                     >
                         {/* Cabecera */}
                         <div className="flex items-center justify-between">
-                            <span className="text-textMuted text-xs font-semibold uppercase
+                            <span className="text-textMuted text-xs md:text-sm font-semibold uppercase
                                tracking-wide">
                                 {categoria}
                             </span>
-                            <span className="text-lg">
+                            <span className="text-lg md:text-2xl">
                                 {ICONO_CATEGORIA[categoria] ?? '📊'}
                             </span>
                         </div>
 
                         {/* Líder */}
                         {lider ? (
-                            <div className="flex items-center gap-2">
-                                <CamisetaSVG
-                                    colorPrincipal={lider.colorPrincipal}
-                                    colorSecundario={lider.colorSecundario}
-                                    numero={lider.numeroCamiseta}
-                                    modelo={lider.modeloCamiseta}
-                                    estado="DISPONIBLE"
-                                    size={60}
-                                />
+                            <div className="flex items-center gap-2 md:gap-4 md:mt-2">
+                                <div className="md:scale-110 md:origin-left">
+                                    <CamisetaSVG
+                                        colorPrincipal={lider.colorPrincipal}
+                                        colorSecundario={lider.colorSecundario}
+                                        numero={lider.numeroCamiseta}
+                                        modelo={lider.modeloCamiseta}
+                                        estado="DISPONIBLE"
+                                        size={60}
+                                    />
+                                </div>
                                 <div className="min-w-0">
-                                    <p className="text-textMain font-bold text-sm truncate">
+                                    <p className="text-textMain font-bold text-sm md:text-base truncate">
                                         {lider.nombreCompleto.split(',')[0]}
                                     </p>
-                                    <p className="text-textMuted text-xs">{lider.equipoSigla}</p>
+                                    <p className="text-textMuted text-xs md:text-sm">{lider.equipoSigla}</p>
                                 </div>
                             </div>
                         ) : (
@@ -116,11 +118,11 @@ export default function LideresPage() {
 
                         {/* Promedio destacado */}
                         {lider && (
-                            <div className="flex items-end justify-between">
-                                <span className="text-accent font-black text-2xl tabular-nums">
+                            <div className="flex items-end justify-between md:pt-2">
+                                <span className="text-accent font-black text-2xl md:text-4xl tabular-nums">
                                     {lider.promedio?.toFixed(1)}
                                 </span>
-                                <span className="text-textMuted text-xs mb-1">
+                                <span className="text-textMuted text-xs md:text-sm mb-1 md:mb-1.5">
                                     {pluralPartidos(lider.partidosJugados)}
                                 </span>
                             </div>
