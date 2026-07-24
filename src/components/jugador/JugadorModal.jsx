@@ -23,10 +23,10 @@ export default function JugadorModal({
             <div className="fixed bottom-0 md:top-1/2 md:-translate-y-1/2 md:bottom-auto left-0 right-0 max-w-md mx-auto bg-card border-t border-border rounded-t-3xl md:rounded-3xl z-50 p-6 space-y-5 animate-slide-up md:animate-none" onClick={e => e.stopPropagation()} onPointerDown={e => e.stopPropagation()}>
                 <div className="w-10 h-1 bg-border rounded-full mx-auto md:hidden" />
                 <div className="flex items-center gap-4">
-                    <CamisetaSVG colorPrincipal={jugador.colorPrincipal} colorSecundario={jugador.colorSecundario} numero={jugador.numeroCamiseta} estado={jugador.estado} modelo={jugador.modeloCamiseta} size={64} />
+                    <CamisetaSVG colorPrincipal={jugador.colorPrincipal} colorSecundario={jugador.colorSecundario} numero={jugador.posicion === 'DT' ? 'DT' : jugador.numeroCamiseta} estado={jugador.estado} modelo={jugador.modeloCamiseta} size={64} />
                     <div>
                         <h3 className="text-textMain font-bold text-lg leading-tight">{jugador.nombreCompleto}</h3>
-                        <p className="text-textMuted text-sm">{jugador.equipoSigla} · {jugador.posicion}</p>
+                        <p className="text-textMuted text-sm">{jugador.equipoSigla} {jugador.posicion}</p>
                         <p className="text-accent font-semibold text-sm mt-0.5">{jugador.valorMercadoActual?.toFixed(1)} cr</p>
                     </div>
                 </div>

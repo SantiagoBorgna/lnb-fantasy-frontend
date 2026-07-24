@@ -2,9 +2,11 @@ import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { getMe } from '../api/authApi'
+import { useGameStore } from '../store/gameStore'
 
 export default function AuthCallbackPage() {
     const setAuth = useAuthStore(state => state.setAuth)
+    const { setContextoActual } = useGameStore()
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -21,6 +23,9 @@ export default function AuthCallbackPage() {
         // Guardamos el token primero para que el interceptor de axios
         // lo inyecte en el request de /me
         setAuth(token, null)
+        
+        // Reset context to global
+        setContextoActual(null)
 
         getMe()
             .then(usuario => {

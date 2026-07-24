@@ -6,31 +6,64 @@ import { getMe, logout } from '../../api/authApi'
 import { createPortal } from 'react-dom'
 import TopNav from './TopNav'
 import NotificacionesPrompt from './NotificacionesPrompt' 
+import ContextSwitcher from './ContextSwitcher'
+
+import { getMisTorneos } from '../../api/torneoApi'
+import { useGameStore } from '../../store/gameStore'
+
+import Toast from './Toast'
 
 export default function AppShell() {
     const { token, setAuth, logout: logoutStore } = useAuthStore()
+    const { setMisLigasDraft, clearGameData } = useGameStore()
     const [modalLogout, setModalLogout] = useState(false)
     const navigate = useNavigate()
 
     useEffect(() => {
         if (!token) return
+        
         getMe()
-            .then(usuarioActualizado => setAuth(token, usuarioActualizado))
-            .catch(() => { })
-    }, [])
+            .then(usuarioActualizado => {
+                setAuth(token, usuarioActualizado)
+                return getMisTorneos()
+            })
+            .then(torneos => {
+                const ligasDraft = torneos.filter(t => t.modalidad === 'DRAFT' && t.estadoDraft === 'FINALIZADO')
+                setMisLigasDraft(ligasDraft)
+            })
+            .catch(e => {
+                if (e.response?.status === 401) {
+                    logoutStore()
+                    navigate('/login')
+                }
+            })
+    }, [token, setAuth, logoutStore, navigate, setMisLigasDraft])
 
     const handleLogout = async () => {
         try {
-            await logout()       // Revoca el token en el backend
-        } catch { }
-        logoutStore()          // Limpia el store local
-        navigate('/login', { replace: true })
+            await logout()
+        } catch (e) {
+            console.error('Error al cerrar sesión en el backend:', e)
+        }
+        logoutStore()
+        clearGameData()
+        navigate('/login')
     }
 
     return (
-        <div className="flex flex-col h-full relative bg-surface overflow-hidden">
+        <div className="flex flex-col h-[100dvh] bg-background font-sans text-textMain overflow-hidden">
+            <Toast />
+            
             {/* Nav superior en desktop */}
             <TopNav className="hidden md:flex" onLogout={() => setModalLogout(true)} />
+
+            {/* Header en mobile para el logo y el Context Switcher */}
+            <div className="md:hidden relative flex items-center justify-end px-4 py-3 bg-card border-b border-border shrink-0 z-10 h-14">
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                    <img src="/icons/logo_blanco.png" alt="Sexto Hombre Fantasy" className="h-8 object-contain pointer-events-none" />
+                </div>
+                <ContextSwitcher />
+            </div>
 
             <main className="flex-1 overflow-y-auto pb-20 px-4 pt-4 md:pb-8 md:px-8 xl:px-16 max-w-md md:max-w-none mx-auto w-full">
                 <Outlet />

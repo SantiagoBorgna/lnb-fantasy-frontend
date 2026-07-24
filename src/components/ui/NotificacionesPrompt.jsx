@@ -53,8 +53,10 @@ export default function NotificacionesPrompt() {
                 setMostrar(false)
             }
         } catch (error) {
-            console.error('[DEBUG] Error crítico al suscribir:', error)
-            alert('Oops, hubo un error técnico al suscribirte:\n' + (error.response?.data?.error || error.response?.data?.message || error.message || error.toString()))
+            console.error('Error suscribiendo:', error)
+            const errorMsg = error.response?.data?.error || error.response?.data?.message || error.message || error.toString()
+            const { useUiStore } = await import('../../store/uiStore')
+            useUiStore.getState().showToast('Hubo un error al suscribirte: ' + errorMsg, 'error')
         } finally {
             console.log('[DEBUG] 7. Finalizando carga')
             setCargando(false)

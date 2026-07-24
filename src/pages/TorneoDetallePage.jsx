@@ -1,10 +1,11 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
-import { getTorneo, getTorneoPorCodigo, getTablaTorneo, salirDeTorneo, unirseTorneo, editarTorneo, expulsarParticipante } from '../api/torneoApi'
+import { getTorneo, getTorneoPorCodigo, getTablaTorneo, getFixtureTorneo, salirDeTorneo, unirseTorneo, editarTorneo, expulsarParticipante } from '../api/torneoApi'
 import { getRankingJornada } from '../api/rankingApi'
 import { getJornadas } from '../api/jornadaApi'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
+import JornadaSelector from '../components/ui/JornadaSelector'
 import { createPortal } from 'react-dom'
 import clsx from 'clsx'
 
@@ -18,6 +19,9 @@ export default function TorneoDetallePage() {
     const [tablaJornada, setTablaJornada] = useState([])
     const [jornadas, setJornadas] = useState([])
     const [jornadaSel, setJornadaSel] = useState(null)
+    const [fixture, setFixture] = useState([])
+    const [todasJornadas, setTodasJornadas] = useState([])
+    const [jornadaFixtureSel, setJornadaFixtureSel] = useState(null)
     const [tab, setTab] = useState('general')
     const [busqueda, setBusqueda] = useState('')
     const [loading, setLoading] = useState(true)
@@ -25,6 +29,7 @@ export default function TorneoDetallePage() {
     const [modalSalir, setModalSalir] = useState(false)
     const [modalInvitar, setModalInvitar] = useState(false)
     const [copiado, setCopiado] = useState(false)
+    const [copiadoCodigo, setCopiadoCodigo] = useState(false)
     const [modalAjustes, setModalAjustes] = useState(false)
     const [ajustesNombre, setAjustesNombre] = useState('')
     const [ajustesDesc, setAjustesDesc] = useState('')
@@ -32,6 +37,7 @@ export default function TorneoDetallePage() {
     const [guardandoAjustes, setGuardandoAjustes] = useState(false)
     const [modalExpulsar, setModalExpulsar] = useState(false)
     const [jugadorAExpulsar, setJugadorAExpulsar] = useState(null)
+    const [errorGlobal, setErrorGlobal] = useState('')
 
     const yaParticipa = tablaGeneral.some(
         f => f.nombreUsuario === usuario?.nombreDisplay
@@ -58,17 +64,57 @@ export default function TorneoDetallePage() {
             
             // 2. Una vez que tenemos el torneo, ya sabemos su ID. 
             // Ahora sí buscamos la tabla y las jornadas.
-            Promise.allSettled([
+                        Promise.allSettled([
                 getTablaTorneo(torneoData.id),
-                getJornadas()
-            ]).then(([tablaRes, jornadasRes]) => {
+                getJornadas(),
+                torneoData.tipoPuntuacion === 'H2H' ? getFixtureTorneo(torneoData.id) : Promise.resolve([])
+            ]).then(([tablaRes, jornadasRes, fixtureRes]) => {
                 if (tablaRes.status === 'fulfilled') setTablaGeneral(tablaRes.value)
+                let fetchedTodas = []
+                let fetchedFixture = []
+                
                 if (jornadasRes.status === 'fulfilled') {
-                    const finalizadas = jornadasRes.value
+                    fetchedTodas = jornadasRes.value
+                    setTodasJornadas(fetchedTodas)
+                    const finalizadas = fetchedTodas
                         .filter(j => j.estado === 'FINALIZADA')
                         .sort((a, b) => b.numero - a.numero)
                     setJornadas(finalizadas)
-                    if (finalizadas.length > 0) setJornadaSel(finalizadas[0].id)
+                    if (finalizadas.length > 0) {
+                        setJornadaSel(finalizadas[0].id)
+                    }
+                }
+                
+                if (fixtureRes && fixtureRes.status === 'fulfilled') {
+                    fetchedFixture = fixtureRes.value
+                    setFixture(fetchedFixture)
+                }
+
+                if (fetchedFixture.length > 0) {
+                    const jornadasDelFixture = fetchedTodas.filter(j => fetchedFixture.some(f => f.jornadaId === j.id));
+                    const noFinalizadas = jornadasDelFixture
+                        .filter(j => j.estado !== 'FINALIZADA')
+                        .sort((a, b) => a.numero - b.numero)
+                    if (noFinalizadas.length > 0) {
+                        setJornadaFixtureSel(noFinalizadas[0].id)
+                    } else if (jornadasDelFixture.length > 0) {
+                        const finalizadas = jornadasDelFixture
+                            .filter(j => j.estado === 'FINALIZADA')
+                            .sort((a, b) => b.numero - a.numero)
+                        if (finalizadas.length > 0) setJornadaFixtureSel(finalizadas[0].id)
+                    }
+                } else if (fetchedTodas.length > 0) {
+                    const noFinalizadas = fetchedTodas
+                        .filter(j => j.estado !== 'FINALIZADA')
+                        .sort((a, b) => a.numero - b.numero)
+                    if (noFinalizadas.length > 0) {
+                        setJornadaFixtureSel(noFinalizadas[0].id)
+                    } else {
+                        const finalizadas = fetchedTodas
+                            .filter(j => j.estado === 'FINALIZADA')
+                            .sort((a, b) => b.numero - a.numero)
+                        if (finalizadas.length > 0) setJornadaFixtureSel(finalizadas[0].id)
+                    }
                 }
                 setLoading(false)
             })
@@ -121,9 +167,10 @@ export default function TorneoDetallePage() {
     const handleSalir = async () => {
         try {
             await salirDeTorneo(torneo.id)
+            setModalSalir(false)
             navigate('/torneos', { replace: true })
         } catch (e) {
-            alert(e.response?.data?.mensaje ?? 'No pudiste salir del torneo.')
+            setErrorGlobal(e.response?.data?.mensaje ?? 'No pudiste salir del torneo.')
         }
     }
 
@@ -176,6 +223,12 @@ export default function TorneoDetallePage() {
         setTimeout(() => setCopiado(false), 2500)
     }
 
+    const copiarCodigo = () => {
+        navigator.clipboard.writeText(torneo?.codigoInvitacion || torneo?.codigo || '')
+        setCopiadoCodigo(true)
+        setTimeout(() => setCopiadoCodigo(false), 2500)
+    }
+
     if (loading) return <LoadingSpinner mensaje="Cargando torneo..." />
     if (!torneo) return (
         <div className="flex items-center justify-center h-full">
@@ -192,14 +245,22 @@ export default function TorneoDetallePage() {
             ) : (
                 tablaArr.map(fila => {
                     const esMiEquipo = fila.nombreUsuario === usuario?.nombreDisplay;
-                    const esClickeable = isJornada && jornadaSel != null && !esMiEquipo;
+                    
+                    // Solo son clickeables en la tabla general
+                    const esClickeable = !esMiEquipo && !isJornada;
+                    
+                    // A dónde mandamos
+                    let idJornadaLink = 'actual';
+                    if (torneo?.modalidad === 'CLASICO' && jornadas.length > 0 && torneo?.tipoPuntuacion !== 'H2H') {
+                        idJornadaLink = jornadas[0].id;
+                    }
                     
                     return (
                         <div
                             key={fila.equipoVirtualId}
                             onClick={() => {
                                 if (esClickeable) {
-                                    navigate(`/torneos/${torneo.id}/equipo/${fila.equipoVirtualId}/jornada/${jornadaSel}`);
+                                    navigate(`/torneos/${torneo.id}/equipo/${fila.equipoVirtualId}/jornada/${idJornadaLink}`);
                                 }
                             }}
                             className={clsx(
@@ -220,7 +281,7 @@ export default function TorneoDetallePage() {
                                 </p>
                             </div>
                             <span className="text-accent font-black text-base tabular-nums shrink-0">
-                                {fila.puntajeGlobal !== undefined ? fila.puntajeGlobal.toFixed(1) : (fila.puntos !== undefined ? fila.puntos.toFixed(1) : '0.0')}
+                                {torneo?.tipoPuntuacion === 'H2H' && fila.puntajeGlobal !== undefined ? Math.round(fila.puntajeGlobal) : (fila.puntajeGlobal !== undefined ? fila.puntajeGlobal.toFixed(1) : (fila.puntos !== undefined ? fila.puntos.toFixed(1) : '0.0'))}
                             </span>
                         </div>
                     )
@@ -228,6 +289,84 @@ export default function TorneoDetallePage() {
             )}
         </div>
     )
+
+
+        const renderFixture = (enfrentamientos) => (
+        <div className="bg-surface border border-border rounded-xl overflow-hidden">
+            {enfrentamientos.length === 0 ? (
+                <p className="text-textMuted text-xs text-center py-6">
+                    Sin partidos.
+                </p>
+            ) : (
+                <div className="flex flex-col">
+                    {enfrentamientos.map((e, index) => {
+                        const localMio = e.equipoLocalId === miFila?.equipoVirtualId
+                        const visitaMio = e.equipoVisitanteId === miFila?.equipoVirtualId
+                        const miEnfrentamiento = localMio || visitaMio
+                        
+                        const handleEquipoClick = (equipoId, esMio) => {
+                            if (esMio) return;
+                            const idJornadaLink = torneo?.modalidad === 'DRAFT' ? 'actual' : e.jornadaId;
+                            navigate(`/torneos/${torneo.id}/equipo/${equipoId}/jornada/${idJornadaLink}`);
+                        }
+
+                        const ganaLocal = e.procesado && e.puntajeLocal > (e.equipoVisitanteId ? e.puntajeVisitante : 0);
+                        const ganaVisita = e.procesado && e.equipoVisitanteId && e.puntajeVisitante > e.puntajeLocal;
+
+                        return (
+                            <div key={e.id} className={clsx("px-3 py-2 flex flex-col gap-2 rounded-xl transition-colors", miEnfrentamiento ? "bg-primary/10 border border-primary/30" : "")}>
+                                <div className="flex items-center justify-between mt-1">
+                                    <div className="flex-1 flex justify-end gap-3 items-center">
+                                        <span 
+                                            onClick={() => handleEquipoClick(e.equipoLocalId, localMio)}
+                                            className={clsx(
+                                                "text-sm font-semibold text-right transition-colors",
+                                                localMio ? "text-primary cursor-default" : "text-textMain hover:text-textMain/80 cursor-pointer"
+                                            )}
+                                        >
+                                            {e.equipoLocalNombre}
+                                        </span>
+                                    </div>
+                                      <div className="w-24 md:w-32 shrink-0">
+                                          {e.procesado ? (
+                                              <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1 md:gap-2 w-full">
+                                                  <span className={clsx("text-right text-sm font-black", ganaLocal ? "text-accent" : "text-textMain")}>{Math.round(e.puntajeLocal)}</span>
+                                                  <span className="text-center text-textMuted text-xs font-semibold mx-1">-</span>
+                                                  <span className={clsx("text-left text-sm font-black", ganaVisita ? "text-accent" : "text-textMain")}>{e.equipoVisitanteId ? Math.round(e.puntajeVisitante) : '0'}</span>
+                                              </div>
+                                          ) : (
+                                              <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1 md:gap-2 w-full">
+                                                  <span className="text-right text-sm font-black text-textMuted">-</span>
+                                                  <span className="text-center text-textMuted text-xs font-semibold mx-1">vs</span>
+                                                  <span className="text-left text-sm font-black text-textMuted">-</span>
+                                              </div>
+                                          )}
+                                      </div>
+                                    <div className="flex-1 flex justify-start gap-3 items-center">
+                                        {e.equipoVisitanteId ? (
+                                            <span 
+                                                onClick={() => handleEquipoClick(e.equipoVisitanteId, visitaMio)}
+                                                className={clsx(
+                                                    "text-sm font-semibold text-left transition-colors",
+                                                    visitaMio ? "text-primary cursor-default" : "text-textMain hover:text-textMain/80 cursor-pointer"
+                                                )}
+                                            >
+                                                {e.equipoVisitanteNombre}
+                                            </span>
+                                        ) : (
+                                            <span className="text-sm font-semibold text-textMuted italic text-left">Fecha Libre</span>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )
+                    })}
+                </div>
+            )}
+        </div>
+    )
+
+
 
     return (
         <div className="space-y-4 pb-6">
@@ -246,21 +385,40 @@ export default function TorneoDetallePage() {
                     <h1 className="text-textMain font-black text-xl truncate">
                         {torneo.nombre}
                     </h1>
+                    {errorGlobal && (
+                        <div className="mt-2 mb-2 p-2 bg-red-500/20 border border-red-500 text-red-400 text-sm font-semibold rounded-lg">
+                            {errorGlobal}
+                        </div>
+                    )}
                     {torneo.descripcion && (
                         <p className="text-textMuted text-xs mt-0.5 line-clamp-2">
                             {torneo.descripcion}
                         </p>
                     )}
-                    <div className="flex items-center gap-3 mt-1">
-                        <span className="text-textMuted text-xs">
-                            {torneo.cantidadParticipantes} participantes
+                    <div className="flex items-center gap-3 mt-2 overflow-x-auto no-scrollbar">
+                        <span className="text-textMuted text-xs whitespace-nowrap shrink-0">
+                            {torneo.cantidadParticipantes}{torneo.maxParticipantes ? `/${torneo.maxParticipantes}` : ''} participantes
                         </span>
                         <span className={clsx(
-                            'text-xs font-semibold',
+                            'text-xs font-semibold whitespace-nowrap shrink-0',
                             torneo.tipo === 'PRIVADO' ? 'text-accent' : 'text-green-400'
                         )}>
                             {torneo.tipo === 'PRIVADO' ? '🔒 Privado' : '🌐 Público'}
                         </span>
+                        {torneo.modalidad === 'DRAFT' && yaParticipa && (
+                            <button
+                                onClick={() => {
+                                    if (torneo.cantidadParticipantes < torneo.maxParticipantes) {
+                                        setErrorGlobal('Los cupos del torneo deben estar llenos para entrar a la Sala de Draft.')
+                                    } else {
+                                        navigate(`/torneos/${torneo.id}/draft`)
+                                    }
+                                }}
+                                className="bg-accent text-white font-bold py-1 px-3 rounded-lg text-xs hover:bg-accent/80 transition-colors whitespace-nowrap shrink-0"
+                            >
+                                Entrar a Sala Draft
+                            </button>
+                        )}
                     </div>
                 </div>
 
@@ -288,14 +446,40 @@ export default function TorneoDetallePage() {
 
                                     {/* Ajustes — solo admin */}
                                     {torneo.esAdmin && (
-                                        <button
-                                            onClick={() => abrirAjustes()}
-                                            className="w-full flex items-center gap-3 px-4 py-3
-                                   text-textMain text-sm hover:bg-surface
-                                   transition-colors text-left"
-                                        >
-                                            ⚙️ Ajustes
-                                        </button>
+                                        <>
+                                            <button
+                                                onClick={() => abrirAjustes()}
+                                                className="w-full flex items-center gap-3 px-4 py-3
+                                       text-textMain text-sm hover:bg-surface
+                                       transition-colors text-left"
+                                            > Ajustes
+                                            </button>
+                                            
+                                            {/* Añadir Bot - testing draft */}
+                                            {torneo.modalidad === 'DRAFT' && (
+                                                <button
+                                                    onClick={async () => {
+                                                        try {
+                                                            setMenuAbierto(false);
+                                                            const { agregarBot } = await import('../api/torneoApi');
+                                                            await agregarBot(torneo.id);
+                                                            const tabla = await getTablaTorneo(torneo.id);
+                                                            setTablaGeneral(tabla);
+                                                            setTorneo(prev => ({
+                                                                ...prev,
+                                                                cantidadParticipantes: prev.cantidadParticipantes + 1
+                                                            }));
+                                                        } catch (e) {
+                                                            setErrorGlobal(e.response?.data?.mensaje ?? "Error al añadir bot");
+                                                        }
+                                                    }}
+                                                    className="w-full flex items-center gap-3 px-4 py-3
+                                       text-textMain text-sm hover:bg-surface
+                                       transition-colors text-left border-t border-border"
+                                                > Añadir Bot
+                                                </button>
+                                            )}
+                                        </>
                                     )}
 
                                     {/* Invitar amigos */}
@@ -307,8 +491,7 @@ export default function TorneoDetallePage() {
                                         className="w-full flex items-center gap-3 px-4 py-3
                                  text-textMain text-sm hover:bg-surface
                                  transition-colors text-left"
-                                    >
-                                        👥 Invitar amigos
+                                    > Invitar amigos
                                     </button>
 
                                     {/* Salir — no disponible para el creador */}
@@ -321,8 +504,7 @@ export default function TorneoDetallePage() {
                                             className="w-full flex items-center gap-3 px-4 py-3
                                    text-red-400 text-sm hover:bg-surface
                                    transition-colors text-left border-t border-border"
-                                        >
-                                            🚪 Salir del torneo
+                                        > Salir del torneo
                                         </button>
                                     )}
                                 </div>
@@ -337,16 +519,19 @@ export default function TorneoDetallePage() {
                 <button
                     onClick={async () => {
                         try {
+                            // Validar limite
+                            if (torneo.maxParticipantes && torneo.cantidadParticipantes >= torneo.maxParticipantes) {
+                                setErrorGlobal("El torneo ya está lleno.")
+                                return
+                            }
+
                             const codigo = torneo.codigo || torneo.codigoInvitacion;
                             if (!codigo) throw new Error("No se encontró el código del torneo.");
 
                             await unirseTorneo(codigo)
-
-                            // Recargar la tabla si tuvo éxito
-                            const tabla = await getTablaTorneo(torneo.id);
-                            setTablaGeneral(tabla)
+                            navigate(`/torneos/${torneo.id}`, { replace: true })
                         } catch (e) {
-                            alert(e.response?.data?.mensaje ?? e.message ?? 'No se pudo unir al torneo.')
+                            setErrorGlobal(e.response?.data?.mensaje ?? e.message ?? 'No se pudo unir al torneo.')
                         }
                     }}
                     className="btn-accent w-full"
@@ -367,17 +552,20 @@ export default function TorneoDetallePage() {
                         <p className="text-textMuted text-xs">Tu posición en este torneo</p>
                     </div>
                     <span className="text-accent font-black text-lg tabular-nums">
-                        {miFila.puntajeGlobal?.toFixed(1)}
+                        {torneo.tipoPuntuacion === 'H2H' ? Math.round(miFila.puntajeGlobal) : miFila.puntajeGlobal?.toFixed(1)}
                     </span>
                 </div>
             )}
 
-            {/* ── Tabs General / Jornada (Solo Móvil) ──────────────────── */}
+            {/* ── Tabs (Solo Móvil) ──────────────────── */}
             <div className="flex gap-2 bg-card rounded-2xl p-1 md:hidden">
-                {[
-                    { key: 'general', label: '🏆 General' },
-                    { key: 'jornada', label: '📅 Jornada' },
-                ].map(({ key, label }) => (
+                {(torneo.tipoPuntuacion === 'H2H' ? [
+                    { key: 'general', label: 'Posiciones' },
+                    { key: 'fixture', label: 'Fixture' },
+                ] : [
+                    { key: 'general', label: 'General' },
+                    { key: 'jornada', label: 'Jornada' },
+                ]).map(({ key, label }) => (
                     <button
                         key={key}
                         onClick={() => setTab(key)}
@@ -404,39 +592,56 @@ export default function TorneoDetallePage() {
                    placeholder-textMuted focus:outline-none focus:border-primary mb-2"
             />
 
-            {/* ── Rankings (Desktop 2 col / Mobile Tabs) ───────────────── */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* ── Rankings (Desktop / Mobile Tabs) ───────────────── */}
+            <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
                 
                 {/* Columna General */}
                 <div className={clsx("space-y-3", tab === 'general' ? 'block' : 'hidden md:block')}>
-                    <h2 className="hidden md:block text-textMain font-bold text-lg px-1">🏆 Ranking General</h2>
+                    <h2 className="hidden md:block text-textMain font-bold text-lg px-1">{torneo.tipoPuntuacion === 'H2H' ? 'Tabla General' : 'Ranking General'}</h2>
                     {renderTabla(tablaGeneralFiltrada, false)}
                 </div>
 
-                {/* Columna Jornada */}
-                <div className={clsx("space-y-3", tab === 'jornada' ? 'block' : 'hidden md:block')}>
-                    <h2 className="hidden md:block text-textMain font-bold text-lg px-1">📅 Ranking Jornada</h2>
-                    {jornadas.length > 0 ? (
-                        <select
-                            value={jornadaSel ?? ''}
-                            onChange={e => setJornadaSel(Number(e.target.value))}
-                            className="w-full bg-card border border-border rounded-xl
-                             px-3 py-2 text-textMain text-sm
-                             focus:outline-none focus:border-primary"
-                        >
-                            {jornadas.map(j => (
-                                <option key={j.id} value={j.id}>
-                                    Jornada {j.numero}
-                                </option>
-                            ))}
-                        </select>
-                    ) : (
-                        <p className="text-textMuted text-xs text-center py-3">
-                            No hay jornadas finalizadas todavía.
-                        </p>
-                    )}
-                    {renderTabla(tablaJornadaFiltrada, true)}
-                </div>
+                {/* Columnas para Clásico / Draft (Por Puntos) */}
+                {torneo.tipoPuntuacion !== 'H2H' && (
+                    <div className={clsx("space-y-3", tab === 'jornada' ? 'block' : 'hidden md:block')}>
+                        <h2 className="hidden md:block text-textMain font-bold text-lg px-1">Ranking Jornada</h2>
+                        {todasJornadas.filter(j => j.estado === 'FINALIZADA').length > 0 ? (
+                            <JornadaSelector
+                                jornadas={todasJornadas.filter(j => j.estado === 'FINALIZADA')}
+                                selectedId={jornadaSel}
+                                onSelect={setJornadaSel}
+                            />
+                        ) : (
+                            <p className="text-textMuted text-xs text-center py-3">
+                                No hay jornadas finalizadas todavía.
+                            </p>
+                        )}
+                        {renderTabla(tablaJornadaFiltrada, true)}
+                    </div>
+                )}
+
+                {/* Columnas para H2H */}
+                {torneo.tipoPuntuacion === 'H2H' && (
+                    <div className={clsx("space-y-3", tab === 'fixture' ? 'block' : 'hidden md:block')}>
+                        <h2 className="hidden md:block text-textMain font-bold text-lg px-1">Fixture</h2>
+                        {(() => {
+                            const jornadasDelFixture = todasJornadas.filter(j => fixture.some(f => f.jornadaId === j.id));
+                            if (jornadasDelFixture.length === 0) return (
+                                <p className="text-textMuted text-xs text-center py-3">
+                                    No hay fixture programado.
+                                </p>
+                            );
+                            return (
+                                <JornadaSelector
+                                    jornadas={jornadasDelFixture}
+                                    selectedId={jornadaFixtureSel}
+                                    onSelect={setJornadaFixtureSel}
+                                />
+                            );
+                        })()}
+                        {renderFixture(fixture.filter(f => f.jornadaId === jornadaFixtureSel))}
+                    </div>
+                )}
 
             </div>
 
@@ -501,6 +706,21 @@ export default function TorneoDetallePage() {
                                 {copiado ? '✓ Copiado' : 'Copiar'}
                             </button>
                         </div>
+                        <p className="text-textMuted text-sm pt-2">
+                            O pasales este código.
+                        </p>
+                        <div className="bg-surface border border-border rounded-xl
+                             px-4 py-3 flex items-center gap-3">
+                            <p className="flex-1 text-textMuted text-xs truncate">
+                                {torneo.codigoInvitacion || torneo.codigo}
+                            </p>
+                            <button
+                                onClick={copiarCodigo}
+                                className="text-primary text-sm font-semibold shrink-0"
+                            >
+                                {copiadoCodigo ? '✓ Copiado' : 'Copiar'}
+                            </button>
+                        </div>
                         <button
                             onClick={() => setModalInvitar(false)}
                             className="w-full py-2 text-textMuted text-sm"
@@ -547,19 +767,26 @@ export default function TorneoDetallePage() {
                      focus:outline-none focus:border-primary"
                             />
                             <div className="flex gap-2">
-                                {['PUBLICO', 'PRIVADO'].map(t => (
-                                    <button
-                                        key={t}
-                                        onClick={() => setAjustesTipo(t)}
-                                        className={`flex-1 py-2 rounded-xl text-sm font-semibold
-                border transition-colors
-                ${ajustesTipo === t
-                                                ? 'bg-primary border-primary text-white'
-                                                : 'border-border text-textMuted'}`}
-                                    >
-                                        {t === 'PUBLICO' ? '🌐 Público' : '🔒 Privado'}
-                                    </button>
-                                ))}
+                                {torneo.modalidad === 'DRAFT' ? (
+                                      <div className="w-full py-2 rounded-xl text-sm font-semibold border bg-primary/20 border-primary/40 text-primary text-center cursor-not-allowed">
+                                          PRIVADO
+                                      </div>
+                                  ) : (
+                                      ['PUBLICO', 'PRIVADO'].map(t => (
+                                          <button
+                                              key={t}
+                                              onClick={() => setAjustesTipo(t)}
+                                              className={`flex-1 py-2 rounded-xl text-sm font-semibold
+                  border transition-colors
+                  ${ajustesTipo === t
+                                                      ? 'bg-primary border-primary text-white'
+                                                      : 'border-border text-textMuted hover:border-primary/50'
+                                                  }`}
+                                          >
+                                              {t}
+                                          </button>
+                                      ))
+                                  )}
                             </div>
                         </div>
 

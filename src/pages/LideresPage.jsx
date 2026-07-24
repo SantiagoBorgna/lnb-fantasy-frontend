@@ -83,18 +83,18 @@ export default function LideresPage() {
                     >
                         {/* Cabecera */}
                         <div className="flex items-center justify-between">
-                            <span className="text-textMuted text-xs md:text-sm font-semibold uppercase
+                            <span className="text-textMuted text-sm font-semibold uppercase
                                tracking-wide">
                                 {categoria}
                             </span>
-                            <span className="text-lg md:text-2xl">
+                            <span className="text-xl md:text-2xl">
                                 {ICONO_CATEGORIA[categoria] ?? '📊'}
                             </span>
                         </div>
 
                         {/* Líder */}
                         {lider ? (
-                            <div className="flex items-center gap-2 md:gap-4 md:mt-2">
+                            <div className="flex items-center gap-3 md:gap-4 md:mt-2">
                                 <div className="md:scale-110 md:origin-left">
                                     <CamisetaSVG
                                         colorPrincipal={lider.colorPrincipal}
@@ -106,23 +106,23 @@ export default function LideresPage() {
                                     />
                                 </div>
                                 <div className="min-w-0">
-                                    <p className="text-textMain font-bold text-sm md:text-base truncate">
+                                    <p className="text-textMain font-bold text-base truncate">
                                         {lider.nombreCompleto.split(',')[0]}
                                     </p>
-                                    <p className="text-textMuted text-xs md:text-sm">{lider.equipoSigla}</p>
+                                    <p className="text-textMuted text-sm">{lider.equipoSigla}</p>
                                 </div>
                             </div>
                         ) : (
-                            <p className="text-textMuted text-xs">Sin datos</p>
+                            <p className="text-textMuted text-sm">Sin datos</p>
                         )}
 
                         {/* Promedio destacado */}
                         {lider && (
                             <div className="flex items-end justify-between md:pt-2">
-                                <span className="text-accent font-black text-2xl md:text-4xl tabular-nums">
+                                <span className="text-accent font-black text-3xl md:text-4xl tabular-nums">
                                     {lider.promedio?.toFixed(1)}
                                 </span>
-                                <span className="text-textMuted text-xs md:text-sm mb-1 md:mb-1.5">
+                                <span className="text-textMuted text-sm mb-1 md:mb-1.5">
                                     {pluralPartidos(lider.partidosJugados)}
                                 </span>
                             </div>

@@ -12,15 +12,16 @@ export default function SlotJugador({
     onDragOver,
     onDrop,
     readonly = false, // <-- Prop de solo lectura
+    esDraft = false,
 }) {
     const esCap = jugador.rol === 'CAPITAN'
 
     // El valor mostrado depende del modo:
-    // - undefined → modo edición → mostrar créditos
+    // - undefined → modo edición → mostrar créditos (o nada en draft)
     // - null      → modo lectura, no jugó → mostrar "--"
     // - número    → modo lectura, jugó → mostrar pts
     const valorInfo = puntosJornada === undefined
-        ? `${jugador.valorMercadoActual?.toFixed(1) ?? '?'} cr`
+        ? (esDraft ? '' : `${jugador.valorMercadoActual?.toFixed(1) ?? '?'} cr`)
         : puntosJornada === null
             ? '--'
             : `${puntosJornada?.toFixed(1)} pts`

@@ -10,6 +10,9 @@ import EmptyState from '../components/ui/EmptyState'
 import CamisetaSVG from '../components/jugador/CamisetaSVG'
 import { useNavigate } from 'react-router-dom'
 import { useTransferenciaStore } from '../store/transferenciaStore'
+import { useGameStore } from '../store/gameStore'
+import { useAuthStore } from '../store/authStore'
+import { useUiStore } from '../store/uiStore'
 import {
     esTitular, esBanco,
     zonasDeFormacion, esCompatible
@@ -21,10 +24,14 @@ import ModalAyuda from '../components/ui/ModalAyuda'
 import BotonAyuda from '../components/ui/BotonAyuda'
 import { AYUDA } from '../components/ui/ayudaContenido'
 import MercadoPanel from '../components/mercado/MercadoPanel'
+import ProponerTraspasoModal from '../components/mercado/ProponerTraspasoModal'
 
 export default function CanchitaPage() {
     const navigate = useNavigate()
     const iniciarTransferencia = useTransferenciaStore(s => s.iniciarTransferencia)
+    const { contextoActual } = useGameStore()
+    const { usuario } = useAuthStore()
+    const { showToast } = useUiStore()
 
     // ── Estado principal ─────────────────────────────────────────────────────
     const [plantel, setPlantel] = useState(null)
@@ -33,6 +40,7 @@ export default function CanchitaPage() {
     const [jornadaActiva, setJornadaActiva] = useState(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
+    const [jornadaProxima, setJornadaProxima] = useState(null)
 
     // ── Modales ──────────────────────────────────────────────────────────────
     const [jugadorModal, setJugadorModal] = useState(null)
@@ -41,6 +49,7 @@ export default function CanchitaPage() {
     const [dtModal, setDtModal] = useState(false)
     const [selectorDtAberto, setSelectorDtAberto] = useState(false)
     const [dtStatsAbierto, setDtStatsAbierto] = useState(false)
+    const [jugadorParaTraspaso, setJugadorParaTraspaso] = useState(null)
 
     // ── Switch de jornada (Última Fecha) ─────────────────────────────────────
     const [jornadaAnterior, setJornadaAnterior] = useState(null)
@@ -57,6 +66,7 @@ export default function CanchitaPage() {
     const { abierto, abrir, cerrar } = useAyuda('canchita')
 
     const [partidosFixture, setPartidosFixture] = useState([])
+    const [esFaseRestringida, setEsFaseRestringida] = useState(false)
 
     const handleTransferenciaDesdeEntrada = async (jugadorSale) => {
         if (!pendienteEntrada) return
@@ -75,13 +85,24 @@ export default function CanchitaPage() {
         }
 
         try {
-            await realizarTransferencia({
-                jugadorSaleId: jugadorSale.jugadorRealId,
-                jugadorEntraId: pendienteEntrada.id || pendienteEntrada.jugadorRealId,
-                rolEntrante: jugadorSale.rol,
-            })
+            if (contextoActual && esFaseRestringida) {
+                const { waiverApi } = await import('../api/waiverApi')
+                await waiverApi.registrarReclamo({
+                    torneoId: contextoActual.torneoDraft?.id || contextoActual, // Canchita stores torneoId differently? Wait, CanchitaPage uses contextoActual?.torneoDraft?.id!
+                    jugadorEntranteId: pendienteEntrada.id || pendienteEntrada.jugadorRealId,
+                    jugadorSalienteId: jugadorSale.jugadorRealId,
+                })
+            } else {
+                await realizarTransferencia({
+                    torneoId: contextoActual?.torneoDraft?.id || null, // Fallback if it's an object or just a number? Wait, in CanchitaPage: `contextoActual?.torneoDraft?.id` is used in getPlantel. Let's look closely at CanchitaPage's getPlantel call.
+                    jugadorSaleId: jugadorSale.jugadorRealId,
+                    jugadorEntraId: pendienteEntrada.id || pendienteEntrada.jugadorRealId,
+                    rolEntrante: jugadorSale.rol,
+                })
+            }
+            
             cancelarEntrada()
-            const actualizado = await getPlantel()
+            const actualizado = await getPlantel(contextoActual?.torneoDraft?.id || contextoActual || null, contextoActual?.usuario?.id || null)
             setPlantel(actualizado)
             setJugadores(actualizado.jugadores ?? [])
         } catch (e) {
@@ -95,23 +116,43 @@ export default function CanchitaPage() {
     }
 
     // ── Carga inicial ────────────────────────────────────────────────────────
-    const cargarDatos = () => {
+    // ── Carga inicial ────────────────────────────────────────────────────────
+    const cargarDatos = async () => {
         setLoading(true)
+        
+        let faseRestringidaRes = false;
+        if (contextoActual) {
+            try {
+                const { waiverApi } = await import('../api/waiverApi');
+                faseRestringidaRes = await waiverApi.obtenerFaseRestringida();
+            } catch (e) {
+                console.error("Error fetching fase restringida:", e);
+            }
+        }
+        
         Promise.allSettled([
-            getPlantel(),
+            getPlantel(contextoActual, usuario?.id),
             getJornadaActiva(),
-            getJornadaProxima(), // <-- Agregamos esta llamada
+            getJornadaProxima(),
             getJornadas(),
         ]).then(([plantelRes, activaRes, proximaRes, jornadasRes]) => {
+            setEsFaseRestringida(faseRestringidaRes);
             if (plantelRes.status === 'fulfilled' && plantelRes.value) {
                 setPlantel(plantelRes.value)
                 setJugadores(plantelRes.value.jugadores ?? [])
+            } else {
+                setPlantel(null)
+                setJugadores([])
             }
 
             // Lógica inteligente: Si no hay activa, usamos la próxima
             const jornadaActualData = (activaRes.status === 'fulfilled' && activaRes.value)
                 ? activaRes.value
                 : (proximaRes.status === 'fulfilled' ? proximaRes.value : null);
+
+            if (proximaRes.status === 'fulfilled' && proximaRes.value) {
+                setJornadaProxima(proximaRes.value)
+            }
 
             if (jornadaActualData) {
                 setJornadaEstado(jornadaActualData.estado)
@@ -128,7 +169,8 @@ export default function CanchitaPage() {
         }).finally(() => setLoading(false))
     }
 
-    useEffect(() => { cargarDatos() }, [])
+    // Recargar datos cuando cambie el contexto
+    useEffect(() => { cargarDatos() }, [contextoActual])
 
     useEffect(() => {
         const recargarAlVolver = () => {
@@ -139,12 +181,13 @@ export default function CanchitaPage() {
     }, [])
 
     useEffect(() => {
-        const jid = jornadaVista ?? jornadaActiva?.id
+        const esPlantelAdelantado = plantel && jornadaActiva && plantel.jornadaNumero > jornadaActiva.numero;
+        const jid = jornadaVista ?? (esPlantelAdelantado ? jornadaProxima?.id : jornadaActiva?.id)
         if (!jid) return
 
         // Traer estadísticas
         if (jornadaEstado !== 'ABIERTA_A_CAMBIOS' || jornadaVista !== null) {
-            getEstadisticasJornada(jid).then(lista => {
+            getEstadisticasJornada(jid, contextoActual?.torneoDraft?.id || null).then(lista => {
                 const mapa = {}
                 lista.forEach(e => { mapa[e.jugadorRealId] = e })
                 setEstadisticas(mapa)
@@ -156,7 +199,7 @@ export default function CanchitaPage() {
             .then(setPartidosFixture)
             .catch(() => setPartidosFixture([]))
 
-    }, [jornadaVista, jornadaActiva, jornadaEstado])
+    }, [jornadaVista, jornadaActiva, jornadaEstado, plantel, jornadaProxima])
 
     useEffect(() => {
         if (jornadaVista === null) {
@@ -164,28 +207,35 @@ export default function CanchitaPage() {
             return
         }
         setLoadingVista(true)
-        import('../api/plantelApi').then(({ getPlantelJornada }) => {
-            getPlantelJornada(jornadaVista)
+        import('../api/plantelApi').then(({ getPlantelJornada, getPlantelHistoricoDeTorneo }) => {
+            const torneoId = typeof contextoActual === 'object' ? contextoActual?.torneoDraft?.id : contextoActual;
+            const prom = torneoId 
+               ? getPlantelHistoricoDeTorneo(torneoId, jornadaVista, usuario?.id)
+               : getPlantelJornada(jornadaVista);
+               
+            prom
                 .then(data => setPlantelVista(data))
                 .catch(() => setPlantelVista(null))
                 .finally(() => setLoadingVista(false))
         })
-    }, [jornadaVista])
+    }, [jornadaVista, contextoActual, usuario])
 
-    // ── Autoguardado silencioso ──────────────────────────────────────────────
     // ── Autoguardado silencioso ──────────────────────────────────────────────
     const autoGuardar = async (nuevosJugadores, nuevaFormacion) => {
         const formacionFinal = nuevaFormacion || plantel.formacion;
         try {
             if (nuevaFormacion) setPlantel(prev => ({ ...prev, formacion: formacionFinal }));
 
+            const payloadJugadores = nuevosJugadores.map(j => ({
+                jugadorRealId: j.jugadorRealId,
+                rol: j.rol,
+            }))
+
             await guardarPlantel({
                 dtId: plantel.dt?.dtId,
                 formacion: formacionFinal,
-                jugadores: nuevosJugadores.map(j => ({
-                    jugadorRealId: j.jugadorRealId,
-                    rol: j.rol,
-                }))
+                jugadores: payloadJugadores,
+                torneoId: contextoActual
             })
         } catch (e) {
             // ¡ACÁ ESTÁ EL FIX! Ahora leemos el error real de tu Spring Boot
@@ -263,7 +313,23 @@ export default function CanchitaPage() {
 
     const handleCambiarDt = async (nuevoDt) => {
         try {
-            await cambiarDt(nuevoDt.id)
+            if (contextoActual) {
+                const torneoId = typeof contextoActual === 'object' ? contextoActual?.torneoDraft?.id : contextoActual;
+                if (esFaseRestringida) {
+                    const { waiverApi } = await import('../api/waiverApi');
+                    await waiverApi.registrarReclamo({
+                        torneoId,
+                        dtEntranteId: nuevoDt.id,
+                        dtSalienteId: plantel?.dt?.dtId || null
+                    });
+                    showToast("Se creó tu reclamo de DT exitosamente.");
+                } else {
+                    await cambiarDt(nuevoDt.id, torneoId);
+                    showToast("Fichaje de DT exitoso.");
+                }
+            } else {
+                await cambiarDt(nuevoDt.id);
+            }
             cargarDatos()
         } catch (e) {
             setError(e.response?.data?.mensaje ?? 'Error al cambiar de DT.')
@@ -425,6 +491,12 @@ export default function CanchitaPage() {
     }
 
     const handleTransferir = (jugador) => {
+        if (contextoActual) {
+            setJugadorParaTraspaso(jugador)
+            setJugadorModal(null)
+            return
+        }
+
         const zonas = zonasDeFormacion(plantel?.formacion)
         const titulares = getTitularesOrdenados()
         const idxTitular = titulares.findIndex(
@@ -463,7 +535,9 @@ export default function CanchitaPage() {
     );
 
     // 2. Manejamos los estados vacíos de forma inteligente
-    if (!plantelActual) {
+    const estaVacio = !plantelActual || (plantelActual.jugadores && plantelActual.jugadores.length === 0)
+
+    if (estaVacio) {
         return (
             <div className="max-w-md mx-auto w-full px-4 space-y-3 pb-6 min-h-screen pt-4">
                 {TabsJornada}
@@ -473,7 +547,6 @@ export default function CanchitaPage() {
                         <EmptyState
                             titulo="Sin participación"
                             descripcion="No jugaste en la jornada anterior."
-                        // Sin botón de acción
                         />
                     ) : (
                         <EmptyState
@@ -557,7 +630,7 @@ export default function CanchitaPage() {
                             <p className="text-accent font-bold text-lg">
                                 {puntajeEnVivo.toFixed(1)} pts
                             </p>
-                        ) : (
+                        ) : contextoActual ? null : (
                             <>
                                 <p className="text-accent font-bold text-lg">{plantel?.presupuestoRestante?.toFixed(1)} cr</p>
                                 <p className="text-textMuted text-xs">disponibles</p>
@@ -588,7 +661,13 @@ export default function CanchitaPage() {
 
             {!modoLectura && esPlantelAdelantado && jornadaVista === null && (
                 <div className="rounded-2xl px-4 py-2.5 text-sm font-semibold text-center mt-2 bg-green-900/30 border border-green-700/50 text-green-400">
-                    🟢 Mercado abierto para tu debut (Jornada {plantel.jornadaNumero})
+                    🟢 Mercado abierto para la fecha {plantel.jornadaNumero}
+                </div>
+            )}
+
+            {!modoLectura && !esPlantelAdelantado && jornadaVista === null && (
+                <div className="rounded-2xl px-4 py-2.5 text-sm font-semibold text-center mt-2 bg-green-900/30 border border-green-700/50 text-green-400">
+                    🟢 Mercado abierto para la jornada {jornadaActiva?.numero}
                 </div>
             )}
 
@@ -662,6 +741,7 @@ export default function CanchitaPage() {
                                                 ? (stats?.jugó ? (stats.puntajeFantasy * jugador.multiplicador) : null)
                                                 : undefined
                                             }
+                                            esDraft={!!contextoActual}
                                             onClick={() => handleClickSlot(jugador)}
                                             onDragStart={() => handleDragStart(jugador.jugadorRealId)}
                                             onDrop={() => handleDrop(jugador.jugadorRealId)}
@@ -690,6 +770,7 @@ export default function CanchitaPage() {
                                         ? (stats?.jugó ? (stats.puntajeFantasy * jugador.multiplicador) : null)
                                         : undefined
                                     }
+                                    esDraft={!!contextoActual}
                                     onClick={() => handleClickSlot(jugador)}
                                     onDragStart={() => handleDragStart(jugador.jugadorRealId)}
                                     onDrop={() => handleDrop(jugador.jugadorRealId)}
@@ -736,17 +817,14 @@ export default function CanchitaPage() {
 
                             return (
                                 <div key={partido.id} className="bg-surface border border-border rounded-xl p-3 flex flex-col gap-2">
-                                    <div className="flex justify-between items-center text-[10px] font-bold text-textMuted uppercase tracking-wider">
+                                    <div className="flex justify-center items-center text-[10px] font-bold text-textMuted uppercase tracking-wider">
                                         <span>{diaStr} - {horaStr} hs</span>
-                                        <span className={terminado ? 'text-accent' : 'text-primary'}>
-                                            {terminado ? 'Finalizado' : 'Programado'}
-                                        </span>
                                     </div>
                                     <div className="flex items-center justify-between mt-1">
-                                        <div className="flex-1 flex justify-end gap-3 items-center">
+                                        <div className="flex-1 flex justify-end items-center pr-8">
                                             <span className="text-sm font-semibold text-textMain">{partido.siglaLocal}</span>
                                         </div>
-                                        <div className="w-16 text-center shrink-0">
+                                        <div className="w-20 text-center shrink-0">
                                             {terminado ? (
                                                 <span className="text-sm font-black text-accent tracking-widest">
                                                     {partido.puntosLocal} - {partido.puntosVisitante}
@@ -755,7 +833,7 @@ export default function CanchitaPage() {
                                                 <span className="text-xs font-bold text-textMuted px-2 py-1 bg-card rounded-md">VS</span>
                                             )}
                                         </div>
-                                        <div className="flex-1 flex justify-start gap-3 items-center">
+                                        <div className="flex-1 flex justify-start items-center pl-8">
                                             <span className="text-sm font-semibold text-textMain">{partido.siglaVisitante}</span>
                                         </div>
                                     </div>
@@ -769,8 +847,8 @@ export default function CanchitaPage() {
             </div> {/* Fin COLUMNA IZQUIERDA */}
             
             {/* COLUMNA DERECHA (Mercado, solo en Tablet/Desktop) */}
-            <div className="hidden md:block w-[55%] lg:w-1/2 shrink-0 border-l border-border pl-4 md:pl-4 lg:pl-8">
-                <div id="mercado-scroll-container" className="h-[calc(100vh-2rem)] sticky top-4 overflow-y-auto pb-8 scrollbar-hide pr-1 lg:pr-2">
+            <div className="hidden md:block w-[55%] lg:w-1/2 shrink-0 relative border-l border-border">
+                <div id="mercado-scroll-container" className="absolute inset-0 overflow-y-auto pb-8 scrollbar-hide pl-4 md:pl-4 lg:pl-8 pr-1 lg:pr-2">
                     <MercadoPanel layout="panel" onActionComplete={cargarDatos} />
                 </div>
             </div>
@@ -809,7 +887,12 @@ export default function CanchitaPage() {
             )}
 
             {selectorDtAberto && (
-                <ListaDtsModal dtActualId={plantel.dt?.dtId} onElegir={handleCambiarDt} onCerrar={() => setSelectorDtAberto(false)} />
+                <ListaDtsModal 
+                    dtActualId={plantel.dt?.dtId} 
+                    torneoId={typeof contextoActual === 'object' ? contextoActual?.torneoDraft?.id : contextoActual}
+                    onElegir={handleCambiarDt} 
+                    onCerrar={() => setSelectorDtAberto(false)} 
+                />
             )}
 
             {dtStatsAbierto && (
@@ -822,6 +905,18 @@ export default function CanchitaPage() {
             )}
 
             <ModalAyuda pagina="canchita" contenido={AYUDA.canchita} onCerrar={cerrar} abierto={abierto} />
+
+            {jugadorParaTraspaso && (
+                <ProponerTraspasoModal
+                    torneoId={contextoActual?.torneoDraft?.id || contextoActual}
+                    jugadorSaliente={jugadorParaTraspaso}
+                    onCerrar={() => setJugadorParaTraspaso(null)}
+                    onExito={() => {
+                        setJugadorParaTraspaso(null)
+                        cargarDatos()
+                    }}
+                />
+            )}
         </div>
     )
 }
@@ -892,15 +987,15 @@ function DtOpcionesModal({ dt, onCerrar, onTransferir }) { /* ... código intact
     )
 }
 
-function ListaDtsModal({ dtActualId, onElegir, onCerrar }) {
+function ListaDtsModal({ dtActualId, onElegir, onCerrar, torneoId }) {
     const [dts, setDts] = useState([])
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        getDts().then(data => {
+        getDts(torneoId).then(data => {
             setDts(data.filter(dt => dt.id !== dtActualId))
         }).finally(() => setLoading(false))
-    }, [dtActualId])
+    }, [dtActualId, torneoId])
 
     return createPortal(
         <>

@@ -18,7 +18,13 @@ const TABS = ['Mis Torneos', 'Explorar']
 
 export default function TorneosPage() {
     const navigate = useNavigate() // <-- 3. Faltaba inicializar navigate
-    const [tab, setTab] = useState('Mis Torneos')
+    const [tab, setTabState] = useState(sessionStorage.getItem('torneosTab') || 'Mis Torneos')
+    
+    const setTab = (newTab) => {
+        setTabState(newTab)
+        sessionStorage.setItem('torneosTab', newTab)
+    }
+
     const [misTorneos, setMisTorneos] = useState([])
     const [publicos, setPublicos] = useState([])
     const [busqueda, setBusqueda] = useState('')
@@ -62,13 +68,9 @@ export default function TorneosPage() {
         return () => clearTimeout(timer)
     }, [busqueda, tab, misTorneos])
 
-    const handleUnirse = async (codigo) => {
-        try {
-            await unirseTorneo(codigo)
-            await cargarDatos()
-            setCodigoUnirse('')
-        } catch (e) {
-            console.error(e)
+    const handleUnirse = (codigo) => {
+        if (codigo) {
+            navigate(`/torneos/unirse/${codigo}`)
         }
     }
 
@@ -220,9 +222,15 @@ export default function TorneosPage() {
             {modalCrear && (
                 <ModalCrearTorneo
                     onCreado={async (body) => {
-                        await crearTorneo(body)
-                        await cargarDatos()
-                        setModalCrear(false)
+                        try {
+                            const nuevo = await crearTorneo(body)
+                            setModalCrear(false)
+                            navigate(`/torneos/${nuevo.id}`)
+                        } catch (e) {
+                            console.error(e)
+                            await cargarDatos()
+                            setModalCrear(false)
+                        }
                     }}
                     onCerrar={() => setModalCrear(false)}
                 />
@@ -363,6 +371,9 @@ function ModalCrearTorneo({ onCreado, onCerrar }) {
     const [nombre, setNombre] = useState('')
     const [descripcion, setDescripcion] = useState('')
     const [tipo, setTipo] = useState('PUBLICO')
+    const [modalidad, setModalidad] = useState('CLASICO')
+    const [tipoPuntuacion, setTipoPuntuacion] = useState('GENERAL')
+    const [maxParticipantes, setMaxParticipantes] = useState(8)
     const [guardando, setGuardando] = useState(false)
     const [error, setError] = useState('')
 
@@ -370,7 +381,14 @@ function ModalCrearTorneo({ onCreado, onCerrar }) {
         if (!nombre.trim()) { setError('El nombre es obligatorio.'); return }
         setGuardando(true)
         try {
-            await onCreado({ nombre: nombre.trim(), descripcion, tipo })
+            await onCreado({ 
+                nombre: nombre.trim(), 
+                descripcion, 
+                tipo,
+                modalidad,
+                tipoPuntuacion,
+                maxParticipantes: modalidad === 'DRAFT' ? Number(maxParticipantes) : null
+            })
         } catch (e) {
             setError(e.response?.data?.mensaje ?? 'Error al crear el torneo.')
         } finally {
@@ -412,24 +430,90 @@ function ModalCrearTorneo({ onCreado, onCerrar }) {
 
                     {/* Selector de tipo */}
                     <div className="flex gap-2">
-                        {['PUBLICO', 'PRIVADO'].map(t => (
+                        {['PUBLICO', 'PRIVADO'].map(t => {
+                            const isPublicDisabled = t === 'PUBLICO' && modalidad === 'DRAFT';
+                            return (
+                                <button
+                                    key={t}
+                                    onClick={() => !isPublicDisabled && setTipo(t)}
+                                    disabled={isPublicDisabled}
+                                    className={`flex-1 py-2 rounded-xl text-sm font-semibold
+                                    border transition-colors
+                                    ${tipo === t
+                                            ? 'bg-primary border-primary text-white'
+                                            : isPublicDisabled 
+                                                ? 'bg-surface border-border text-textMuted/50 cursor-not-allowed'
+                                                : 'border-border text-textMuted hover:text-textMain'}`}
+                                >
+                                    {t === 'PUBLICO' ? '🌐 Público' : '🔒 Privado'}
+                                </button>
+                            );
+                        })}
+                    </div>
+
+                    {/* Selector de modalidad */}
+                    <div className="flex gap-2">
+                        {['CLASICO', 'DRAFT'].map(m => (
                             <button
-                                key={t}
-                                onClick={() => setTipo(t)}
+                                key={m}
+                                onClick={() => {
+                                    setModalidad(m)
+                                    if (m === 'DRAFT') {
+                                        setTipo('PRIVADO')
+                                        setTipoPuntuacion('H2H')
+                                    } else {
+                                        setTipoPuntuacion('GENERAL')
+                                    }
+                                }}
                                 className={`flex-1 py-2 rounded-xl text-sm font-semibold
-                  border transition-colors
-                  ${tipo === t
-                                        ? 'bg-primary border-primary text-white'
-                                        : 'border-border text-textMuted hover:text-textMain'}`}
+                                border transition-colors
+                                ${modalidad === m
+                                        ? 'bg-accent border-accent text-white'
+                                        : 'bg-surface border-border text-textMuted hover:border-accent hover:text-accent'
+                                    }`}
                             >
-                                {t === 'PUBLICO' ? '🌐 Público' : '🔒 Privado'}
+                                {m === 'CLASICO' ? '📈 Clásico' : '🎯 Draft'}
                             </button>
                         ))}
                     </div>
 
-                    {error && (
-                        <p className="text-red-400 text-xs text-center">{error}</p>
+                    {/* Selector de Tipo de Puntuación (Solo para Draft) */}
+                    {modalidad === 'DRAFT' && (
+                        <div className="flex gap-2 mt-2">
+                            {['GENERAL', 'H2H'].map(tp => (
+                                <button
+                                    key={tp}
+                                    onClick={() => setTipoPuntuacion(tp)}
+                                    className={`flex-1 py-2 rounded-xl text-sm font-semibold
+                                    border transition-colors
+                                    ${tipoPuntuacion === tp
+                                            ? 'bg-primary border-primary text-white'
+                                            : 'border-border text-textMuted hover:text-textMain'
+                                        }`}
+                                >
+                                    {tp === 'GENERAL' ? '🏆 Pts Totales' : '⚔️ Head to Head'}
+                                </button>
+                            ))}
+                        </div>
                     )}
+
+                    {/* Cantidad de participantes si es Draft */}
+                    {modalidad === 'DRAFT' && (
+                        <div className="space-y-1 mt-2">
+                            <label className="text-xs font-semibold text-textMuted px-1">Límite de participantes</label>
+                            <select
+                                value={maxParticipantes}
+                                onChange={e => setMaxParticipantes(e.target.value)}
+                                className="w-full bg-surface border border-border rounded-xl px-4 py-2 text-textMain text-sm focus:outline-none focus:border-primary"
+                            >
+                                {[2, 3, 4, 5, 6, 7, 8].map(n => (
+                                    <option key={n} value={n}>{n} Participantes</option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
+
+                    {error && <p className="text-red-400 text-xs font-semibold text-center">{error}</p>}
                 </div>
 
                 <button

@@ -11,6 +11,7 @@ export default defineConfig({
       manifest: false,  // Usamos nuestro manifest.json manual
       workbox: {
         importScripts: ['/push-sw.js'],
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MiB
         // Cachear assets estáticos
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
 

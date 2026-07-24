@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
+import { useGameStore } from '../store/gameStore'
 import { useCountdown } from '../hooks/useCountdown'
 import { getJornadaProxima, getJornadaActiva, getJornadas } from '../api/jornadaApi'
 import { getPlantel } from '../api/plantelApi'
 import {
     getRankingGlobal, getRankingJornada, getMiPosicion
 } from '../api/rankingApi'
+import { getTablaTorneo } from '../api/torneoApi'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
 import CamisetaSVG from '../components/jugador/CamisetaSVG'
 import { useAyuda } from '../hooks/useAyuda'
@@ -17,6 +19,7 @@ import { AYUDA } from '../components/ui/ayudaContenido'
 
 export default function DashboardPage() {
     const usuario = useAuthStore(state => state.usuario)
+    const { contextoActual } = useGameStore()
     const navigate = useNavigate()
 
     const [jornada, setJornada] = useState(null)
@@ -34,25 +37,48 @@ export default function DashboardPage() {
     const countdown = useCountdown(jornada?.fechaInicio)
 
     useEffect(() => {
+        setLoading(true)
         Promise.allSettled([
             getJornadaActiva(),
             getJornadaProxima(),
-            getPlantel(),
-            getRankingGlobal(5),
-            getMiPosicion(),
+            getPlantel(contextoActual?.id),
+            contextoActual ? getTablaTorneo(contextoActual.id) : getRankingGlobal(5),
+            !contextoActual ? getMiPosicion() : Promise.resolve(null),
             getJornadas(),
         ]).then(([activa, proxima, plantelRes, rankGlobal, miPos, jornadasRes]) => {
 
-            const jornadaData =
-                activa.status === 'fulfilled' && activa.value
-                    ? activa.value
-                    : proxima.status === 'fulfilled' ? proxima.value : null
+            const activaData = activa.status === 'fulfilled' && activa.value ? activa.value : null;
+            const proximaData = proxima.status === 'fulfilled' && proxima.value ? proxima.value : null;
 
-            setJornada(jornadaData)
+            let plantelData = null;
+            if (plantelRes.status === 'fulfilled') {
+                plantelData = plantelRes.value;
+                setPlantel(plantelData);
+            } else {
+                setPlantel(null);
+            }
 
-            if (plantelRes.status === 'fulfilled') setPlantel(plantelRes.value)
-            if (rankGlobal.status === 'fulfilled') setRankingGlobal(rankGlobal.value)
-            if (miPos.status === 'fulfilled') setMiPosicion(miPos.value)
+            if (activaData && plantelData && plantelData.jornadaNumero === activaData.numero) {
+                setJornada(activaData);
+            } else if (proximaData) {
+                setJornada(proximaData);
+            } else if (activaData) {
+                setJornada(activaData);
+            } else {
+                setJornada(null);
+            }
+
+            if (rankGlobal.status === 'fulfilled') {
+                if (contextoActual) {
+                    setRankingGlobal(rankGlobal.value.slice(0, 5));
+                    const miFila = rankGlobal.value.find(f => f.nombreUsuario === usuario?.nombreDisplay);
+                    setMiPosicion(miFila || null);
+                } else {
+                    setRankingGlobal(rankGlobal.value);
+                    if (miPos.status === 'fulfilled') setMiPosicion(miPos.value);
+                }
+            }
+            
             if (jornadasRes.status === 'fulfilled') {
                 const finalizadas = jornadasRes.value
                     .filter(j => j.estado === 'FINALIZADA')
@@ -63,7 +89,7 @@ export default function DashboardPage() {
                 }
             }
         }).finally(() => setLoading(false))
-    }, [])
+    }, [contextoActual?.id, usuario?.id, usuario?.nombreDisplay])
 
     // Cargar ranking de jornada cuando cambia la selección
     useEffect(() => {
@@ -112,37 +138,28 @@ export default function DashboardPage() {
             {jornada ? (
                 <div className="card space-y-4 py-8">
                     <div className="flex flex-col lg:flex-row items-center justify-center gap-6">
-                        <div className="text-center lg:text-right">
+                        <div className="text-center">
                             <h2 className="text-textMain font-black text-lg md:text-xl lg:text-3xl uppercase tracking-wider">
                                 {jornada.estado === 'EN_JUEGO' ? `SE ESTÁ JUGANDO LA JORNADA ${jornada.numero}` : `LA PRÓXIMA JORNADA COMIENZA EN:`}
                             </h2>
                         </div>
 
-                        {jornada.estado === 'EN_JUEGO' ? (
-                            <div className="text-center lg:text-left flex items-baseline gap-2">
-                                <p className="text-accent font-black text-3xl lg:text-4xl tabular-nums">
-                                    {puntajeEnVivo.toFixed(1)}
-                                </p>
-                                <p className="text-textMuted text-xl lg:text-2xl font-semibold uppercase">Puntos</p>
+                        {jornada.estado !== 'EN_JUEGO' && countdown && (
+                            <div className="flex items-center gap-4">
+                                {[
+                                    { valor: countdown.dias, label: 'd' },
+                                    { valor: countdown.horas, label: 'h' },
+                                    { valor: countdown.minutos, label: 'm' },
+                                    { valor: countdown.segundos, label: 's' },
+                                ].map(({ valor, label }) => (
+                                    <div key={label} className="flex items-baseline gap-1">
+                                        <span className="text-accent font-black text-3xl lg:text-4xl tabular-nums">
+                                            {String(valor).padStart(2, '0')}
+                                        </span>
+                                        <span className="text-accent font-bold text-xl lg:text-2xl">{label}</span>
+                                    </div>
+                                ))}
                             </div>
-                        ) : (
-                            countdown && (
-                                <div className="flex items-center gap-4">
-                                    {[
-                                        { valor: countdown.dias, label: 'd' },
-                                        { valor: countdown.horas, label: 'h' },
-                                        { valor: countdown.minutos, label: 'm' },
-                                        { valor: countdown.segundos, label: 's' },
-                                    ].map(({ valor, label }) => (
-                                        <div key={label} className="flex items-baseline gap-1">
-                                            <span className="text-accent font-black text-3xl lg:text-4xl tabular-nums">
-                                                {String(valor).padStart(2, '0')}
-                                            </span>
-                                            <span className="text-accent font-bold text-xl lg:text-2xl">{label}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            )
                         )}
                     </div>
                 </div>
@@ -164,18 +181,22 @@ export default function DashboardPage() {
                             <>
                                 {/* Stats del plantel */}
                                 <div className="grid grid-cols-3 gap-2">
-                                    <StatCard
-                                        label="Presupuesto"
-                                        valor={`${plantel.presupuestoRestante?.toFixed(1)} cr`}
-                                    />
+                                    {!contextoActual && (
+                                        <StatCard
+                                            label="Presupuesto"
+                                            valor={`${plantel.presupuestoRestante?.toFixed(1)} cr`}
+                                        />
+                                    )}
                                     <StatCard
                                         label={`Jornada ${plantel.jornadaNumero}`}
                                         valor={plantel.puntajeObtenidoFecha?.toFixed(1) ?? '—'}
                                     />
-                                    <StatCard
-                                        label="Transferencias"
-                                        valor={`${plantel.transferenciasRestantes}/3`}
-                                    />
+                                    {!contextoActual && (
+                                        <StatCard
+                                            label="Transferencias"
+                                            valor={`${plantel.transferenciasRestantes}/3`}
+                                        />
+                                    )}
                                 </div>
 
                                 {/* Mi posición en el ranking */}
@@ -231,7 +252,9 @@ export default function DashboardPage() {
                 <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Vista Desktop (md+): Mostramos ambos rankings separados */}
                     <div className="hidden md:block card space-y-3 h-fit">
-                        <h3 className="text-textMain font-bold">🏆 Ranking General</h3>
+                        <h3 className="text-textMain font-bold">
+                            🏆 {contextoActual ? 'Posiciones de la Liga' : 'Ranking General'}
+                        </h3>
                         <div className="space-y-2">
                             {rankingGlobal.map(fila => (
                                 <div key={`global-${fila.equipoVirtualId}`} className="flex items-center gap-3">
@@ -281,7 +304,7 @@ export default function DashboardPage() {
                     <div className="md:hidden card space-y-3 h-fit">
                         <div className="flex gap-2 bg-surface rounded-2xl p-1">
                             {[
-                                { key: 'global', label: '🏆 General' },
+                                { key: 'global', label: contextoActual ? '🏆 Liga' : '🏆 General' },
                                 { key: 'jornada', label: '📅 Jornada' },
                             ].map(({ key, label }) => (
                                 <button

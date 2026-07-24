@@ -15,6 +15,9 @@ export const unirseTorneo = (codigo) =>
 export const getTablaTorneo = (torneoId) =>
     axiosClient.get(`/ranking/torneo/${torneoId}`).then(r => r.data)
 
+export const getFixtureTorneo = (torneoId) =>
+    axiosClient.get(`/torneos/${torneoId}/fixture`).then(r => r.data)
+
 export const getTorneo = (torneoId) =>
     axiosClient.get(`/torneos/${torneoId}`).then(r => r.data)
 
@@ -32,3 +35,6 @@ export const getTorneoPorCodigo = async (codigo) => {
     const res = await axiosClient.get(`/torneos/codigo/${codigo}`)
     return res.data
 }
+
+export const agregarBot = (torneoId) =>
+    axiosClient.post(`/torneos/${torneoId}/bot`).then(r => r.data)

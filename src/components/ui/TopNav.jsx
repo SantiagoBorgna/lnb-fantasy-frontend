@@ -9,6 +9,8 @@ import {
     LogoutIcon 
 } from './BottomNav'
 
+import ContextSwitcher from './ContextSwitcher'
+
 const NAV_ITEMS = [
     { to: '/', label: 'Inicio', icon: HomeIcon, exact: true },
     { to: '/canchita', label: 'Equipo', icon: CourtIcon },
@@ -19,12 +21,13 @@ const NAV_ITEMS = [
 
 export default function TopNav({ onLogout, className }) {
     return (
-        <nav className={clsx("bg-card border-b border-border h-16 flex items-center justify-between px-6 shrink-0", className)}>
-            <div className="flex items-center">
-                <img src="/icons/logo_blanco.png" alt="Sexto Hombre Fantasy" className="h-10 object-contain" />
+        <nav className={clsx("relative bg-card border-b border-border h-16 flex items-center justify-between px-6 shrink-0", className)}>
+            <div className="flex items-center gap-4 z-10">
+                <img src="/icons/logo_blanco.png" alt="Sexto Hombre Fantasy" className="h-10 object-contain pointer-events-none" />
+                <ContextSwitcher />
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-2">
                 {NAV_ITEMS.map(({ to, label, icon: Icon, exact }) => (
                     <NavLink
                         key={to}
