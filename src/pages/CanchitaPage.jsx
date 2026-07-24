@@ -572,7 +572,7 @@ export default function CanchitaPage() {
             <div className="flex flex-col md:flex-row gap-4 md:gap-4 lg:gap-8">
                 
                 {/* COLUMNA IZQUIERDA */}
-                <div className="flex-1 space-y-4">
+                <div className="flex-1 space-y-4 min-h-[500px] md:min-h-[700px]">
                     {TabsJornada}
                     {loadingVista ? (
                         <div className="pt-16 pb-16">

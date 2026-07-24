@@ -47,7 +47,7 @@ export default function ContextSwitcher() {
             </button>
 
             {isOpen && (
-                <div className="absolute top-full right-0 mt-2 w-48 bg-card border border-border rounded-xl shadow-lg z-50 overflow-hidden">
+                <div className="absolute top-full right-0 md:left-0 md:right-auto mt-2 w-48 bg-card border border-border rounded-xl shadow-lg z-50 overflow-hidden">
                     {ligasOpciones.map(opcion => (
                         <button
                             key={opcion.id ?? 'global'}
