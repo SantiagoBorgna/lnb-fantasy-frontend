@@ -526,39 +526,16 @@ export default function CanchitaPage() {
     const TabsJornada = jornadaAnterior && (
         <div className="flex bg-surface rounded-xl p-1 border border-border mx-auto mb-2">
             <button onClick={() => setJornadaVista(null)} className={clsx("flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors", !jornadaVista ? "bg-card shadow text-textMain" : "text-textMuted")}>
-                Jornada Actual
+                Jornada actual
             </button>
             <button onClick={() => setJornadaVista(jornadaAnterior.id)} className={clsx("flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors", jornadaVista ? "bg-card shadow text-textMain" : "text-textMuted")}>
-                Última Fecha
+                Última jornada
             </button>
         </div>
     );
 
     // 2. Manejamos los estados vacíos de forma inteligente
     const estaVacio = !plantelActual || (plantelActual.jugadores && plantelActual.jugadores.length === 0)
-
-    if (estaVacio) {
-        return (
-            <div className="max-w-md mx-auto w-full px-4 space-y-3 pb-6 min-h-screen pt-4">
-                {TabsJornada}
-
-                <div className="pt-16">
-                    {jornadaVista !== null ? (
-                        <EmptyState
-                            titulo="Sin participación"
-                            descripcion="No jugaste en la jornada anterior."
-                        />
-                    ) : (
-                        <EmptyState
-                            titulo="Sin plantel"
-                            descripcion="Todavía no armaste tu equipo."
-                            accion={{ label: 'Ir al Mercado', onClick: () => { if (window.innerWidth < 768) navigate('/mercado') } }}
-                        />
-                    )}
-                </div>
-            </div>
-        )
-    }
 
     const titulares = getTitularesOrdenados()
     const banco = jugadoresActuales.filter(j => esBanco(j.rol))
@@ -568,12 +545,12 @@ export default function CanchitaPage() {
 
     const filas = []
     let cursor = 0
-    plantelActual.formacion?.split('-').forEach(n => {
+    plantelActual?.formacion?.split('-').forEach(n => {
         filas.push(titulares.slice(cursor, cursor + Number(n)))
         cursor += Number(n)
     })
 
-    let puntajeEnVivo = plantelActual.puntajeObtenidoFecha ?? 0
+    let puntajeEnVivo = plantelActual?.puntajeObtenidoFecha ?? 0
     if (modoLectura && Object.keys(estadisticas).length > 0) {
         let sum = 0
         jugadoresActuales.forEach(j => {
@@ -582,7 +559,7 @@ export default function CanchitaPage() {
                 sum += (s.puntajeFantasy * j.multiplicador)
             }
         })
-        if (plantelActual.puntajeDt != null) {
+        if (plantelActual?.puntajeDt != null) {
             sum += plantelActual.puntajeDt
         }
         puntajeEnVivo = sum
@@ -597,11 +574,32 @@ export default function CanchitaPage() {
                 {/* COLUMNA IZQUIERDA */}
                 <div className="flex-1 space-y-4">
                     {TabsJornada}
-                    <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-textMain font-bold text-xl truncate max-w-[180px]">
-                        {plantelActual.nombreEquipo ?? 'Mi Equipo'}
-                    </h1>
+                    {loadingVista ? (
+                        <div className="pt-16 pb-16">
+                            <LoadingSpinner mensaje="Cargando jornada..." />
+                        </div>
+                    ) : estaVacio ? (
+                        <div className="pt-16 pb-16">
+                            {jornadaVista !== null ? (
+                                <EmptyState
+                                    titulo="Sin participación"
+                                    descripcion="No jugaste en la jornada anterior."
+                                />
+                            ) : (
+                                <EmptyState
+                                    titulo="Sin plantel"
+                                    descripcion="Todavía no armaste tu equipo."
+                                    accion={{ label: 'Ir al Mercado', onClick: () => { if (window.innerWidth < 768) navigate('/mercado') } }}
+                                />
+                            )}
+                        </div>
+                    ) : (
+                        <>
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h1 className="text-textMain font-bold text-xl truncate max-w-[180px]">
+                                        {plantelActual?.nombreEquipo ?? 'Mi Equipo'}
+                                    </h1>
 
                     <div className="flex items-center gap-2 mt-1">
                         {!modoLectura ? (
@@ -842,6 +840,8 @@ export default function CanchitaPage() {
                         })}
                     </div>
                 </div>
+            )}
+            </>
             )}
 
             </div> {/* Fin COLUMNA IZQUIERDA */}

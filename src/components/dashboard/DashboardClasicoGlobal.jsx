@@ -165,7 +165,7 @@ export default function DashboardClasicoGlobal({
 
                 {/* Vista Móvil (hasta md): Usamos las Tabs */}
                 <div className="md:hidden card space-y-3 h-fit">
-                    <div className="flex gap-2 bg-surface rounded-2xl p-1">
+                        <div className="flex bg-surface rounded-xl p-1 border border-border mb-3">
                         {[
                             { key: 'global', label: 'General' },
                             { key: 'jornada', label: 'Jornada' },
@@ -173,12 +173,12 @@ export default function DashboardClasicoGlobal({
                             <button
                                 key={key}
                                 onClick={() => setJornadaTab(key)}
-                                className={`flex-1 py-1.5 rounded-xl text-xs font-semibold transition-colors ${jornadaTab === key ? 'bg-primary text-white' : 'text-textMuted hover:text-textMain'}`}
+                                className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors ${jornadaTab === key ? 'bg-card shadow text-textMain' : 'text-textMuted'}`}
                             >
                                 {label}
                             </button>
                         ))}
-                    </div>
+                        </div>
 
                     {jornadaTab === 'jornada' && jornadas.length > 0 && (
                         <select

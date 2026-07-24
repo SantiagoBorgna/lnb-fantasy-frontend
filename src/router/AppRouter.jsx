@@ -6,12 +6,14 @@ import AuthCallbackPage from '../pages/AuthCallbackPage'
 import OnboardingPerfilPage from '../pages/onboarding/OnboardingPerfilPage'
 import OnboardingReglas from '../pages/onboarding/OnboardingReglasPage'
 import OnboardingCanchita from '../pages/onboarding/OnboardingCanchitaPage'
+import OnboardingDraftPage from '../pages/onboarding/OnboardingDraftPage'
 import DashboardPage from '../pages/DashboardPage'
 import CanchitaPage from '../pages/CanchitaPage'
 import MercadoPage from '../pages/MercadoPage'
 import TorneosPage from '../pages/TorneosPage'
 import LideresPage from '../pages/LideresPage'
 import AppShell from '../components/ui/AppShell'
+import Toast from '../components/ui/Toast'
 import TorneoDetallePage from '../pages/TorneoDetallePage'
 import CanchitaAjenaPage from '../pages/CanchitaAjenaPage'
 import SalaDraftPage from '../pages/SalaDraftPage'
@@ -50,6 +52,7 @@ function OnboardingGuard({ children }) {
 export default function AppRouter() {
     return (
         <BrowserRouter>
+            <Toast />
             <Routes>
 
                 {/* ── Públicas ───────────────────────────────────────────── */}
@@ -65,6 +68,9 @@ export default function AppRouter() {
                 } />
                 <Route path="/onboarding/canchita" element={
                     <PrivateRoute><OnboardingCanchita /></PrivateRoute>
+                } />
+                <Route path="/onboarding/draft" element={
+                    <PrivateRoute><OnboardingDraftPage /></PrivateRoute>
                 } />
                 <Route path="/onboarding/mercado" element={
                     <PrivateRoute><MercadoPage modoOnboarding={true} /></PrivateRoute>

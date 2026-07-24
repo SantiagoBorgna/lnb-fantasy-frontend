@@ -638,12 +638,12 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
                     <h2 className="text-textMain font-bold text-xl mb-3">
                         {esFaseRestringida ? "Agencia Restringida" : "Agencia Libre"}
                     </h2>
-                    <div className="flex gap-2 bg-surface p-1 rounded-xl w-full max-w-lg mx-auto border border-border">
+                    <div className="flex bg-surface p-1 rounded-xl w-full max-w-lg mx-auto border border-border">
                         <button
                             onClick={() => setActiveTab('agencia')}
                             className={clsx(
-                                "flex-1 py-1.5 text-sm font-semibold rounded-lg transition-colors",
-                                activeTab === 'agencia' ? "bg-primary text-black" : "text-textMuted hover:text-textMain"
+                                "flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors",
+                                activeTab === 'agencia' ? "bg-card shadow text-textMain" : "text-textMuted"
                             )}
                         >
                             Agencia Libre
@@ -651,8 +651,8 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
                         <button
                             onClick={() => setActiveTab('reclamos')}
                             className={clsx(
-                                "flex-1 py-1.5 text-sm font-semibold rounded-lg transition-colors",
-                                activeTab === 'reclamos' ? "bg-primary text-black" : "text-textMuted hover:text-textMain"
+                                "flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors",
+                                activeTab === 'reclamos' ? "bg-card shadow text-textMain" : "text-textMuted"
                             )}
                         >
                             Reclamos
@@ -660,8 +660,8 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
                         <button
                             onClick={() => setActiveTab('traspasos')}
                             className={clsx(
-                                "flex-1 py-1.5 text-sm font-semibold rounded-lg transition-colors",
-                                activeTab === 'traspasos' ? "bg-primary text-black" : "text-textMuted hover:text-textMain"
+                                "flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors",
+                                activeTab === 'traspasos' ? "bg-card shadow text-textMain" : "text-textMuted"
                             )}
                         >
                             Traspasos
@@ -883,23 +883,20 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
             {activeTab === 'traspasos' && (
                 <>
                     <div className="gap-8 w-full max-w-7xl mx-auto items-start flex flex-col">
-                        <div className="grid grid-cols-6 md:flex md:flex-row justify-center gap-1.5 md:gap-2 bg-surface/50 p-1.5 rounded-xl border border-border/50 self-center w-full md:w-auto mb-4">
-                            {['TODAS', 'PENDIENTE', 'ACEPTADA', 'RECHAZADA', 'CANCELADA'].map((estado, idx) => (
+                        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide w-full mb-4 px-1">
+                            {['TODAS', 'PENDIENTE', 'ACEPTADA', 'RECHAZADA', 'CANCELADA'].map((estado) => (
                                 <button
                                     key={estado}
                                     onClick={() => setFiltroEstadoTraspasos(estado)}
                                     className={clsx(
-                                        "px-1 sm:px-3 md:px-5 py-1.5 md:py-2.5 text-[10px] sm:text-xs md:text-sm font-bold rounded-lg transition-colors whitespace-nowrap text-center",
-                                        idx < 3 ? "col-span-2" : "col-span-3 md:col-span-1",
-                                        filtroEstadoTraspasos === estado 
-                                            ? "bg-primary text-white shadow-sm" 
-                                            : "text-textMuted hover:text-textMain hover:bg-white/5"
+                                        'pill shrink-0 whitespace-nowrap',
+                                        filtroEstadoTraspasos === estado && 'pill-active'
                                     )}
-                            >
-                                {estado === 'TODAS' ? 'Todas' : estado.charAt(0) + estado.slice(1).toLowerCase()}
-                            </button>
-                        ))}
-                    </div>
+                                >
+                                    {estado === 'TODAS' ? 'Todas' : estado.charAt(0) + estado.slice(1).toLowerCase()}
+                                </button>
+                            ))}
+                        </div>
 
                     <div className={clsx("flex flex-col gap-8 w-full", layout === 'full' ? "lg:flex-row" : "")}>
                         <div className="flex-1 flex flex-col gap-4">

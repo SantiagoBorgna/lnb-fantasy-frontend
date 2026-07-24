@@ -89,15 +89,15 @@ export default function TorneosPage() {
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-2 bg-card rounded-2xl p-1">
+            <div className="flex bg-surface rounded-xl p-1 border border-border">
                 {TABS.map(t => (
                     <button
                         key={t}
                         onClick={() => setTab(t)}
-                        className={`flex-1 py-2 rounded-xl text-sm font-semibold transition-colors
-              ${tab === t
-                                ? 'bg-primary text-white'
-                                : 'text-textMuted hover:text-textMain'}`}
+                        className={clsx(
+                            "flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors",
+                            tab === t ? "bg-card shadow text-textMain" : "text-textMuted"
+                        )}
                     >
                         {t}
                     </button>
@@ -163,10 +163,10 @@ export default function TorneosPage() {
                         </div>
                     )}
 
-                    <div className="flex justify-center pt-2">
+                    <div className="fixed bottom-16 left-0 right-0 p-4 pb-2 bg-gradient-to-t from-background via-background/95 to-transparent z-40 flex justify-center pointer-events-none md:static md:bg-none md:p-0 md:pt-2 md:pointer-events-auto">
                         <button
                             onClick={() => setModalCrear(true)}
-                            className="btn-accent w-full md:w-auto px-8"
+                            className="btn-accent w-full md:w-auto px-8 pointer-events-auto shadow-xl shadow-background md:shadow-none"
                         >
                             + Crear torneo
                         </button>
@@ -491,7 +491,7 @@ function ModalCrearTorneo({ onCreado, onCerrar }) {
                                             : 'border-border text-textMuted hover:text-textMain'
                                         }`}
                                 >
-                                    {tp === 'GENERAL' ? '🏆 Pts Totales' : '⚔️ Head to Head'}
+                                    {tp === 'GENERAL' ? '🏆 Pts Totales' : '⚔️ Versus'}
                                 </button>
                             ))}
                         </div>

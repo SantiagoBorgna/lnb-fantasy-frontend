@@ -11,8 +11,6 @@ import ContextSwitcher from './ContextSwitcher'
 import { getMisTorneos } from '../../api/torneoApi'
 import { useGameStore } from '../../store/gameStore'
 
-import Toast from './Toast'
-
 export default function AppShell() {
     const { token, setAuth, logout: logoutStore } = useAuthStore()
     const { setMisLigasDraft, clearGameData } = useGameStore()
@@ -52,16 +50,13 @@ export default function AppShell() {
 
     return (
         <div className="flex flex-col h-[100dvh] bg-background font-sans text-textMain overflow-hidden">
-            <Toast />
             
             {/* Nav superior en desktop */}
             <TopNav className="hidden md:flex" onLogout={() => setModalLogout(true)} />
 
             {/* Header en mobile para el logo y el Context Switcher */}
-            <div className="md:hidden relative flex items-center justify-end px-4 py-3 bg-card border-b border-border shrink-0 z-10 h-14">
-                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                    <img src="/icons/logo_blanco.png" alt="Sexto Hombre Fantasy" className="h-8 object-contain pointer-events-none" />
-                </div>
+            <div className="md:hidden flex items-center justify-between px-4 py-3 bg-card border-b border-border shrink-0 z-10 h-14">
+                <img src="/icons/logo-redondo.png" alt="Sexto Hombre Fantasy" className="h-8 object-contain pointer-events-none" />
                 <ContextSwitcher />
             </div>
 

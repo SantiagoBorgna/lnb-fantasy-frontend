@@ -56,11 +56,7 @@ export default function BottomNav({ onLogout, className }) {
                 </NavLink>
             ))}
             <button
-                onClick={async () => {
-                    await logout()
-                    setAuth(null)
-                    navigate('/login')
-                }}
+                onClick={onLogout}
                 className="flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl text-xs font-medium transition-colors text-red-500/80 hover:text-red-500"
             >
                 <LogoutIcon className="w-5 h-5" />

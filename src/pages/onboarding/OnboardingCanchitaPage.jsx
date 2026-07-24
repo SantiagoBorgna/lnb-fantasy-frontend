@@ -8,6 +8,7 @@ import CamisetaSVG from '../../components/jugador/CamisetaSVG'
 import LoadingSpinner from '../../components/ui/LoadingSpinner'
 import { createPortal } from 'react-dom'
 import clsx from 'clsx'
+import { useUiStore } from '../../store/uiStore'
 
 const FORMACIONES = ['1-2-2', '1-3-1', '2-1-2', '2-2-1', '3-1-1']
 
@@ -28,9 +29,9 @@ export default function OnboardingCanchitaPage() {
         hacerCapitan, setDt, quitarJugador,
         estaCompleto, motivoIncompleto, resetDraft,
     } = useDraftStore()
+    const { showToast } = useUiStore()
 
     const [guardando, setGuardando] = useState(false)
-    const [error, setError] = useState('')
     const [modalJugador, setModalJugador] = useState(null)
     const [modalDt, setModalDt] = useState(false)
 
@@ -64,7 +65,6 @@ export default function OnboardingCanchitaPage() {
     const handleGuardar = async () => {
         if (!estaCompleto() || excedePresupuesto) return
         setGuardando(true)
-        setError('')
 
         try {
             await guardarPlantel({
@@ -79,9 +79,9 @@ export default function OnboardingCanchitaPage() {
             resetDraft()
             const usuarioActualizado = await getMe()
             setAuth(token, usuarioActualizado)
-            navigate('/', { replace: true })
+            navigate('/onboarding/draft', { replace: true })
         } catch (e) {
-            setError(e.response?.data?.mensaje ?? 'Error al guardar el equipo.')
+            showToast(e.response?.data?.mensaje ?? 'Error al guardar el equipo.', 'error')
         } finally {
             setGuardando(false)
         }
@@ -94,9 +94,10 @@ export default function OnboardingCanchitaPage() {
     }
 
     return (
-        <div className="min-h-screen bg-surface flex flex-col">
+        <div className="min-h-screen bg-surface flex items-center justify-center p-0 md:p-8">
+            <div className="w-full max-w-2xl bg-surface md:bg-card border-none md:border md:border-border rounded-none md:rounded-3xl flex flex-col shadow-none md:shadow-xl min-h-screen md:min-h-0 md:h-[90vh] overflow-y-auto custom-scrollbar relative pb-6 md:pb-10">
 
-            <div className="flex gap-2 px-6 pt-6 max-w-md mx-auto w-full">
+            <div className="flex gap-2 px-6 pt-6 md:pt-10 max-w-md mx-auto w-full shrink-0">
                 {[1, 2, 3].map(n => (
                     <div key={n} className="h-1 flex-1 rounded-full bg-accent" />
                 ))}
@@ -107,9 +108,9 @@ export default function OnboardingCanchitaPage() {
                 {/* Header Actualizado con Presupuesto */}
                 <div className="flex items-start justify-between">
                     <div>
-                        <h2 className="text-textMain font-black text-xl">Armá tu equipo 🏀</h2>
+                        <h2 className="text-textMain font-black text-xl">Armá tu equipo</h2>
                         <p className="text-textMuted text-xs mt-0.5">
-                            Tocá los slots vacíos para agregar jugadores.
+                            Tocá los espacios vacíos para agregar jugadores.
                         </p>
                     </div>
                     <div className="text-right">
@@ -240,10 +241,6 @@ export default function OnboardingCanchitaPage() {
                     </div>
                 )}
 
-                {error && (
-                    <p className="text-red-400 text-sm text-center">{error}</p>
-                )}
-
                 <button
                     onClick={handleGuardar}
                     disabled={!estaCompleto() || guardando || excedePresupuesto}
@@ -300,6 +297,7 @@ export default function OnboardingCanchitaPage() {
             {modalDt && (
                 <ModalDt onElegir={(dtElegido) => { setDt(dtElegido); setModalDt(false) }} onCerrar={() => setModalDt(false)} />
             )}
+        </div>
         </div>
     )
 }
@@ -374,11 +372,11 @@ function ModalDt({ onElegir, onCerrar }) {
     return createPortal(
         <>
             <div className="fixed inset-0 bg-black/60 z-40" onClick={onCerrar} />
-            <div className="fixed bottom-0 md:top-1/2 md:-translate-y-1/2 md:bottom-auto left-0 right-0 max-w-md mx-auto bg-card border-t border-border rounded-t-3xl md:rounded-3xl z-50 p-6 space-y-4 animate-slide-up md:animate-none max-h-[70vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-                <div className="w-10 h-1 bg-border rounded-full mx-auto md:hidden" />
-                <h3 className="text-textMain font-bold text-lg">Elegir Director Técnico</h3>
+            <div className="fixed bottom-0 md:top-1/2 md:-translate-y-1/2 md:bottom-auto left-0 right-0 max-w-md mx-auto bg-card border-t border-border rounded-t-3xl md:rounded-3xl z-50 p-6 flex flex-col max-h-[80vh] animate-slide-up md:animate-none" onClick={e => e.stopPropagation()}>
+                <div className="w-10 h-1 bg-border rounded-full mx-auto md:hidden shrink-0 mb-4" />
+                <h3 className="text-textMain font-bold text-lg shrink-0 mb-4">Elegir Director Técnico</h3>
                 {loading ? <LoadingSpinner /> : (
-                    <div className="space-y-2">
+                    <div className="space-y-2 overflow-y-auto flex-1 min-h-0 custom-scrollbar pr-1 pb-2">
                         {dts.map(dt => (
                             <button key={dt.id} onClick={() => onElegir(dt)} className="w-full flex items-center gap-3 p-3 rounded-2xl bg-surface border border-border hover:border-primary transition-colors text-left active:scale-[0.98]">
                                 <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold text-xs shrink-0">DT</div>
@@ -391,7 +389,7 @@ function ModalDt({ onElegir, onCerrar }) {
                         ))}
                     </div>
                 )}
-                <button onClick={onCerrar} className="w-full py-2 text-textMuted text-sm font-medium">Cancelar</button>
+                <button onClick={onCerrar} className="w-full py-2 text-textMuted text-sm font-medium shrink-0 mt-4">Cancelar</button>
             </div>
         </>,
         document.body

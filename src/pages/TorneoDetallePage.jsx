@@ -160,7 +160,7 @@ export default function TorneoDetallePage() {
 
     // Mi fila en la tabla activa (solo para mostrar el banner de posición, se basará en el tab en movil o general en PC)
     const miFila = useMemo(() => {
-        const tabla = tab === 'general' ? tablaGeneral : tablaJornada
+        const tabla = tab === 'jornada' ? tablaJornada : tablaGeneral
         return tabla.find(f => f.nombreUsuario === usuario?.nombreDisplay)
     }, [tab, tablaGeneral, tablaJornada, usuario])
 
@@ -558,7 +558,7 @@ export default function TorneoDetallePage() {
             )}
 
             {/* ── Tabs (Solo Móvil) ──────────────────── */}
-            <div className="flex gap-2 bg-card rounded-2xl p-1 md:hidden">
+            <div className="flex bg-surface rounded-xl p-1 border border-border md:hidden mb-4">
                 {(torneo.tipoPuntuacion === 'H2H' ? [
                     { key: 'general', label: 'Posiciones' },
                     { key: 'fixture', label: 'Fixture' },
@@ -570,10 +570,8 @@ export default function TorneoDetallePage() {
                         key={key}
                         onClick={() => setTab(key)}
                         className={clsx(
-                            'flex-1 py-2 rounded-xl text-sm font-semibold transition-colors',
-                            tab === key
-                                ? 'bg-primary text-white'
-                                : 'text-textMuted hover:text-textMain'
+                            "flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors",
+                            tab === key ? "bg-card shadow text-textMain" : "text-textMuted"
                         )}
                     >
                         {label}
@@ -582,15 +580,17 @@ export default function TorneoDetallePage() {
             </div>
 
             {/* ── Buscador ─────────────────────────────────────────────── */}
-            <input
-                type="text"
-                placeholder="Buscar por usuario o equipo..."
-                value={busqueda}
-                onChange={e => setBusqueda(e.target.value)}
-                className="w-full bg-card border border-border rounded-xl
+            {torneo?.modalidad !== 'DRAFT' && (
+                <input
+                    type="text"
+                    placeholder="Buscar por usuario o equipo..."
+                    value={busqueda}
+                    onChange={e => setBusqueda(e.target.value)}
+                    className="w-full bg-card border border-border rounded-xl
                    px-4 py-2.5 text-textMain text-sm
                    placeholder-textMuted focus:outline-none focus:border-primary mb-2"
-            />
+                />
+            )}
 
             {/* ── Rankings (Desktop / Mobile Tabs) ───────────────── */}
             <div className="grid gap-4 grid-cols-1 md:grid-cols-2">

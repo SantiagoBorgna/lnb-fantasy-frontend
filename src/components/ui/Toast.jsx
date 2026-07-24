@@ -16,7 +16,7 @@ export default function Toast() {
     if (!toast) return null
 
     return createPortal(
-        <div className="fixed top-20 md:top-8 left-1/2 -translate-x-1/2 z-[100] animate-slide-down">
+        <div className="fixed top-28 md:top-12 left-1/2 -translate-x-1/2 z-[100] animate-slide-down">
             <div className={clsx(
                 "px-5 py-3 rounded-2xl shadow-xl border font-semibold flex items-center gap-3 text-sm backdrop-blur-md",
                 toast.tipo === 'success' 

@@ -3,17 +3,19 @@ import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import { getEquiposParaOnboarding, completarPerfil } from '../../api/authApi'
 import { getMe } from '../../api/authApi'
+import { useUiStore } from '../../store/uiStore'
+import PatronEquipo from '../../components/ui/PatronEquipo'
 
 export default function OnboardingPerfilPage() {
     const navigate = useNavigate()
     const { token, setAuth, usuario } = useAuthStore()
+    const { showToast } = useUiStore()
 
     const [equipos, setEquipos] = useState([])
-    const [equipoElegido, setEquipoElegido] = useState(null)
-    const [nombreEquipo, setNombreEquipo] = useState('')
+    const [equipoElegido, setEquipoElegido] = useState(usuario?.equipoFavoritoId || null)
+    const [nombreEquipo, setNombreEquipo] = useState(usuario?.nombreEquipoVirtual || '')
     const [loading, setLoading] = useState(true)
     const [guardando, setGuardando] = useState(false)
-    const [error, setError] = useState('')
 
     useEffect(() => {
         getEquiposParaOnboarding()
@@ -22,14 +24,13 @@ export default function OnboardingPerfilPage() {
     }, [])
 
     const handleGuardar = async () => {
-        if (!equipoElegido) { setError('Elegí tu equipo favorito.'); return }
+        if (!equipoElegido) { showToast('Elegí tu equipo favorito.', 'error'); return }
         if (nombreEquipo.trim().length < 3) {
-            setError('El nombre debe tener al menos 3 caracteres.')
+            showToast('El nombre debe tener al menos 3 caracteres.', 'error')
             return
         }
 
         setGuardando(true)
-        setError('')
 
         try {
             await completarPerfil({
@@ -43,7 +44,7 @@ export default function OnboardingPerfilPage() {
 
             navigate('/onboarding/reglas', { replace: true })
         } catch (e) {
-            setError(e.response?.data?.mensaje ?? 'Error al guardar el perfil.')
+            showToast(e.response?.data?.mensaje ?? 'Error al guardar el perfil.', 'error')
         } finally {
             setGuardando(false)
         }
@@ -57,7 +58,8 @@ export default function OnboardingPerfilPage() {
     )
 
     return (
-        <div className="min-h-screen bg-surface px-6 py-10 flex flex-col max-w-md mx-auto">
+        <div className="min-h-screen bg-surface flex items-center justify-center p-0 md:p-8">
+            <div className="w-full max-w-2xl bg-surface md:bg-card border-none md:border md:border-border rounded-none md:rounded-3xl p-6 py-8 md:p-10 flex flex-col shadow-none md:shadow-xl h-[100dvh] md:h-auto md:min-h-[600px]">
 
             {/* Progreso */}
             <div className="flex gap-2 mb-8">
@@ -68,7 +70,7 @@ export default function OnboardingPerfilPage() {
             </div>
 
             <h1 className="text-textMain font-black text-2xl mb-1">
-                ¡Bienvenido, {usuario?.nombreDisplay?.split(' ')[0]}! 👋
+                ¡Bienvenido/a, {usuario?.nombreDisplay?.split(' ')[0]}!
             </h1>
             <p className="text-textMuted text-sm mb-8">
                 Configurá tu perfil para arrancar.
@@ -95,11 +97,11 @@ export default function OnboardingPerfilPage() {
             </div>
 
             {/* Selector de equipo favorito */}
-            <div className="space-y-2 mb-8">
-                <label className="text-textMain text-sm font-semibold">
+            <div className="space-y-2 mb-6 flex-1 flex flex-col min-h-0">
+                <label className="text-textMain text-sm font-semibold shrink-0">
                     Tu equipo favorito de la LNB
                 </label>
-                <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto pr-1">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 flex-1 md:max-h-80 overflow-y-auto pr-2 custom-scrollbar">
                     {equipos.map(equipo => (
                         <button
                             key={equipo.id}
@@ -112,11 +114,16 @@ export default function OnboardingPerfilPage() {
                                     : 'border-border bg-card hover:border-primary'}
               `}
                         >
-                            {/* Rectángulo de color del equipo */}
-                            <div
-                                className="w-6 h-6 rounded-md shrink-0"
-                                style={{ background: equipo.colorPrincipal }}
-                            />
+                            {/* Rectángulo con el patrón de la camiseta */}
+                            <div className="w-6 h-6 rounded-md shrink-0 relative overflow-hidden shadow-[inset_0_1px_3px_rgba(255,255,255,0.3)] border border-white/10">
+                                <PatronEquipo 
+                                    colorPrincipal={equipo.colorPrincipal} 
+                                    colorSecundario={equipo.colorSecundario} 
+                                    modelo={equipo.modeloCamiseta} 
+                                    className="w-full h-full absolute inset-0 z-0" 
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent mix-blend-overlay z-10"></div>
+                            </div>
                             <div className="min-w-0">
                                 <p className="text-textMain text-xs font-semibold truncate">
                                     {equipo.sigla}
@@ -125,25 +132,19 @@ export default function OnboardingPerfilPage() {
                                     {equipo.nombre}
                                 </p>
                             </div>
-                            {equipoElegido === equipo.id && (
-                                <span className="ml-auto text-accent text-sm">✓</span>
-                            )}
                         </button>
                     ))}
                 </div>
             </div>
-
-            {error && (
-                <p className="text-red-400 text-sm text-center mb-4">{error}</p>
-            )}
 
             <button
                 onClick={handleGuardar}
                 disabled={guardando}
                 className="btn-primary w-full mt-auto disabled:opacity-50"
             >
-                {guardando ? 'Guardando...' : 'Continuar →'}
+                {guardando ? 'Guardando...' : 'Continuar'}
             </button>
+        </div>
         </div>
     )
 }
