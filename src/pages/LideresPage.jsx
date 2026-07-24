@@ -10,14 +10,6 @@ import { AYUDA } from '../components/ui/ayudaContenido'
 import EmptyState from '../components/ui/EmptyState'
 
 
-const ICONO_CATEGORIA = {
-    'Puntos Fantasy': '🏆',
-    'Puntos': '🏀',
-    'Rebotes': '↕️',
-    'Asistencias': '🤝',
-    'Robos': '✋',
-    'Tapones': '🛡️',
-}
 
 export default function LideresPage() {
     const [categorias, setCategorias] = useState([])
@@ -87,9 +79,6 @@ export default function LideresPage() {
                                tracking-wide">
                                 {categoria}
                             </span>
-                            <span className="text-xl md:text-2xl">
-                                {ICONO_CATEGORIA[categoria] ?? '📊'}
-                            </span>
                         </div>
 
                         {/* Líder */}
@@ -147,7 +136,7 @@ export default function LideresPage() {
                         <div className="w-10 h-1 bg-border rounded-full mx-auto md:hidden" />
                         <div className="flex items-center justify-between">
                             <h3 className="text-textMain font-bold text-lg">
-                                {ICONO_CATEGORIA[categoriaAbierta]} Top 5 — {categoriaAbierta}
+                                Top 5 — {categoriaAbierta}
                             </h3>
                             <button
                                 onClick={() => setCategoriaAbierta(null)}

@@ -24,7 +24,6 @@ export default function ModalAyuda({ contenido, onCerrar, abierto }) {
                 <div className="space-y-3">
                     {contenido.pasos.map(({ icono, titulo, texto }) => (
                         <div key={titulo} className="flex items-start gap-3 md:gap-4">
-                            <span className="text-2xl md:text-3xl shrink-0 mt-0.5 md:mt-1">{icono}</span>
                             <div>
                                 <p className="text-textMain font-semibold text-sm md:text-base">{titulo}</p>
                                 <p className="text-textMuted text-xs md:text-sm mt-0.5 md:mt-1 leading-relaxed">

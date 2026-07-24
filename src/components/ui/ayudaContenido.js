@@ -3,19 +3,16 @@ export const AYUDA = {
         titulo: '¿Cómo funciona el Dashboard?',
         pasos: [
             {
-                icono: '📅',
                 titulo: 'Jornadas',
-                texto: 'Cada jornada dura 3-4 días. La cuenta regresiva te muestra cuánto tiempo tenés para hacer cambios antes de que empiece.',
+                texto: 'Cada jornada de competencia agrupa varios partidos. La cuenta regresiva te indica el tiempo restante para hacer cambios en tu equipo.',
             },
             {
-                icono: '📊',
                 titulo: 'Rankings',
-                texto: 'Seguí tu posición en el ranking general y compará cómo te fue jornada a jornada.',
+                texto: 'Revisá tu posición en el ranking general y analizá tu rendimiento jornada a jornada.',
             },
             {
-                icono: '💰',
                 titulo: 'Armado del Equipo',
-                texto: 'Tenés 100 créditos para fichar 10 jugadores. Podés elegir un máximo de 2 jugadores por cada club.',
+                texto: 'Disponés de 100 créditos para armar tu plantel de 10 jugadores. Recordá que podés elegir un máximo de 2 jugadores del mismo club.',
             },
         ],
     },
@@ -24,24 +21,20 @@ export const AYUDA = {
         titulo: '¿Cómo funciona la Canchita?',
         pasos: [
             {
-                icono: '👆',
-                titulo: 'Tocar un jugador',
-                texto: 'Tocá cualquier jugador para ver sus opciones: hacer capitán, cambiar por un suplente o transferirlo.',
+                titulo: 'Interacción',
+                texto: 'Tocá cualquier jugador titular o suplente para ver sus opciones: asignarle la capitanía, cambiarlo de posición o transferirlo.',
             },
             {
-                icono: '↕️',
                 titulo: 'Arrastrar',
-                texto: 'Arrastrá un jugador sobre otro para intercambiarlos de posición. Solo podés mover jugadores a posiciones compatibles.',
+                texto: 'Mantené presionado y arrastrá a un jugador sobre otro para intercambiarlos. Solo podés moverlos a posiciones compatibles.',
             },
             {
-                icono: '👑',
-                titulo: 'Capitán',
-                texto: 'El capitán suma x1.5 puntos. El Sexto Hombre suma x0.75. Los suplentes suman x0.5.',
+                titulo: 'Puntuación Extra',
+                texto: 'El Capitán multiplica sus puntos por 1.5. El Sexto Hombre suma un 75% de sus puntos y los suplentes un 50%.',
             },
             {
-                icono: '🔄',
                 titulo: 'Transferencias',
-                texto: 'Tenés 3 transferencias por jornada. El DT consume una. Límite: 2 jugadores del mismo club por equipo.',
+                texto: 'Tenés 3 transferencias disponibles por jornada. Modificar al DT consume una de ellas.',
             },
         ],
     },
@@ -50,19 +43,16 @@ export const AYUDA = {
         titulo: '¿Cómo funciona el Mercado?',
         pasos: [
             {
-                icono: '🔍',
                 titulo: 'Filtrar jugadores',
-                texto: 'Usá las píldoras de posición para filtrar por Base, Escolta, Alero, Ala-Pivot o Pivot.',
+                texto: 'Utilizá los filtros superiores para buscar jugadores por posición: Base, Escolta, Alero, Ala-Pivot o Pivot.',
             },
             {
-                icono: '📈',
                 titulo: 'Precios dinámicos',
-                texto: 'El precio de cada jugador sube o baja según su rendimiento en las últimas 3 jornadas.',
+                texto: 'El valor de los jugadores fluctúa (sube o baja) dependiendo de su rendimiento real en las últimas 3 jornadas.',
             },
             {
-                icono: '🔄',
-                titulo: 'Fichar un jugador',
-                texto: 'Tocá un jugador para ver sus estadísticas. Desde ahí podés transferirlo a tu equipo eligiendo quién sale.',
+                titulo: 'Fichar',
+                texto: 'Seleccioná un jugador para analizar sus estadísticas y sumarlo a tu equipo a cambio de un jugador saliente.',
             },
         ],
     },
@@ -71,19 +61,16 @@ export const AYUDA = {
         titulo: '¿Cómo funcionan los Torneos?',
         pasos: [
             {
-                icono: '🌐',
                 titulo: 'Torneos públicos',
-                texto: 'Encontrá torneos abiertos en la pestaña "Explorar" y unite para competir contra otros mánagers.',
+                texto: 'Explorá los torneos abiertos en la comunidad y unite para competir contra otros usuarios.',
             },
             {
-                icono: '🔒',
                 titulo: 'Torneos privados',
-                texto: 'Creá un torneo privado y compartí el link de invitación con tus amigos.',
+                texto: 'Creá tu propia liga privada y compartí el link o código de invitación con tus amigos.',
             },
             {
-                icono: '🏆',
                 titulo: 'Tabla de posiciones',
-                texto: 'Cada torneo tiene su propio ranking. Podés ver el general y el de cada jornada individual.',
+                texto: 'Cada torneo cuenta con su propio ranking exclusivo, con vistas de clasificación general y por jornada.',
             },
         ],
     },
@@ -92,19 +79,16 @@ export const AYUDA = {
         titulo: '¿Qué son los Líderes?',
         pasos: [
             {
-                icono: '🏀',
                 titulo: 'Estadísticas reales',
-                texto: 'Los líderes muestran los jugadores de la LNB con mejores promedios en cada estadística.',
+                texto: 'Descubrí a los jugadores de la LNB con los mejores promedios en cada rubro estadístico.',
             },
             {
-                icono: '👆',
-                titulo: 'Ver el Top 5',
-                texto: 'Tocá cualquier tarjeta para ver el ranking completo de los 5 mejores en esa categoría.',
+                titulo: 'Top 5',
+                texto: 'Seleccioná cualquier categoría para expandir el ranking y ver a los 5 mejores jugadores.',
             },
             {
-                icono: '💡',
-                titulo: 'Usalo para fichar',
-                texto: 'Es tu herramienta clave para decidir qué jugadores vale la pena incorporar a tu equipo.',
+                titulo: 'Fichajes estratégicos',
+                texto: 'Utilizá esta sección como herramienta clave para decidir tus próximas incorporaciones.',
             },
         ],
     },
