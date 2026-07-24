@@ -4,13 +4,15 @@ import { useAuthStore } from '../store/authStore'
 import { getTorneo, getTorneoPorCodigo, getTablaTorneo, getFixtureTorneo, salirDeTorneo, unirseTorneo, editarTorneo, expulsarParticipante } from '../api/torneoApi'
 import { getRankingJornada } from '../api/rankingApi'
 import { getJornadas } from '../api/jornadaApi'
+import { encodeId, decodeId, encodeMultiple } from '../utils/urlParams'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
 import JornadaSelector from '../components/ui/JornadaSelector'
 import { createPortal } from 'react-dom'
 import clsx from 'clsx'
 
 export default function TorneoDetallePage() {
-    const { torneoId, codigo } = useParams()
+    const { torneoId: rawTorneoId, codigo } = useParams()
+    const torneoId = decodeId(rawTorneoId)
     const navigate = useNavigate()
     const usuario = useAuthStore(state => state.usuario)
 
@@ -254,13 +256,13 @@ export default function TorneoDetallePage() {
                     if (torneo?.modalidad === 'CLASICO' && jornadas.length > 0 && torneo?.tipoPuntuacion !== 'H2H') {
                         idJornadaLink = jornadas[0].id;
                     }
-                    
                     return (
                         <div
                             key={fila.equipoVirtualId}
                             onClick={() => {
                                 if (esClickeable) {
-                                    navigate(`/torneos/${torneo.id}/equipo/${fila.equipoVirtualId}/jornada/${idJornadaLink}`);
+                                    const idJornadaLink = torneo?.modalidad === 'DRAFT' ? 999999 : (torneo.jornadaActualId || 999999);
+                                    navigate(`/v/${encodeMultiple([torneo.id, fila.equipoVirtualId, idJornadaLink])}`);
                                 }
                             }}
                             className={clsx(
@@ -306,8 +308,8 @@ export default function TorneoDetallePage() {
                         
                         const handleEquipoClick = (equipoId, esMio) => {
                             if (esMio) return;
-                            const idJornadaLink = torneo?.modalidad === 'DRAFT' ? 'actual' : e.jornadaId;
-                            navigate(`/torneos/${torneo.id}/equipo/${equipoId}/jornada/${idJornadaLink}`);
+                            const idJornadaLink = torneo?.modalidad === 'DRAFT' ? 999999 : e.jornadaId;
+                            navigate(`/v/${encodeMultiple([torneo.id, equipoId, idJornadaLink])}`);
                         }
 
                         const ganaLocal = e.procesado && e.puntajeLocal > (e.equipoVisitanteId ? e.puntajeVisitante : 0);
@@ -411,7 +413,7 @@ export default function TorneoDetallePage() {
                                     if (torneo.cantidadParticipantes < torneo.maxParticipantes) {
                                         setErrorGlobal('Los cupos del torneo deben estar llenos para entrar a la Sala de Draft.')
                                     } else {
-                                        navigate(`/torneos/${torneo.id}/draft`)
+                                        navigate(`/d/${encodeId(torneo.id)}`)
                                     }
                                 }}
                                 className="bg-accent text-white font-bold py-1 px-3 rounded-lg text-xs hover:bg-accent/80 transition-colors whitespace-nowrap shrink-0"
@@ -529,7 +531,7 @@ export default function TorneoDetallePage() {
                             if (!codigo) throw new Error("No se encontró el código del torneo.");
 
                             await unirseTorneo(codigo)
-                            navigate(`/torneos/${torneo.id}`, { replace: true })
+                            navigate(`/t/${encodeId(torneo.id)}`, { replace: true })
                         } catch (e) {
                             setErrorGlobal(e.response?.data?.mensaje ?? e.message ?? 'No se pudo unir al torneo.')
                         }

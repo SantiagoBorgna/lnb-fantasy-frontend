@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { getEstadoDraft, iniciarDraft, elegirJugadorDraft } from '../api/draftApi'
 import { getMercadoJugadores } from '../api/mercadoApi'
+import { encodeId, decodeId } from '../utils/urlParams'
 import { useUiStore } from '../store/uiStore'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
 import EmptyState from '../components/ui/EmptyState'
@@ -25,7 +26,8 @@ async function getDirectoresTecnicos() {
 }
 
 export default function SalaDraftPage() {
-    const { torneoId } = useParams()
+    const { torneoId: rawTorneoId } = useParams()
+    const torneoId = decodeId(rawTorneoId)
     const navigate = useNavigate()
     const { usuario } = useAuthStore()
     const { showToast } = useUiStore()
@@ -208,7 +210,7 @@ export default function SalaDraftPage() {
                                 <div className="flex flex-col gap-2">
                                     <span>El draft ha finalizado.</span>
                                     <button 
-                                        onClick={() => navigate(`/torneos/${torneoId}`)} 
+                                        onClick={() => navigate(`/t/${encodeId(torneoId)}`)} 
                                         className="bg-accent text-white font-bold py-3 px-4 rounded-xl hover:bg-accent/90 transition-colors mt-2 w-fit"
                                     >
                                         Ir al Torneo

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useAuthStore } from '../store/authStore'
 import { useNavigate } from 'react-router-dom'
+import { encodeId } from '../utils/urlParams'
 import {
     getTorneosPublicos, getMisTorneos,
     crearTorneo, unirseTorneo, getTablaTorneo
@@ -70,7 +71,7 @@ export default function TorneosPage() {
 
     const handleUnirse = (codigo) => {
         if (codigo) {
-            navigate(`/torneos/unirse/${codigo}`)
+            navigate(`/u/${codigo}`)
         }
     }
 
@@ -137,7 +138,7 @@ export default function TorneosPage() {
                             {misTorneos.map(t => (
                                 <button
                                     key={t.id}
-                                    onClick={() => navigate(`/torneos/${t.id}`)}
+                                    onClick={() => navigate(`/t/${encodeId(t.id)}`)}
                                     className="card w-full text-left space-y-1 active:scale-95
                    transition-transform hover:border-primary"
                                 >
@@ -193,7 +194,7 @@ export default function TorneosPage() {
                             {publicos.map(t => (
                                 <button
                                     key={t.id}
-                                    onClick={() => navigate(`/torneos/${t.id}`)}
+                                    onClick={() => navigate(`/t/${encodeId(t.id)}`)}
                                     className="card w-full text-left space-y-1 active:scale-95
                    transition-transform hover:border-primary"
                                 >
@@ -225,7 +226,7 @@ export default function TorneosPage() {
                         try {
                             const nuevo = await crearTorneo(body)
                             setModalCrear(false)
-                            navigate(`/torneos/${nuevo.id}`)
+                            navigate(`/t/${encodeId(nuevo.id)}`)
                         } catch (e) {
                             console.error(e)
                             await cargarDatos()

@@ -91,10 +91,10 @@ export default function AppRouter() {
                     <Route path="canchita" element={<CanchitaPage />} />
                     <Route path="mercado" element={<MercadoPage />} />
                     <Route path="torneos" element={<TorneosPage />} />
-                    <Route path="torneos/:torneoId" element={<TorneoDetallePage />} />
-                    <Route path="torneos/:torneoId/draft" element={<SalaDraftPage />} />
-                    <Route path="torneos/:torneoId/equipo/:equipoVirtualId/jornada/:jornadaId" element={<CanchitaAjenaPage />} />
-                    <Route path="torneos/unirse/:codigo" element={<TorneoDetallePage />} />
+                    <Route path="t/:torneoId" element={<TorneoDetallePage />} />
+                    <Route path="d/:torneoId" element={<SalaDraftPage />} />
+                    <Route path="v/:hashData" element={<CanchitaAjenaPage />} />
+                    <Route path="u/:codigo" element={<TorneoDetallePage />} />
                     <Route path="lideres" element={<LideresPage />} />
                 </Route>
 

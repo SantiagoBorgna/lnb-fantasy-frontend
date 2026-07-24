@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { getPlantelAjeno, getEstadisticasAjenas, getPlantelActualAjeno, getEstadisticasActualesAjenas } from '../api/plantelApi'
+import { encodeId, decodeMultiple } from '../utils/urlParams'
 import SlotJugador from '../components/plantel/SlotJugador'
 import JugadorStatsModal from '../components/jugador/JugadorStatsModal'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
@@ -11,7 +12,9 @@ import clsx from 'clsx'
 import EmptyState from '../components/ui/EmptyState'
 
 export default function CanchitaAjenaPage() {
-    const { torneoId, equipoVirtualId, jornadaId } = useParams()
+    const { hashData } = useParams()
+    const [torneoId, equipoVirtualId, decodedJornadaId] = decodeMultiple(hashData)
+    const jornadaId = decodedJornadaId === 999999 ? 'actual' : decodedJornadaId;
     const navigate = useNavigate()
 
     const [plantel, setPlantel] = useState(null)
@@ -58,7 +61,7 @@ export default function CanchitaAjenaPage() {
             <EmptyState
                 titulo="No disponible"
                 descripcion={error || 'El jugador no armó equipo en esta fecha.'}
-                accion={{ label: 'Volver al torneo', onClick: () => navigate(`/torneos/${torneoId}`) }}
+                accion={{ label: 'Volver al torneo', onClick: () => navigate(`/t/${encodeId(torneoId)}`) }}
             />
         </div>
     )
@@ -118,7 +121,7 @@ export default function CanchitaAjenaPage() {
                     <div className="flex items-center justify-between w-full max-w-[480px] pb-2">
                         <div className="text-left w-auto">
                             <button
-                                onClick={() => navigate(`/torneos/${torneoId}`)}
+                                onClick={() => navigate(`/t/${encodeId(torneoId)}`)}
                                 className="text-textMuted text-xs mb-1 flex items-center justify-start gap-1 hover:text-textMain transition-colors w-full"
                             >
                                 ← Volver al torneo
