@@ -16,11 +16,16 @@ import ModalAyuda from '../components/ui/ModalAyuda'
 import BotonAyuda from '../components/ui/BotonAyuda'
 import PerfilModal from '../components/ui/PerfilModal'
 import { AYUDA } from '../components/ui/ayudaContenido'
+import DashboardClasicoGlobal from '../components/dashboard/DashboardClasicoGlobal'
+import DashboardDraftClasico from '../components/dashboard/DashboardDraftClasico'
+import DashboardDraftH2H from '../components/dashboard/DashboardDraftH2H'
 
 export default function DashboardPage() {
     const usuario = useAuthStore(state => state.usuario)
-    const { contextoActual } = useGameStore()
+    const { contextoActual, misLigasDraft } = useGameStore()
     const navigate = useNavigate()
+
+    const torneoActual = misLigasDraft?.find(t => t.id === contextoActual)
 
     const [jornada, setJornada] = useState(null)
     const [plantel, setPlantel] = useState(null)
@@ -28,7 +33,6 @@ export default function DashboardPage() {
     const [rankingFecha, setRankingFecha] = useState([])
     const [miPosicion, setMiPosicion] = useState(null)
     const [jornadas, setJornadas] = useState([])
-    const [jornadaTab, setJornadaTab] = useState('global')
     const [jornadaSel, setJornadaSel] = useState(null)
     const [loading, setLoading] = useState(true)
     const { abierto, abrir, cerrar } = useAyuda('dashboard')
@@ -37,13 +41,26 @@ export default function DashboardPage() {
     const countdown = useCountdown(jornada?.fechaInicio)
 
     useEffect(() => {
+        if (!jornadaSel) return
+        getRankingJornada(jornadaSel, 100).then(todos => {
+            const top5 = todos.slice(0, 5);
+            const yo = todos.find(f => f.nombreUsuario === usuario?.nombreDisplay);
+            if (yo && yo.posicion > 5) {
+                setRankingFecha([...top5, yo]);
+            } else {
+                setRankingFecha(todos.slice(0, 6));
+            }
+        }).catch(() => { })
+    }, [jornadaSel, usuario])
+
+    useEffect(() => {
         setLoading(true)
         Promise.allSettled([
             getJornadaActiva(),
             getJornadaProxima(),
-            getPlantel(contextoActual?.id),
-            contextoActual ? getTablaTorneo(contextoActual.id) : getRankingGlobal(5),
-            !contextoActual ? getMiPosicion() : Promise.resolve(null),
+            getPlantel(torneoActual?.id),
+            torneoActual ? getTablaTorneo(torneoActual.id) : getRankingGlobal(100),
+            !torneoActual ? getMiPosicion() : Promise.resolve(null),
             getJornadas(),
         ]).then(([activa, proxima, plantelRes, rankGlobal, miPos, jornadasRes]) => {
 
@@ -69,12 +86,19 @@ export default function DashboardPage() {
             }
 
             if (rankGlobal.status === 'fulfilled') {
-                if (contextoActual) {
-                    setRankingGlobal(rankGlobal.value.slice(0, 5));
+                if (torneoActual) {
+                    setRankingGlobal(rankGlobal.value);
                     const miFila = rankGlobal.value.find(f => f.nombreUsuario === usuario?.nombreDisplay);
                     setMiPosicion(miFila || null);
                 } else {
-                    setRankingGlobal(rankGlobal.value);
+                    const todos = rankGlobal.value;
+                    const top5 = todos.slice(0, 5);
+                    const yo = todos.find(f => f.nombreUsuario === usuario?.nombreDisplay);
+                    if (yo && yo.posicion > 5) {
+                        setRankingGlobal([...top5, yo]);
+                    } else {
+                        setRankingGlobal(todos.slice(0, 6));
+                    }
                     if (miPos.status === 'fulfilled') setMiPosicion(miPos.value);
                 }
             }
@@ -89,20 +113,14 @@ export default function DashboardPage() {
                 }
             }
         }).finally(() => setLoading(false))
-    }, [contextoActual?.id, usuario?.id, usuario?.nombreDisplay])
-
-    // Cargar ranking de jornada cuando cambia la selección
-    useEffect(() => {
-        if (!jornadaSel) return
-        getRankingJornada(jornadaSel, 5).then(setRankingFecha).catch(() => { })
-    }, [jornadaSel])
+    }, [torneoActual?.id, usuario?.id, usuario?.nombreDisplay])
 
     if (loading) return <LoadingSpinner mensaje="Cargando dashboard..." />
 
     return (
         <div className="space-y-4">
 
-            {/* ── Header ─────────────────────────────────────────────── */}
+            {/* ── Header ── */}
             <div className="flex items-center gap-3 pt-2 cursor-pointer md:hover:opacity-80" onClick={() => setModalPerfilAbierto(true)}>
                 <div className="w-12 h-12 rounded-full bg-primary flex items-center
                         justify-center text-white font-bold text-lg shrink-0 overflow-hidden">
@@ -134,7 +152,7 @@ export default function DashboardPage() {
                 </div>
             </div>
 
-            {/* ── Jornada + Countdown (Full Width) ─────────────────────── */}
+            {/* ── Jornada + Countdown (Full Width) ── */}
             {jornada ? (
                 <div className="card space-y-4 py-8">
                     <div className="flex flex-col lg:flex-row items-center justify-center gap-6">
@@ -170,182 +188,28 @@ export default function DashboardPage() {
                 </div>
             )}
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <div className="space-y-4">
-
-                    {/* ── Mi equipo ────────────────────────────────────────────── */}
-                    <div className="card space-y-3">
-                        <h3 className="text-textMain font-semibold">Mi Equipo</h3>
-
-                        {plantel ? (
-                            <>
-                                {/* Stats del plantel */}
-                                <div className="grid grid-cols-3 gap-2">
-                                    {!contextoActual && (
-                                        <StatCard
-                                            label="Presupuesto"
-                                            valor={`${plantel.presupuestoRestante?.toFixed(1)} cr`}
-                                        />
-                                    )}
-                                    <StatCard
-                                        label={`Jornada ${plantel.jornadaNumero}`}
-                                        valor={plantel.puntajeObtenidoFecha?.toFixed(1) ?? '—'}
-                                    />
-                                    {!contextoActual && (
-                                        <StatCard
-                                            label="Transferencias"
-                                            valor={`${plantel.transferenciasRestantes}/3`}
-                                        />
-                                    )}
-                                </div>
-
-                                {/* Mi posición en el ranking */}
-                                {miPosicion && (
-                                    <div className="bg-surface rounded-2xl p-3 border border-border
-                                      flex items-center gap-3">
-                                        <div className={`
-                          w-8 h-8 rounded-full flex items-center justify-center
-                          text-sm font-black shrink-0
-                          ${miPosicion.posicion === 1 ? 'bg-yellow-500 text-white' : ''}
-                          ${miPosicion.posicion === 2 ? 'bg-gray-400 text-white' : ''}
-                          ${miPosicion.posicion === 3 ? 'bg-amber-700 text-white' : ''}
-                          ${miPosicion.posicion >= 4 ? 'bg-border text-textMuted' : ''}
-                        `}>
-                                            {miPosicion.posicion}
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-textMain text-[15px] font-semibold truncate">
-                                                {miPosicion.nombreEquipo}
-                                            </p>
-                                            <p className="text-textMuted text-xs">Ranking general</p>
-                                        </div>
-                                        <span className="text-accent font-bold tabular-nums text-[15px]">
-                                            {miPosicion.puntajeGlobal?.toFixed(1)} pts
-                                        </span>
-                                    </div>
-                                )}
-
-                                <button
-                                    onClick={() => navigate('/canchita')}
-                                    className="btn-primary w-full"
-                                >
-                                    Ver Equipo
-                                </button>
-                            </>
-                        ) : (
-                            <div className="text-center py-4 space-y-3">
-                                <p className="text-textMuted text-sm">
-                                    Comenzarás a jugar en la siguiente jornada.
-                                </p>
-                                <button
-                                    onClick={() => navigate('/canchita')}
-                                    className="btn-accent w-full"
-                                >
-                                    Ver Equipo
-                                </button>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                {/* ── Rankings (Desktop / Mobile) ───────────────────────── */}
-                <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Vista Desktop (md+): Mostramos ambos rankings separados */}
-                    <div className="hidden md:block card space-y-3 h-fit">
-                        <h3 className="text-textMain font-bold">
-                            🏆 {contextoActual ? 'Posiciones de la Liga' : 'Ranking General'}
-                        </h3>
-                        <div className="space-y-2">
-                            {rankingGlobal.map(fila => (
-                                <div key={`global-${fila.equipoVirtualId}`} className="flex items-center gap-3">
-                                    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-black shrink-0 ${fila.posicion === 1 ? 'bg-yellow-500 text-white' : fila.posicion === 2 ? 'bg-gray-400 text-white' : fila.posicion === 3 ? 'bg-amber-700 text-white' : 'bg-border text-textMuted'}`}>
-                                        {fila.posicion}
-                                    </span>
-                                    <p className="flex-1 text-textMain font-medium text-[15px] truncate">{fila.nombreEquipo}</p>
-                                    <span className="text-accent font-bold text-[15px] tabular-nums shrink-0">{fila.puntajeGlobal?.toFixed(1)}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className="hidden md:flex flex-col card space-y-3 h-fit">
-                        <div className="flex items-center justify-between">
-                            <h3 className="text-textMain font-bold">📅 Ranking Jornada</h3>
-                            {jornadas.length > 0 && (
-                                <select
-                                    value={jornadaSel ?? ''}
-                                    onChange={e => setJornadaSel(Number(e.target.value))}
-                                    className="bg-surface border border-border rounded-xl px-4 py-2 min-w-[160px] text-textMain text-sm font-semibold focus:outline-none focus:border-primary cursor-pointer"
-                                >
-                                    {jornadas.map(j => (
-                                        <option key={j.id} value={j.id}>Jornada {j.numero}</option>
-                                    ))}
-                                </select>
-                            )}
-                        </div>
-                        <div className="space-y-2">
-                            {rankingFecha.length === 0 ? (
-                                <p className="text-textMuted text-xs text-center py-3">No hay datos para esta jornada.</p>
-                            ) : (
-                                rankingFecha.map(fila => (
-                                    <div key={`jornada-${fila.equipoVirtualId}`} className="flex items-center gap-3">
-                                        <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-black shrink-0 ${fila.posicion === 1 ? 'bg-yellow-500 text-white' : fila.posicion === 2 ? 'bg-gray-400 text-white' : fila.posicion === 3 ? 'bg-amber-700 text-white' : 'bg-border text-textMuted'}`}>
-                                            {fila.posicion}
-                                        </span>
-                                        <p className="flex-1 text-textMain font-medium text-[15px] truncate">{fila.nombreEquipo}</p>
-                                        <span className="text-accent font-bold text-[15px] tabular-nums shrink-0">{fila.puntajeGlobal?.toFixed(1)}</span>
-                                    </div>
-                                ))
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Vista Móvil (hasta md): Usamos las Tabs */}
-                    <div className="md:hidden card space-y-3 h-fit">
-                        <div className="flex gap-2 bg-surface rounded-2xl p-1">
-                            {[
-                                { key: 'global', label: contextoActual ? '🏆 Liga' : '🏆 General' },
-                                { key: 'jornada', label: '📅 Jornada' },
-                            ].map(({ key, label }) => (
-                                <button
-                                    key={key}
-                                    onClick={() => setJornadaTab(key)}
-                                    className={`flex-1 py-1.5 rounded-xl text-xs font-semibold transition-colors ${jornadaTab === key ? 'bg-primary text-white' : 'text-textMuted hover:text-textMain'}`}
-                                >
-                                    {label}
-                                </button>
-                            ))}
-                        </div>
-
-                        {jornadaTab === 'jornada' && jornadas.length > 0 && (
-                            <select
-                                value={jornadaSel ?? ''}
-                                onChange={e => setJornadaSel(Number(e.target.value))}
-                                className="w-full bg-surface border border-border rounded-xl px-3 py-2 text-textMain text-sm focus:outline-none focus:border-primary"
-                            >
-                                {jornadas.map(j => (
-                                    <option key={j.id} value={j.id}>Jornada {j.numero}</option>
-                                ))}
-                            </select>
-                        )}
-
-                        <div className="space-y-2">
-                            {(jornadaTab === 'global' ? rankingGlobal : rankingFecha).map(fila => (
-                                <div key={fila.equipoVirtualId} className="flex items-center gap-3">
-                                    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-black shrink-0 ${fila.posicion === 1 ? 'bg-yellow-500 text-white' : fila.posicion === 2 ? 'bg-gray-400 text-white' : fila.posicion === 3 ? 'bg-amber-700 text-white' : 'bg-border text-textMuted'}`}>
-                                        {fila.posicion}
-                                    </span>
-                                    <p className="flex-1 text-textMain font-medium text-[15px] truncate">{fila.nombreEquipo}</p>
-                                    <span className="text-accent font-bold text-[15px] tabular-nums shrink-0">{fila.puntajeGlobal?.toFixed(1)}</span>
-                                </div>
-                            ))}
-                            {jornadaTab === 'jornada' && rankingFecha.length === 0 && (
-                                <p className="text-textMuted text-xs text-center py-3">No hay datos para esta jornada.</p>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {/* 🏆 CONTENIDO DINÁMICO SEGÚN EL MODO DEL TORNEO 🏆 */}
+            {!torneoActual ? (
+                <DashboardClasicoGlobal
+                    plantel={plantel}
+                    miPosicion={miPosicion}
+                    rankingGlobal={rankingGlobal}
+                    jornadas={jornadas}
+                    jornadaSelInicial={jornadaSel}
+                />
+            ) : torneoActual.tipoPuntuacion === 'H2H' ? (
+                <DashboardDraftH2H
+                    rankingGlobal={rankingGlobal}
+                    contextoActual={torneoActual}
+                />
+            ) : (
+                <DashboardDraftClasico
+                    plantel={plantel}
+                    miPosicion={miPosicion}
+                    rankingGlobal={rankingGlobal}
+                    contextoActual={torneoActual}
+                />
+            )}
 
             <ModalAyuda
                 pagina="dashboard"
@@ -358,31 +222,6 @@ export default function DashboardPage() {
                 isOpen={modalPerfilAbierto} 
                 onClose={() => setModalPerfilAbierto(false)} 
             />
-        </div>
-    )
-}
-
-// ── Sub-componentes ──────────────────────────────────────────────────────────
-
-function EstadoBadge({ estado }) {
-    const config = {
-        ABIERTA_A_CAMBIOS: { bg: 'bg-green-900/40', text: 'text-green-400', label: 'Abierta' },
-        EN_JUEGO: { bg: 'bg-red-900/40', text: 'text-red-400', label: 'En juego' },
-        FINALIZADA: { bg: 'bg-gray-800', text: 'text-textMuted', label: 'Finalizada' },
-    }
-    const cfg = config[estado] ?? config.FINALIZADA
-    return (
-        <span className={`${cfg.bg} ${cfg.text} text-xs font-semibold px-2 py-1 rounded-full`}>
-            {cfg.label}
-        </span>
-    )
-}
-
-function StatCard({ label, valor }) {
-    return (
-        <div className="bg-surface rounded-xl p-3 text-center border border-border">
-            <p className="text-accent font-bold text-lg tabular-nums">{valor}</p>
-            <p className="text-textMuted text-xs mt-0.5">{label}</p>
         </div>
     )
 }

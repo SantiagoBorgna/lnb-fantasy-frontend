@@ -22,7 +22,7 @@ export default function ContextSwitcher() {
     if (!misLigasDraft || misLigasDraft.length === 0) return null
 
     const ligasOpciones = [
-        { id: null, nombre: 'Modo Clásico (Global)' },
+        { id: null, nombre: 'Modo Clásico' },
         ...misLigasDraft.map(t => ({ id: t.id, nombre: t.nombre }))
     ]
 
