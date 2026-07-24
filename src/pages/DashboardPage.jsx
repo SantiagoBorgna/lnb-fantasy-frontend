@@ -131,7 +131,7 @@ export default function DashboardPage() {
                     )}
                 </div>
                 <div className="min-w-0 flex-1">
-                    <p className="text-textMuted text-xs">Bienvenido</p>
+                    <p className="text-textMuted text-xs">Bienvenido/a</p>
                     <h2 className="text-textMain font-bold text-lg truncate">
                         {usuario?.nombreDisplay ?? 'Mánager'}
                     </h2>
