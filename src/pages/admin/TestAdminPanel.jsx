@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useAuthStore } from '../../store/authStore'
-import { api } from '../../api/axiosClient'
+import axiosClient from '../../api/axiosClient'
 import { Navigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
 import AppShell from '../../components/ui/AppShell'
@@ -19,7 +19,7 @@ export default function TestAdminPanel() {
         if (!window.confirm("ATENCION: Esto va a borrar todos los usuarios, planteles, mercado y partidos. Estas seguro?")) return;
         setLoading(true)
         try {
-            const res = await api.post('/admin/test/reset-db')
+            const res = await axiosClient.post('/admin/test/reset-db')
             toast.success(res.data.message || 'Base de datos limpia')
         } catch (error) {
             toast.error('Error al limpiar DB')
@@ -32,7 +32,7 @@ export default function TestAdminPanel() {
     const handleSeedJornadas = async () => {
         setLoading(true)
         try {
-            const res = await api.post('/admin/test/seed-jornadas')
+            const res = await axiosClient.post('/admin/test/seed-jornadas')
             toast.success(res.data.message || 'Jornadas generadas')
         } catch (error) {
             toast.error(error.response?.data?.message || 'Error al generar jornadas')
@@ -49,7 +49,7 @@ export default function TestAdminPanel() {
         }
         setLoading(true)
         try {
-            const res = await api.post(`/admin/test/simular-jornada/${jornadaId}`)
+            const res = await axiosClient.post(`/admin/test/simular-jornada/${jornadaId}`)
             toast.success(res.data.message || 'Jornada simulada')
         } catch (error) {
             toast.error(error.response?.data?.message || 'Error al simular jornada')
