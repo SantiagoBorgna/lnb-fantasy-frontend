@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useAuthStore } from '../../store/authStore'
-import { api } from '../../api/axiosConfig'
+import { api } from '../../api/axiosClient'
 import { Navigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
 import AppShell from '../../components/ui/AppShell'
