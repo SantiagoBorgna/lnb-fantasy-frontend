@@ -98,8 +98,8 @@ export default function OnboardingCanchitaPage() {
             <div className="w-full max-w-2xl bg-surface md:bg-card border-none md:border md:border-border rounded-none md:rounded-3xl flex flex-col shadow-none md:shadow-xl min-h-screen md:min-h-0 md:h-[90vh] overflow-y-auto custom-scrollbar relative pb-6 md:pb-10">
 
             <div className="flex gap-2 px-6 pt-6 md:pt-10 max-w-md mx-auto w-full shrink-0">
-                {[1, 2, 3].map(n => (
-                    <div key={n} className="h-1 flex-1 rounded-full bg-accent" />
+                {[1, 2, 3, 4].map(n => (
+                    <div key={n} className={`h-1 flex-1 rounded-full ${n <= 3 ? 'bg-accent' : 'bg-border'}`} />
                 ))}
             </div>
 

@@ -197,7 +197,13 @@ export default function SalaDraftPage() {
             <header className="flex flex-col gap-2">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="text-center md:text-left flex-1">
-                        <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+                        <button
+                            onClick={() => navigate(`/t/${encodeId(torneoId)}`)}
+                            className="text-textMuted text-sm mb-1 flex items-center justify-center md:justify-start gap-1 hover:text-textMain transition-colors w-full md:w-auto"
+                        >
+                            ← Volver al torneo
+                        </button>
+                        <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-1">
                             <h1 className="text-2xl font-black text-textMain tracking-tight">Sala de Draft</h1>
                             <span className="text-xs bg-surface border border-border px-2.5 py-1 rounded-full text-textMuted font-bold">
                                 {draftState.cantidadParticipantes}/{draftState.maxParticipantes} participantes
@@ -390,7 +396,7 @@ export default function SalaDraftPage() {
                 <div className="animate-fade-in space-y-4">
                     <div className="bg-card rounded-2xl border border-border p-6 shadow-sm">
                         <h2 className="text-xl font-black text-textMain mb-4 flex items-center gap-2">
-                            <span>📝 Resumen de tu Draft</span>
+                            <span>Resumen de tu Draft</span>
                         </h2>
                         
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 
 export default function LoginPage() {
@@ -17,12 +17,9 @@ export default function LoginPage() {
 
             {/* Logo / Título */}
             <div className="mb-12 text-center">
-                <div className="w-20 h-20 bg-primary rounded-3xl mx-auto mb-4
-                        flex items-center justify-center">
-                    <span className="text-white text-3xl font-bold">LNB</span>
-                </div>
-                <h1 className="text-3xl font-bold text-textMain">Fantasy</h1>
-                <p className="text-textMuted mt-2 text-sm">
+                <img src="/icons/logo-cuadrado.jpg" alt="Sexto Hombre Fantasy" className="w-28 h-28 mx-auto mb-6 object-cover rounded-[22px] drop-shadow-xl" />
+                <h1 className="text-3xl font-bold text-white tracking-tight">Sexto Hombre Fantasy</h1>
+                <p className="text-textMuted mt-3 text-sm font-medium">
                     La Liga Nacional de Básquet, a tu manera
                 </p>
             </div>
@@ -46,7 +43,7 @@ export default function LoginPage() {
 
 
                 <a
-                    href={`${import.meta.env.VITE_API_URL}/oauth2/authorization/microsoft`}
+                    href={`${import.meta.env.VITE_API_URL}/oauth2/authorization/azure`}
                     className="
                     flex items-center justify-center gap-3
                     w-full py-3 px-4 rounded-2xl
@@ -60,10 +57,17 @@ export default function LoginPage() {
                 </a>
             </div>
 
-            <p className="text-textMuted text-xs text-center mt-8 max-w-xs">
-                Al iniciar sesión aceptás los términos de uso de LNB Fantasy.
-                No guardamos contraseñas.
-            </p>
+            {/* Aviso de T&C */}
+            <div className="mt-8 text-center px-4 max-w-sm">
+                <p className="text-textMuted text-xs">
+                    Al continuar, aceptas nuestros{' '}
+                    <Link to="/terminos" className="text-primary hover:underline font-semibold transition-all">
+                        Términos y Condiciones
+                    </Link>
+                    {' '}y Política de Privacidad.
+                </p>
+            </div>
+
         </div >
     )
 }

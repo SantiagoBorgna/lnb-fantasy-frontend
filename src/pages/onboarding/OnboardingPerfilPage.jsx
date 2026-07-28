@@ -63,7 +63,7 @@ export default function OnboardingPerfilPage() {
 
             {/* Progreso */}
             <div className="flex gap-2 mb-8">
-                {[1, 2, 3].map(n => (
+                {[1, 2, 3, 4].map(n => (
                     <div key={n} className={`h-1 flex-1 rounded-full ${n === 1 ? 'bg-accent' : 'bg-border'
                         }`} />
                 ))}

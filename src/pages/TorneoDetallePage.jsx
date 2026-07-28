@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { getTorneo, getTorneoPorCodigo, getTablaTorneo, getFixtureTorneo, salirDeTorneo, unirseTorneo, editarTorneo, expulsarParticipante } from '../api/torneoApi'
-import { getRankingJornada } from '../api/rankingApi'
+import { getRankingJornada, getRankingJornadaTorneo } from '../api/rankingApi'
 import { getJornadas } from '../api/jornadaApi'
 import { encodeId, decodeId, encodeMultiple } from '../utils/urlParams'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
@@ -11,7 +11,8 @@ import { createPortal } from 'react-dom'
 import clsx from 'clsx'
 
 export default function TorneoDetallePage() {
-    const { torneoId: rawTorneoId, codigo } = useParams()
+    const { hashId, torneoId: oldTorneoId, codigo } = useParams()
+    const rawTorneoId = hashId || oldTorneoId;
     const torneoId = decodeId(rawTorneoId)
     const navigate = useNavigate()
     const usuario = useAuthStore(state => state.usuario)
@@ -76,7 +77,15 @@ export default function TorneoDetallePage() {
                 let fetchedFixture = []
                 
                 if (jornadasRes.status === 'fulfilled') {
-                    fetchedTodas = jornadasRes.value
+                    let validJornadas = jornadasRes.value
+                    if (torneoData.modalidad === 'DRAFT' && torneoData.creadoEn) {
+                        const creado = new Date(torneoData.creadoEn)
+                        validJornadas = validJornadas.filter(j => {
+                            if (!j.fechaInicio) return true
+                            return new Date(j.fechaInicio) >= creado
+                        })
+                    }
+                    fetchedTodas = validJornadas
                     setTodasJornadas(fetchedTodas)
                     const finalizadas = fetchedTodas
                         .filter(j => j.estado === 'FINALIZADA')
@@ -130,16 +139,13 @@ export default function TorneoDetallePage() {
 
     // Cargar ranking de jornada cuando cambia el selector
     useEffect(() => {
-        if (!jornadaSel) return
-        // Filtramos del ranking global de la jornada solo los que están en este torneo
-        getRankingJornada(jornadaSel, 500).then(rankingCompleto => {
-            const idsEnTorneo = new Set(tablaGeneral.map(f => f.equipoVirtualId))
-            const filtrado = rankingCompleto
-                .filter(f => idsEnTorneo.has(f.equipoVirtualId))
-                .map((f, i) => ({ ...f, posicion: i + 1 }))
-            setTablaJornada(filtrado)
+        if (!jornadaSel || !torneo) return
+        
+        getRankingJornadaTorneo(torneo.id, jornadaSel, 500).then(rankingFiltrado => {
+            // El backend ya filtra y ordena correctamente los puntos según la modalidad del torneo
+            setTablaJornada(rankingFiltrado)
         }).catch(() => { })
-    }, [jornadaSel, tablaGeneral])
+    }, [jornadaSel, torneo])
 
     // Busqueda en las tablas
     const tablaGeneralFiltrada = useMemo(() => {
@@ -608,11 +614,14 @@ export default function TorneoDetallePage() {
                     <div className={clsx("space-y-3", tab === 'jornada' ? 'block' : 'hidden md:block')}>
                         <h2 className="hidden md:block text-textMain font-bold text-lg px-1">Ranking Jornada</h2>
                         {todasJornadas.filter(j => j.estado === 'FINALIZADA').length > 0 ? (
-                            <JornadaSelector
-                                jornadas={todasJornadas.filter(j => j.estado === 'FINALIZADA')}
-                                selectedId={jornadaSel}
-                                onSelect={setJornadaSel}
-                            />
+                            <>
+                                <JornadaSelector
+                                    jornadas={todasJornadas.filter(j => j.estado === 'FINALIZADA')}
+                                    selectedId={jornadaSel}
+                                    onSelect={setJornadaSel}
+                                />
+                                {renderTabla(tablaJornadaFiltrada, true)}
+                            </>
                         ) : (
                             <p className="text-textMuted text-xs text-center py-3">
                                 No hay jornadas finalizadas todavía.

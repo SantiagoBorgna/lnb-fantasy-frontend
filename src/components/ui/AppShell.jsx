@@ -7,6 +7,7 @@ import { createPortal } from 'react-dom'
 import TopNav from './TopNav'
 import NotificacionesPrompt from './NotificacionesPrompt' 
 import ContextSwitcher from './ContextSwitcher'
+import { useUiStore } from '../../store/uiStore'
 
 import { getMisTorneos } from '../../api/torneoApi'
 import { useGameStore } from '../../store/gameStore'
@@ -14,8 +15,27 @@ import { useGameStore } from '../../store/gameStore'
 export default function AppShell() {
     const { token, setAuth, logout: logoutStore } = useAuthStore()
     const { setMisLigasDraft, clearGameData } = useGameStore()
+    const showToast = useUiStore(state => state.showToast)
     const [modalLogout, setModalLogout] = useState(false)
     const navigate = useNavigate()
+
+    useEffect(() => {
+        const channel = new BroadcastChannel('lnb-notifications')
+        channel.onmessage = (event) => {
+            const data = event.data
+            
+            // Si es una notificación de Draft y el usuario ya está en una sala de draft, no mostramos el toast.
+            const isDraftNotif = data.type?.startsWith('DRAFT');
+            const isUserInDraftRoom = window.location.pathname.startsWith('/d/');
+            
+            if (isDraftNotif && isUserInDraftRoom) {
+                return; // Suprimir toast in-app
+            }
+
+            showToast(`${data.title}: ${data.body}`, 'info')
+        }
+        return () => channel.close()
+    }, [showToast])
 
     useEffect(() => {
         if (!token) return

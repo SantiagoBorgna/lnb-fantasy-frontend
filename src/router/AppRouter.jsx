@@ -17,6 +17,8 @@ import Toast from '../components/ui/Toast'
 import TorneoDetallePage from '../pages/TorneoDetallePage'
 import CanchitaAjenaPage from '../pages/CanchitaAjenaPage'
 import SalaDraftPage from '../pages/SalaDraftPage'
+import TerminosPage from '../pages/TerminosPage'
+import RedirectTorneo from '../components/ui/RedirectTorneo'
 
 
 function PrivateRoute({ children }) {
@@ -58,6 +60,7 @@ export default function AppRouter() {
                 {/* ── Públicas ───────────────────────────────────────────── */}
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/auth/callback" element={<AuthCallbackPage />} />
+                <Route path="/terminos" element={<TerminosPage />} />
 
                 {/* ── Onboarding ─────────────────────────────────────────── */}
                 <Route path="/onboarding/perfil" element={
@@ -91,7 +94,8 @@ export default function AppRouter() {
                     <Route path="canchita" element={<CanchitaPage />} />
                     <Route path="mercado" element={<MercadoPage />} />
                     <Route path="torneos" element={<TorneosPage />} />
-                    <Route path="t/:torneoId" element={<TorneoDetallePage />} />
+                    <Route path="/t/:hashId" element={<PrivateRoute><TorneoDetallePage /></PrivateRoute>} />
+                    <Route path="/t-redir/:id/*" element={<PrivateRoute><RedirectTorneo /></PrivateRoute>} />
                     <Route path="d/:torneoId" element={<SalaDraftPage />} />
                     <Route path="v/:hashData" element={<CanchitaAjenaPage />} />
                     <Route path="u/:codigo" element={<TorneoDetallePage />} />
