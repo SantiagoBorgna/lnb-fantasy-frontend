@@ -2,12 +2,13 @@ import { useState } from 'react'
 import { useAuthStore } from '../../store/authStore'
 import axiosClient from '../../api/axiosClient'
 import { Navigate } from 'react-router-dom'
-import { toast } from 'react-hot-toast'
+import { useUiStore } from '../../store/uiStore'
 import AppShell from '../../components/ui/AppShell'
 import LoadingSpinner from '../../components/ui/LoadingSpinner'
 
 export default function TestAdminPanel() {
     const usuario = useAuthStore(state => state.usuario)
+    const showToast = useUiStore(state => state.showToast)
     const [loading, setLoading] = useState(false)
     const [jornadaId, setJornadaId] = useState('')
 
@@ -20,9 +21,9 @@ export default function TestAdminPanel() {
         setLoading(true)
         try {
             const res = await axiosClient.post('/admin/test/reset-db')
-            toast.success(res.data.message || 'Base de datos limpia')
+            showToast(res.data.message || 'Base de datos limpia', 'success')
         } catch (error) {
-            toast.error('Error al limpiar DB')
+            showToast('Error al limpiar DB', 'error')
             console.error(error)
         } finally {
             setLoading(false)
@@ -33,9 +34,9 @@ export default function TestAdminPanel() {
         setLoading(true)
         try {
             const res = await axiosClient.post('/admin/test/seed-jornadas')
-            toast.success(res.data.message || 'Jornadas generadas')
+            showToast(res.data.message || 'Jornadas generadas', 'success')
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Error al generar jornadas')
+            showToast(error.response?.data?.message || 'Error al generar jornadas', 'error')
             console.error(error)
         } finally {
             setLoading(false)
@@ -44,15 +45,15 @@ export default function TestAdminPanel() {
 
     const handleSimularJornada = async () => {
         if (!jornadaId) {
-            toast.error('Ingresa el ID de la jornada')
+            showToast('Ingresa el ID de la jornada', 'error')
             return
         }
         setLoading(true)
         try {
             const res = await axiosClient.post(`/admin/test/simular-jornada/${jornadaId}`)
-            toast.success(res.data.message || 'Jornada simulada')
+            showToast(res.data.message || 'Jornada simulada', 'success')
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Error al simular jornada')
+            showToast(error.response?.data?.message || 'Error al simular jornada', 'error')
             console.error(error)
         } finally {
             setLoading(false)
