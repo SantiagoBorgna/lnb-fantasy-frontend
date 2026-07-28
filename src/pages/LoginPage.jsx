@@ -28,7 +28,7 @@ export default function LoginPage() {
             <div className="w-full max-w-sm space-y-3">
 
                 <a
-                    href={`${import.meta.env.VITE_API_URL}/oauth2/authorization/google`}
+                    href={import.meta.env.VITE_OAUTH2_GOOGLE_URL}
                     className="
                     flex items-center justify-center gap-3
                     w-full py-3 px-4 rounded-2xl
@@ -43,7 +43,7 @@ export default function LoginPage() {
 
 
                 <a
-                    href={`${import.meta.env.VITE_API_URL}/oauth2/authorization/azure`}
+                    href={import.meta.env.VITE_OAUTH2_MICROSOFT_URL}
                     className="
                     flex items-center justify-center gap-3
                     w-full py-3 px-4 rounded-2xl
