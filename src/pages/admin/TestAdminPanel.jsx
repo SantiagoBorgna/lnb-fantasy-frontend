@@ -1,14 +1,14 @@
 import { useState } from 'react'
 import { useAuthStore } from '../../store/authStore'
 import axiosClient from '../../api/axiosClient'
-import { Navigate } from 'react-router-dom'
+import { useNavigate, Navigate } from 'react-router-dom'
 import { useUiStore } from '../../store/uiStore'
-import AppShell from '../../components/ui/AppShell'
 import LoadingSpinner from '../../components/ui/LoadingSpinner'
 
 export default function TestAdminPanel() {
     const usuario = useAuthStore(state => state.usuario)
     const showToast = useUiStore(state => state.showToast)
+    const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
     const [jornadaId, setJornadaId] = useState('')
 
@@ -61,8 +61,11 @@ export default function TestAdminPanel() {
     }
 
     return (
-        <AppShell hideNav={true}>
-            <div className="p-4 max-w-lg mx-auto">
+        <div className="min-h-screen bg-background text-white p-4">
+            <div className="max-w-lg mx-auto mt-4">
+                <button onClick={() => navigate('/dashboard')} className="text-sm text-gray-400 mb-4 hover:text-white flex items-center gap-1">
+                    ← Volver al Dashboard
+                </button>
                 <h1 className="text-2xl font-bold text-white mb-2">🛠️ Panel de Pruebas (Admin)</h1>
                 <p className="text-gray-400 mb-6 text-sm">
                     Acceso restringido. Estas acciones modifican la base de datos de producción.
@@ -118,6 +121,6 @@ export default function TestAdminPanel() {
                     </div>
                 </div>
             </div>
-        </AppShell>
+        </div>
     )
 }
