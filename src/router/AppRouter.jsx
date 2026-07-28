@@ -19,6 +19,7 @@ import CanchitaAjenaPage from '../pages/CanchitaAjenaPage'
 import SalaDraftPage from '../pages/SalaDraftPage'
 import TerminosPage from '../pages/TerminosPage'
 import RedirectTorneo from '../components/ui/RedirectTorneo'
+import TestAdminPanel from '../pages/admin/TestAdminPanel'
 
 
 function PrivateRoute({ children }) {
@@ -78,8 +79,10 @@ export default function AppRouter() {
                 <Route path="/onboarding/mercado" element={
                     <PrivateRoute><MercadoPage modoOnboarding={true} /></PrivateRoute>
                 } />
-                <Route path="/onboarding/mercado" element={
-                    <PrivateRoute><MercadoPage /></PrivateRoute>
+
+                {/* 🛠️ Admin Test */}
+                <Route path="/admin-test" element={
+                    <PrivateRoute><TestAdminPanel /></PrivateRoute>
                 } />
 
                 {/* ── App principal — solo usuarios ACTIVOS ──────────────── */}
