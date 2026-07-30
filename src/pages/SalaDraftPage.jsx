@@ -45,8 +45,8 @@ export default function SalaDraftPage() {
     // Modal state
     const [confirmModal, setConfirmModal] = useState({ open: false, action: null, message: '', title: '' })
 
-    const cargarDatos = () => {
-        setLoading(true)
+    const cargarDatos = (showLoader = true) => {
+        if (showLoader) setLoading(true)
         setError('')
         Promise.all([
             getEstadoDraft(torneoId),
@@ -76,7 +76,9 @@ export default function SalaDraftPage() {
         .catch(e => {
             setError('No se pudo cargar la sala de draft')
         })
-        .finally(() => setLoading(false))
+        .finally(() => {
+            if (showLoader) setLoading(false)
+        })
     }
 
     useEffect(() => {
@@ -149,7 +151,7 @@ export default function SalaDraftPage() {
                     }
                     showToast("Pick registrado")
                     setBusqueda('')
-                    cargarDatos()
+                    cargarDatos(false)
                 } catch (e) {
                     const errorMsg = typeof e.response?.data === 'string' ? e.response.data : (e.response?.data?.message || e.response?.data?.mensaje || e.response?.data?.error || "Error al elegir")
                     setError(errorMsg)
@@ -302,7 +304,7 @@ export default function SalaDraftPage() {
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <p className="font-bold text-sm text-textMain truncate">{dt.nombreCompleto}</p>
-                                            <p className="text-xs text-textMuted truncate">Director Técnico</p>
+                                            <p className="text-xs text-textMuted truncate">DT · {dt.equipoSigla || dt.equipoNombre}</p>
                                         </div>
                                         <button
                                             onClick={() => handlePick(dt, true)}
@@ -316,6 +318,14 @@ export default function SalaDraftPage() {
                             ) : (
                                 jugadoresDisponibles
                                     .filter(j => j.nombreCompleto.toLowerCase().includes(busqueda.toLowerCase()))
+                                    .filter(j => {
+                                        const countTeam = misJugadores.filter(mj => mj.equipoRealNombre === j.equipoRealNombre).length;
+                                        if (countTeam >= 2) return false;
+                                        if (j.posicion === 'BASE' || j.posicion === 'ESCOLTA') return basesEscoltas.length < 4;
+                                        if (j.posicion === 'ALERO' || j.posicion === 'ALA_PIVOT') return alerosAlaPivots.length < 4;
+                                        if (j.posicion === 'PIVOT') return pivots.length < 4;
+                                        return true;
+                                    })
                                     .sort((a, b) => a.nombreCompleto.localeCompare(b.nombreCompleto))
                                     .map(j => (
                                     <div key={j.id} className="flex items-center gap-3 p-3 rounded-xl bg-surface border border-border">

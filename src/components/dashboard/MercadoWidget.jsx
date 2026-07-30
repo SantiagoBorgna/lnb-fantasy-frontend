@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { waiverApi } from '../../api/waiverApi'
 import { obtenerMisPropuestas } from '../../api/mercadoApi'
 import { getPlantel } from '../../api/plantelApi'
+import { getJornadaActiva } from '../../api/jornadaApi'
 import { useAuthStore } from '../../store/authStore'
 import LoadingSpinner from '../ui/LoadingSpinner'
 
@@ -21,14 +22,18 @@ export default function MercadoWidget({ torneoId, miEquipoId }) {
             waiverApi.obtenerMisReclamos(torneoId),
             obtenerMisPropuestas(torneoId, 0),
             waiverApi.obtenerOrdenPrioridad(torneoId),
-            getPlantel(torneoId, usuario.id)
-        ]).then(([faseRes, reclamosRes, propuestasRes, prioridadRes, plantelRes]) => {
+            getPlantel(torneoId, usuario.id),
+            getJornadaActiva()
+        ]).then(([faseRes, reclamosRes, propuestasRes, prioridadRes, plantelRes, jornadaRes]) => {
             const fase = faseRes.status === 'fulfilled' ? faseRes.value : false;
             const reclamos = reclamosRes.status === 'fulfilled' ? reclamosRes.value : [];
             const propuestas = propuestasRes.status === 'fulfilled' ? (propuestasRes.value.content || propuestasRes.value || []) : [];
             const prioridadList = prioridadRes.status === 'fulfilled' ? prioridadRes.value : [];
             const plantel = plantelRes.status === 'fulfilled' ? plantelRes.value : null;
+            const jornada = (jornadaRes && jornadaRes.status === 'fulfilled') ? jornadaRes.value : null;
             
+            const isMercadoCerrado = jornada && (jornada.estado === 'EN_JUEGO' || jornada.estado === 'EN_CURSO');
+
             const miPrioridadIndex = prioridadList.findIndex(p => p.equipoVirtualId === miEquipoId);
             const miPrioridad = miPrioridadIndex !== -1 ? miPrioridadIndex + 1 : '-';
 
@@ -38,6 +43,7 @@ export default function MercadoWidget({ torneoId, miEquipoId }) {
 
             setStats({
                 faseRestringida: fase,
+                mercadoCerrado: isMercadoCerrado,
                 reclamosActivos: reclamos.length,
                 propuestasEnviadas: enviadas,
                 propuestasRecibidas: recibidas,
@@ -54,7 +60,7 @@ export default function MercadoWidget({ torneoId, miEquipoId }) {
                 <h3 className="text-textMain font-bold">Estado del Mercado</h3>
                 {stats && (
                     <span className="text-xs font-semibold px-2 py-1 bg-surface border border-border rounded-lg text-textMuted">
-                        {stats.faseRestringida ? 'Agencia restringida' : 'Agencia libre'}
+                        {stats.mercadoCerrado ? 'Mercado cerrado' : stats.faseRestringida ? 'Agencia restringida' : 'Agencia libre'}
                     </span>
                 )}
             </div>
