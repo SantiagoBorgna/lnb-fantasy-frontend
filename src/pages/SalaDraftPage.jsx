@@ -319,7 +319,7 @@ export default function SalaDraftPage() {
                                 jugadoresDisponibles
                                     .filter(j => j.nombreCompleto.toLowerCase().includes(busqueda.toLowerCase()))
                                     .filter(j => {
-                                        const countTeam = misJugadores.filter(mj => mj.equipoRealNombre === j.equipoRealNombre).length;
+                                        const countTeam = misJugadores.filter(mj => mj.equipoNombre === j.equipoNombre).length;
                                         if (countTeam >= 2) return false;
                                         if (j.posicion === 'BASE' || j.posicion === 'ESCOLTA') return basesEscoltas.length < 4;
                                         if (j.posicion === 'ALERO' || j.posicion === 'ALA_PIVOT') return alerosAlapivots.length < 4;
