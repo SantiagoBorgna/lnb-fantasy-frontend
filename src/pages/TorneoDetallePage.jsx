@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
-import { getTorneo, getTorneoPorCodigo, getTablaTorneo, getFixtureTorneo, salirDeTorneo, unirseTorneo, editarTorneo, expulsarParticipante } from '../api/torneoApi'
+import { getTorneo, getTorneoPorCodigo, getTablaTorneo, getFixtureTorneo, salirDeTorneo, unirseTorneo, editarTorneo, expulsarParticipante, eliminarTorneo } from '../api/torneoApi'
 import { getRankingJornada, getRankingJornadaTorneo } from '../api/rankingApi'
 import { getJornadas } from '../api/jornadaApi'
 import { encodeId, decodeId, encodeMultiple } from '../utils/urlParams'
@@ -39,6 +39,8 @@ export default function TorneoDetallePage() {
     const [ajustesTipo, setAjustesTipo] = useState('PUBLICO')
     const [guardandoAjustes, setGuardandoAjustes] = useState(false)
     const [modalExpulsar, setModalExpulsar] = useState(false)
+    const [modalEliminar, setModalEliminar] = useState(false)
+    const [eliminandoTorneo, setEliminandoTorneo] = useState(false)
     const [jugadorAExpulsar, setJugadorAExpulsar] = useState(null)
     const [errorGlobal, setErrorGlobal] = useState('')
 
@@ -199,6 +201,21 @@ export default function TorneoDetallePage() {
             console.error(e)
         } finally {
             setGuardandoAjustes(false)
+        }
+    }
+
+    const handleEliminarTorneo = async () => {
+        setEliminandoTorneo(true)
+        try {
+            await eliminarTorneo(torneo.id)
+            setModalEliminar(false)
+            setModalAjustes(false)
+            navigate('/torneos')
+        } catch (e) {
+            console.error(e)
+            setErrorGlobal('Error al eliminar torneo')
+        } finally {
+            setEliminandoTorneo(false)
         }
     }
 
@@ -781,27 +798,25 @@ export default function TorneoDetallePage() {
                      px-4 py-2.5 text-textMain text-sm
                      focus:outline-none focus:border-primary"
                             />
-                            <div className="flex gap-2">
+                            <div className="flex bg-surface rounded-xl p-1 border border-border w-full">
                                 {torneo.modalidad === 'DRAFT' ? (
-                                      <div className="w-full py-2 rounded-xl text-sm font-semibold border bg-primary/20 border-primary/40 text-primary text-center cursor-not-allowed">
-                                          PRIVADO
-                                      </div>
-                                  ) : (
-                                      ['PUBLICO', 'PRIVADO'].map(t => (
-                                          <button
-                                              key={t}
-                                              onClick={() => setAjustesTipo(t)}
-                                              className={`flex-1 py-2 rounded-xl text-sm font-semibold
-                  border transition-colors
-                  ${ajustesTipo === t
-                                                      ? 'bg-primary border-primary text-white'
-                                                      : 'bg-surface border-border text-textMuted hover:text-textMain'
-                                                  }`}
-                                          >
-                                              {t === 'PUBLICO' ? '🌐 Público' : '🔒 Privado'}
-                                          </button>
-                                      ))
-                                  )}
+                                    <div className="w-full py-1.5 rounded-lg text-xs font-bold border bg-primary/20 border-primary/40 text-primary text-center cursor-not-allowed">
+                                        PRIVADO
+                                    </div>
+                                ) : (
+                                    ['PUBLICO', 'PRIVADO'].map(t => (
+                                        <button
+                                            key={t}
+                                            onClick={() => setAjustesTipo(t)}
+                                            className={clsx(
+                                                "flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors",
+                                                ajustesTipo === t ? "bg-card shadow text-textMain" : "text-textMuted"
+                                            )}
+                                        >
+                                            {t === 'PUBLICO' ? '🌐 Público' : '🔒 Privado'}
+                                        </button>
+                                    ))
+                                )}
                             </div>
                         </div>
 
@@ -855,11 +870,52 @@ export default function TorneoDetallePage() {
                         </div>
 
                         <button
+                            onClick={() => setModalEliminar(true)}
+                            className="w-full py-3 text-red-500 font-bold border border-red-500/30 rounded-xl hover:bg-red-500/10 transition-colors"
+                        >
+                            Borrar Torneo
+                        </button>
+
+                        <button
                             onClick={() => setModalAjustes(false)}
                             className="w-full py-2 text-textMuted text-sm"
                         >
                             Cerrar
                         </button>
+                    </div>
+                </>,
+                document.body
+            )}
+
+            {/* ── Modal: Confirmar Eliminar Torneo ────────────────────────────────── */}
+            {modalEliminar && createPortal(
+                <>
+                    <div className="fixed inset-0 bg-black/70 z-[60]"
+                        onClick={() => setModalEliminar(false)} />
+                    <div className="fixed bottom-0 md:top-1/2 md:-translate-y-1/2 md:bottom-auto left-0 right-0 max-w-md mx-auto
+                          bg-card border-t border-border rounded-t-3xl md:rounded-3xl
+                          z-[70] p-6 space-y-4 animate-slide-up md:animate-none"
+                        onClick={e => e.stopPropagation()}>
+                        <div className="w-10 h-1 bg-border rounded-full mx-auto md:hidden" />
+                        <h3 className="text-textMain font-bold text-lg text-center">¿Borrar torneo?</h3>
+                        <p className="text-textMuted text-sm text-center">
+                            Esta acción es permanente y no se puede deshacer. Se eliminarán todos los participantes y datos asociados al torneo.
+                        </p>
+                        <div className="flex gap-3 pt-2">
+                            <button
+                                onClick={() => setModalEliminar(false)}
+                                className="flex-1 py-2.5 rounded-xl text-textMain font-semibold border border-border hover:bg-surface transition-colors"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={handleEliminarTorneo}
+                                disabled={eliminandoTorneo}
+                                className="flex-1 py-2.5 rounded-xl text-white font-semibold bg-red-500 hover:bg-red-600 transition-colors disabled:opacity-50"
+                            >
+                                {eliminandoTorneo ? 'Borrando...' : 'Sí, borrar'}
+                            </button>
+                        </div>
                     </div>
                 </>,
                 document.body

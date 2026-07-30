@@ -77,7 +77,7 @@ export default function AppShell() {
 
             {/* Header en mobile para el logo y el Context Switcher */}
             <div className="md:hidden flex items-center justify-between px-4 py-3 bg-card border-b border-border shrink-0 z-10 h-14">
-                <img src="/icons/logo-redondo.png" alt="Sexto Hombre Fantasy" className="h-8 object-contain pointer-events-none" />
+                <img src="/icons/logo-redondo.png" alt="Sexto Hombre Fantasy" className="h-8 object-contain pointer-events-none drop-shadow-[0_0_1px_#ffffff]" />
                 <ContextSwitcher />
             </div>
 

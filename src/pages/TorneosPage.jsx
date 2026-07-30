@@ -433,7 +433,7 @@ function ModalCrearTorneo({ onCreado, onCerrar }) {
                     />
 
                     {/* Selector de tipo */}
-                    <div className="flex gap-2">
+                    <div className="flex bg-surface rounded-xl p-1 border border-border">
                         {['PUBLICO', 'PRIVADO'].map(t => {
                             const isPublicDisabled = t === 'PUBLICO' && modalidad === 'DRAFT';
                             return (
@@ -441,13 +441,11 @@ function ModalCrearTorneo({ onCreado, onCerrar }) {
                                     key={t}
                                     onClick={() => !isPublicDisabled && setTipo(t)}
                                     disabled={isPublicDisabled}
-                                    className={`flex-1 py-2 rounded-xl text-sm font-semibold
-                                    border transition-colors
-                                    ${tipo === t
-                                            ? 'bg-primary border-primary text-white'
-                                            : isPublicDisabled 
-                                                ? 'bg-surface border-border text-textMuted/50 cursor-not-allowed'
-                                                : 'border-border text-textMuted hover:text-textMain'}`}
+                                    className={clsx(
+                                        "flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors",
+                                        tipo === t ? "bg-card shadow text-textMain" :
+                                        isPublicDisabled ? "text-textMuted/30 cursor-not-allowed" : "text-textMuted"
+                                    )}
                                 >
                                     {t === 'PUBLICO' ? '🌐 Público' : '🔒 Privado'}
                                 </button>
@@ -456,7 +454,7 @@ function ModalCrearTorneo({ onCreado, onCerrar }) {
                     </div>
 
                     {/* Selector de modalidad */}
-                    <div className="flex gap-2">
+                    <div className="flex bg-surface rounded-xl p-1 border border-border">
                         {['CLASICO', 'DRAFT'].map(m => (
                             <button
                                 key={m}
@@ -464,17 +462,13 @@ function ModalCrearTorneo({ onCreado, onCerrar }) {
                                     setModalidad(m)
                                     if (m === 'DRAFT') {
                                         setTipo('PRIVADO')
-                                        setTipoPuntuacion('H2H')
-                                    } else {
                                         setTipoPuntuacion('GENERAL')
                                     }
                                 }}
-                                className={`flex-1 py-2 rounded-xl text-sm font-semibold
-                                border transition-colors
-                                ${modalidad === m
-                                        ? 'bg-accent border-accent text-white'
-                                        : 'bg-surface border-border text-textMuted hover:border-accent hover:text-accent'
-                                    }`}
+                                className={clsx(
+                                    "flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors",
+                                    modalidad === m ? "bg-card shadow text-textMain" : "text-textMuted"
+                                )}
                             >
                                 {m === 'CLASICO' ? '📈 Clásico' : '🎯 Draft'}
                             </button>
@@ -483,19 +477,17 @@ function ModalCrearTorneo({ onCreado, onCerrar }) {
 
                     {/* Selector de Tipo de Puntuación (Solo para Draft) */}
                     {modalidad === 'DRAFT' && (
-                        <div className="flex gap-2 mt-2">
+                        <div className="flex bg-surface rounded-xl p-1 border border-border mt-2">
                             {['GENERAL', 'H2H'].map(tp => (
                                 <button
                                     key={tp}
                                     onClick={() => setTipoPuntuacion(tp)}
-                                    className={`flex-1 py-2 rounded-xl text-sm font-semibold
-                                    border transition-colors
-                                    ${tipoPuntuacion === tp
-                                            ? 'bg-primary border-primary text-white'
-                                            : 'border-border text-textMuted hover:text-textMain'
-                                        }`}
+                                    className={clsx(
+                                        "flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors",
+                                        tipoPuntuacion === tp ? "bg-card shadow text-textMain" : "text-textMuted"
+                                    )}
                                 >
-                                    {tp === 'GENERAL' ? '🏆 Pts Totales' : '⚔️ Versus'}
+                                    {tp === 'GENERAL' ? '📊 Pts Totales' : '⚔️ Versus'}
                                 </button>
                             ))}
                         </div>

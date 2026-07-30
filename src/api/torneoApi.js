@@ -24,6 +24,9 @@ export const getTorneo = (torneoId) =>
 export const salirDeTorneo = (torneoId) =>
     axiosClient.delete(`/torneos/${torneoId}/salir`).then(r => r.data)
 
+export const eliminarTorneo = (torneoId) =>
+    axiosClient.delete(`/torneos/${torneoId}`).then(r => r.data)
+
 export const editarTorneo = (torneoId, body) =>
     axiosClient.patch(`/torneos/${torneoId}/ajustes`, body).then(r => r.data)
 
