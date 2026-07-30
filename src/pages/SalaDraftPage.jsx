@@ -322,7 +322,7 @@ export default function SalaDraftPage() {
                                         const countTeam = misJugadores.filter(mj => mj.equipoRealNombre === j.equipoRealNombre).length;
                                         if (countTeam >= 2) return false;
                                         if (j.posicion === 'BASE' || j.posicion === 'ESCOLTA') return basesEscoltas.length < 4;
-                                        if (j.posicion === 'ALERO' || j.posicion === 'ALA_PIVOT') return alerosAlaPivots.length < 4;
+                                        if (j.posicion === 'ALERO' || j.posicion === 'ALA_PIVOT') return alerosAlapivots.length < 4;
                                         if (j.posicion === 'PIVOT') return pivots.length < 4;
                                         return true;
                                     })
