@@ -24,7 +24,6 @@ import ModalAyuda from '../components/ui/ModalAyuda'
 import BotonAyuda from '../components/ui/BotonAyuda'
 import { AYUDA } from '../components/ui/ayudaContenido'
 import MercadoPanel from '../components/mercado/MercadoPanel'
-import ProponerTraspasoModal from '../components/mercado/ProponerTraspasoModal'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 export default function CanchitaPage() {
@@ -51,7 +50,6 @@ export default function CanchitaPage() {
     const [dtModal, setDtModal] = useState(false)
     const [selectorDtAberto, setSelectorDtAberto] = useState(false)
     const [dtStatsAbierto, setDtStatsAbierto] = useState(false)
-    const [jugadorParaTraspaso, setJugadorParaTraspaso] = useState(null)
 
     // ── Switch de jornada (Última Fecha) ─────────────────────────────────────
     const [jornadaAnterior, setJornadaAnterior] = useState(null)
@@ -504,12 +502,6 @@ export default function CanchitaPage() {
     }
 
     const handleTransferir = (jugador) => {
-        if (contextoActual) {
-            setJugadorParaTraspaso(jugador)
-            setJugadorModal(null)
-            return
-        }
-
         const zonas = zonasDeFormacion(plantel?.formacion)
         const titulares = getTitularesOrdenados()
         const idxTitular = titulares.findIndex(
@@ -920,17 +912,6 @@ export default function CanchitaPage() {
 
             <ModalAyuda pagina="canchita" contenido={AYUDA.canchita} onCerrar={cerrar} abierto={abierto} />
 
-            {jugadorParaTraspaso && (
-                <ProponerTraspasoModal
-                    torneoId={contextoActual?.torneoDraft?.id || contextoActual}
-                    jugadorSaliente={jugadorParaTraspaso}
-                    onCerrar={() => setJugadorParaTraspaso(null)}
-                    onExito={() => {
-                        setJugadorParaTraspaso(null)
-                        queryClient.invalidateQueries({ queryKey: ['plantel', contextoActual, usuario?.id] })
-                    }}
-                />
-            )}
         </div>
     )
 }

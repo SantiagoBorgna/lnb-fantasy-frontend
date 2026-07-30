@@ -1,6 +1,6 @@
 export default function Footer() {
     return (
-        <footer className="w-full mt-8 py-4 mb-2 md:mb-0 border-t border-border flex flex-col items-center justify-center gap-3 text-textMuted">
+        <footer className="w-full mt-4 py-2 mb-2 md:mb-0 border-t border-border flex flex-col items-center justify-center gap-2 text-textMuted">
             <div className="flex items-center gap-6">
                 <a
                     href="https://www.instagram.com/sexto.hombre.fantasy"
