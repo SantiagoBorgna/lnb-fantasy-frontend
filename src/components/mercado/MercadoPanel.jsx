@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { getMercadoJugadores, getMercadoLibres, getJugadorStats } from '../../api/mercadoApi'
 import { getPlantel, realizarTransferencia } from '../../api/plantelApi'
 import LoadingSpinner from '../ui/LoadingSpinner'
@@ -50,16 +51,10 @@ const ESTADO_CONFIG = {
 
 export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
     const { contextoActual } = useGameStore()
-    const [jugadores, setJugadores] = useState([])
-    const [loading, setLoading] = useState(true)
     const [busqueda, setBusqueda] = useState('')
-    const [buscando, setBuscando] = useState(false)
+    const [debouncedBusqueda, setDebouncedBusqueda] = useState('')
     const [orden, setOrden] = useState(contextoActual ? 'promedio_desc' : 'precio_desc')
     const [filtroEstadoTraspasos, setFiltroEstadoTraspasos] = useState('TODAS')
-
-    const [plantelActivo, setPlantelActivo] = useState(null)
-    const [idsPlantelActivo, setIdsPlantelActivo] = useState([])
-    const [mercadoCerrado, setMercadoCerrado] = useState(false)
 
     const [ejecutandoTransferencia, setEjecutandoTransferencia] = useState(false)
     const [errorTransferencia, setErrorTransferencia] = useState('')
@@ -117,30 +112,33 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
     const [visibleRealizadas, setVisibleRealizadas] = useState(10)
     const [visibleRecibidas, setVisibleRecibidas] = useState(10)
 
+    const { data: activaData } = useQuery({
+        queryKey: ['jornadaActiva'],
+        queryFn: () => import('../../api/jornadaApi').then(m => m.getJornadaActiva())
+    })
+
+    const { data: plantelActivo } = useQuery({
+        queryKey: ['plantel', contextoActual, usuario?.id],
+        queryFn: () => getPlantel(contextoActual, usuario?.id),
+        enabled: !!usuario?.id || !!contextoActual
+    })
+
+    const idsPlantelActivo = useMemo(() => {
+        if (!plantelActivo || !plantelActivo.jugadores) return []
+        return plantelActivo.jugadores.map(j => String(j.jugadorRealId || j.id))
+    }, [plantelActivo])
+
+    const mercadoCerrado = useMemo(() => {
+        if (activaData && activaData.estado === 'EN_JUEGO') {
+            const esAdelantado = plantelActivo && plantelActivo.jornadaNumero > activaData.numero
+            return !esAdelantado
+        }
+        return false
+    }, [activaData, plantelActivo])
+
     useEffect(() => {
-        // Cargar datos del plantel y jornada al mismo tiempo
         const fetchDatos = async () => {
             try {
-                const [jornadaRes, plantelRes] = await Promise.allSettled([
-                    import('../../api/jornadaApi').then(m => m.getJornadaActiva()),
-                    getPlantel(contextoActual, usuario?.id)
-                ]);
-
-                const activa = jornadaRes.status === 'fulfilled' ? jornadaRes.value : null;
-                const plantelData = plantelRes.status === 'fulfilled' ? plantelRes.value : null;
-
-                if (plantelData && plantelData.jugadores) {
-                    setPlantelActivo(plantelData)
-                    const ids = plantelData.jugadores.map(j => String(j.jugadorRealId || j.id))
-                    setIdsPlantelActivo(ids)
-                }
-
-                if (activa && activa.estado === 'EN_JUEGO') {
-                    const esAdelantado = plantelData && plantelData.jornadaNumero > activa.numero;
-                    if (!esAdelantado) {
-                        setMercadoCerrado(true)
-                    }
-                }
 
                 if (contextoActual) {
                     const waiverApi = await import('../../api/waiverApi').then(m => m.waiverApi)
@@ -424,38 +422,21 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
     }, [modoTransferencia, posicionInicialTransferencia, modoAsignacion])
 
     useEffect(() => {
-        if (busqueda.trim() === '') {
-            setLoading(true)
-            fetchYFiltrar({ posicion: posicion ?? undefined, orden })
-                .then(setJugadores)
-                .catch(console.error)
-                .finally(() => setLoading(false))
-            return
-        }
-
         const timer = setTimeout(() => {
-            setBuscando(true)
-            fetchYFiltrar({
-                nombre: busqueda.trim(),
-                posicion: posicion ?? undefined,
-                orden
-            })
-                .then(setJugadores)
-                .catch(console.error)
-                .finally(() => setBuscando(false))
+            setDebouncedBusqueda(busqueda)
         }, 400)
-
         return () => clearTimeout(timer)
-    }, [busqueda, posicion, orden, contextoActual])
+    }, [busqueda])
+
+    const { data: jugadores = [], isFetching: loadingJugadores } = useQuery({
+        queryKey: ['jugadoresMercado', contextoActual, posicion, orden, debouncedBusqueda],
+        queryFn: () => fetchYFiltrar({ posicion: posicion ?? undefined, orden, nombre: debouncedBusqueda.trim() }),
+    })
 
     const limpiarBusqueda = useCallback(() => {
         setBusqueda('')
-        setLoading(true)
-        fetchYFiltrar({ posicion: posicion ?? undefined })
-            .then(setJugadores)
-            .finally(() => setLoading(false))
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [posicion])
+        setDebouncedBusqueda('')
+    }, [])
 
     const handleElegirReemplazo = async (jugadorEntra) => {
         setEjecutandoTransferencia(true)
@@ -1206,7 +1187,7 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
                 </div>
             )}
 
-            {loading || buscando ? (
+            {loadingJugadores ? (
                 <LoadingSpinner mensaje="Buscando jugadores..." />
             ) : jugadoresVisibles.length === 0 ? (
                 <EmptyState

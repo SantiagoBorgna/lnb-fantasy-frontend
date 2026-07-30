@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { getRankingJornada } from '../../api/rankingApi'
-import CamisetaSVG from '../jugador/CamisetaSVG'
 
 function StatCard({ label, valor }) {
     return (
@@ -20,20 +20,20 @@ export default function DashboardClasicoGlobal({
     jornadaSelInicial 
 }) {
     const navigate = useNavigate()
-    const [rankingFecha, setRankingFecha] = useState([])
     const [jornadaSel, setJornadaSel] = useState(jornadaSelInicial)
     const [jornadaTab, setJornadaTab] = useState('global')
-
-    useEffect(() => {
-        if (!jornadaSel) return
-        getRankingJornada(jornadaSel, 5).then(setRankingFecha).catch(() => { })
-    }, [jornadaSel])
 
     useEffect(() => {
         if(jornadaSelInicial && !jornadaSel) {
             setJornadaSel(jornadaSelInicial)
         }
     }, [jornadaSelInicial])
+
+    const { data: rankingFecha = [] } = useQuery({
+        queryKey: ['rankingJornada', jornadaSel],
+        queryFn: () => getRankingJornada(jornadaSel, 5),
+        enabled: !!jornadaSel
+    })
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">

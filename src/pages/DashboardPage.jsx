@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useAuthStore } from '../store/authStore'
 import { useGameStore } from '../store/gameStore'
 import { useCountdown } from '../hooks/useCountdown'
 import { getJornadaProxima, getJornadaActiva, getJornadas } from '../api/jornadaApi'
 import { getPlantel } from '../api/plantelApi'
 import {
-    getRankingGlobal, getRankingJornada, getMiPosicion
+    getRankingGlobal, getMiPosicion
 } from '../api/rankingApi'
 import { getTablaTorneo } from '../api/torneoApi'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
@@ -23,99 +23,70 @@ import DashboardDraftH2H from '../components/dashboard/DashboardDraftH2H'
 export default function DashboardPage() {
     const usuario = useAuthStore(state => state.usuario)
     const { contextoActual, misLigasDraft } = useGameStore()
-    const navigate = useNavigate()
 
     const torneoActual = misLigasDraft?.find(t => t.id === contextoActual)
 
-    const [jornada, setJornada] = useState(null)
-    const [plantel, setPlantel] = useState(null)
-    const [rankingGlobal, setRankingGlobal] = useState([])
-    const [rankingFecha, setRankingFecha] = useState([])
-    const [miPosicion, setMiPosicion] = useState(null)
-    const [jornadas, setJornadas] = useState([])
-    const [jornadaSel, setJornadaSel] = useState(null)
-    const [loading, setLoading] = useState(true)
     const { abierto, abrir, cerrar } = useAyuda('dashboard')
     const [modalPerfilAbierto, setModalPerfilAbierto] = useState(false)
 
+    // ── Consultas Base ──
+    const { data: activaData } = useQuery({ queryKey: ['jornadaActiva'], queryFn: getJornadaActiva })
+    const { data: proximaData } = useQuery({ queryKey: ['jornadaProxima'], queryFn: getJornadaProxima })
+    
+    const { data: plantel, isFetching: loadingPlantel } = useQuery({ 
+        queryKey: ['plantel', torneoActual?.id], 
+        queryFn: () => getPlantel(torneoActual?.id)
+    })
+
+    const { data: jornadasRes } = useQuery({ queryKey: ['jornadas'], queryFn: getJornadas })
+    
+    const { data: rankGlobalRes, isFetching: loadingRank } = useQuery({
+        queryKey: ['rankingGlobal', torneoActual?.id],
+        queryFn: () => torneoActual ? getTablaTorneo(torneoActual.id) : getRankingGlobal(100)
+    })
+
+    const { data: miPosRes } = useQuery({
+        queryKey: ['miPosicion'],
+        queryFn: () => getMiPosicion(),
+        enabled: !torneoActual
+    })
+
+    const jornadas = useMemo(() => {
+        if (!jornadasRes) return [];
+        return jornadasRes.filter(j => j.estado === 'FINALIZADA').sort((a, b) => b.numero - a.numero)
+    }, [jornadasRes]);
+
+    // ── Derivación de Datos ──
+    const jornada = useMemo(() => {
+        if (activaData && plantel && plantel.jornadaNumero === activaData.numero) return activaData;
+        if (proximaData) return proximaData;
+        if (activaData) return activaData;
+        return null;
+    }, [activaData, proximaData, plantel])
+
     const countdown = useCountdown(jornada?.fechaInicio)
 
-    useEffect(() => {
-        if (!jornadaSel) return
-        getRankingJornada(jornadaSel, 100).then(todos => {
+    const [rankingGlobal, miPosicion] = useMemo(() => {
+        if (!rankGlobalRes) return [[], null];
+        
+        if (torneoActual) {
+            const miFila = rankGlobalRes.find(f => f.nombreUsuario === usuario?.nombreDisplay);
+            return [rankGlobalRes, miFila || null];
+        } else {
+            const todos = rankGlobalRes;
             const top5 = todos.slice(0, 5);
             const yo = todos.find(f => f.nombreUsuario === usuario?.nombreDisplay);
+            let resultRank = todos.slice(0, 6);
             if (yo && yo.posicion > 5) {
-                setRankingFecha([...top5, yo]);
-            } else {
-                setRankingFecha(todos.slice(0, 6));
+                resultRank = [...top5, yo];
             }
-        }).catch(() => { })
-    }, [jornadaSel, usuario])
+            return [resultRank, miPosRes || null];
+        }
+    }, [rankGlobalRes, miPosRes, torneoActual, usuario]);
 
-    useEffect(() => {
-        setLoading(true)
-        Promise.allSettled([
-            getJornadaActiva(),
-            getJornadaProxima(),
-            getPlantel(torneoActual?.id),
-            torneoActual ? getTablaTorneo(torneoActual.id) : getRankingGlobal(100),
-            !torneoActual ? getMiPosicion() : Promise.resolve(null),
-            getJornadas(),
-        ]).then(([activa, proxima, plantelRes, rankGlobal, miPos, jornadasRes]) => {
-
-            const activaData = activa.status === 'fulfilled' && activa.value ? activa.value : null;
-            const proximaData = proxima.status === 'fulfilled' && proxima.value ? proxima.value : null;
-
-            let plantelData = null;
-            if (plantelRes.status === 'fulfilled') {
-                plantelData = plantelRes.value;
-                setPlantel(plantelData);
-            } else {
-                setPlantel(null);
-            }
-
-            if (activaData && plantelData && plantelData.jornadaNumero === activaData.numero) {
-                setJornada(activaData);
-            } else if (proximaData) {
-                setJornada(proximaData);
-            } else if (activaData) {
-                setJornada(activaData);
-            } else {
-                setJornada(null);
-            }
-
-            if (rankGlobal.status === 'fulfilled') {
-                if (torneoActual) {
-                    setRankingGlobal(rankGlobal.value);
-                    const miFila = rankGlobal.value.find(f => f.nombreUsuario === usuario?.nombreDisplay);
-                    setMiPosicion(miFila || null);
-                } else {
-                    const todos = rankGlobal.value;
-                    const top5 = todos.slice(0, 5);
-                    const yo = todos.find(f => f.nombreUsuario === usuario?.nombreDisplay);
-                    if (yo && yo.posicion > 5) {
-                        setRankingGlobal([...top5, yo]);
-                    } else {
-                        setRankingGlobal(todos.slice(0, 6));
-                    }
-                    if (miPos.status === 'fulfilled') setMiPosicion(miPos.value);
-                }
-            }
-            
-            if (jornadasRes.status === 'fulfilled') {
-                const finalizadas = jornadasRes.value
-                    .filter(j => j.estado === 'FINALIZADA')
-                    .sort((a, b) => b.numero - a.numero)
-                setJornadas(finalizadas)
-                if (finalizadas.length > 0) {
-                    setJornadaSel(finalizadas[0].id)
-                }
-            }
-        }).finally(() => setLoading(false))
-    }, [torneoActual?.id, usuario?.id, usuario?.nombreDisplay])
-
-    if (loading) return <LoadingSpinner mensaje="Cargando dashboard..." />
+    if (loadingPlantel && !plantel && loadingRank && !rankGlobalRes) {
+        return <LoadingSpinner mensaje="Cargando dashboard..." />
+    }
 
     return (
         <div className="space-y-4">
@@ -195,7 +166,7 @@ export default function DashboardPage() {
                     miPosicion={miPosicion}
                     rankingGlobal={rankingGlobal}
                     jornadas={jornadas}
-                    jornadaSelInicial={jornadaSel}
+                    jornadaSelInicial={jornadas[0]?.id}
                 />
             ) : torneoActual.tipoPuntuacion === 'H2H' ? (
                 <DashboardDraftH2H
