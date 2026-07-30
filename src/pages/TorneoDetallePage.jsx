@@ -72,17 +72,20 @@ export default function TorneoDetallePage() {
                 getJornadas(),
                 torneoData.tipoPuntuacion === 'H2H' ? getFixtureTorneo(torneoData.id) : Promise.resolve([])
             ]).then(([tablaRes, jornadasRes, fixtureRes]) => {
-                if (tablaRes.status === 'fulfilled') setTablaGeneral(tablaRes.value)
+                if (tablaRes.status === 'fulfilled') {
+                    const deduplicated = tablaRes.value.filter((v,i,a)=>a.findIndex(t=>(t.equipoVirtualId === v.equipoVirtualId))===i);
+                    setTablaGeneral(deduplicated);
+                }
                 let fetchedTodas = []
                 let fetchedFixture = []
                 
                 if (jornadasRes.status === 'fulfilled') {
                     let validJornadas = jornadasRes.value
-                    if (torneoData.modalidad === 'DRAFT' && torneoData.creadoEn) {
+                    if (torneoData.creadoEn) {
                         const creado = new Date(torneoData.creadoEn)
                         validJornadas = validJornadas.filter(j => {
-                            if (!j.fechaInicio) return true
-                            return new Date(j.fechaInicio) >= creado
+                            if (!j.fechaInicio || !j.fechaFin) return true
+                            return new Date(j.fechaInicio) >= creado || new Date(j.fechaFin) >= creado
                         })
                     }
                     fetchedTodas = validJornadas
@@ -143,7 +146,7 @@ export default function TorneoDetallePage() {
         
         getRankingJornadaTorneo(torneo.id, jornadaSel, 500).then(rankingFiltrado => {
             // El backend ya filtra y ordena correctamente los puntos según la modalidad del torneo
-            setTablaJornada(rankingFiltrado)
+            setTablaJornada(rankingFiltrado.filter((v,i,a)=>a.findIndex(t=>(t.equipoVirtualId === v.equipoVirtualId))===i))
         }).catch(() => { })
     }, [jornadaSel, torneo])
 
@@ -627,7 +630,6 @@ export default function TorneoDetallePage() {
                                 No hay jornadas finalizadas todavía.
                             </p>
                         )}
-                        {renderTabla(tablaJornadaFiltrada, true)}
                     </div>
                 )}
 
@@ -643,14 +645,16 @@ export default function TorneoDetallePage() {
                                 </p>
                             );
                             return (
-                                <JornadaSelector
-                                    jornadas={jornadasDelFixture}
-                                    selectedId={jornadaFixtureSel}
-                                    onSelect={setJornadaFixtureSel}
-                                />
+                                <>
+                                    <JornadaSelector
+                                        jornadas={jornadasDelFixture}
+                                        selectedId={jornadaFixtureSel}
+                                        onSelect={setJornadaFixtureSel}
+                                    />
+                                    {renderFixture(fixture.filter(f => f.jornadaId === jornadaFixtureSel))}
+                                </>
                             );
                         })()}
-                        {renderFixture(fixture.filter(f => f.jornadaId === jornadaFixtureSel))}
                     </div>
                 )}
 
@@ -791,10 +795,10 @@ export default function TorneoDetallePage() {
                   border transition-colors
                   ${ajustesTipo === t
                                                       ? 'bg-primary border-primary text-white'
-                                                      : 'border-border text-textMuted hover:border-primary/50'
+                                                      : 'bg-surface border-border text-textMuted hover:text-textMain'
                                                   }`}
                                           >
-                                              {t}
+                                              {t === 'PUBLICO' ? '🌐 Público' : '🔒 Privado'}
                                           </button>
                                       ))
                                   )}

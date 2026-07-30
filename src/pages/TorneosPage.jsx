@@ -87,9 +87,17 @@ export default function TorneosPage() {
 
     return (
         <div className="space-y-4 pb-6">
-            <div className="flex items-center justify-between">
-                <h1 className="text-textMain font-bold text-2xl pt-2">Torneos</h1>
-                <BotonAyuda onClick={abrir} />
+            <div className="flex items-center justify-between gap-2">
+                <h1 className="text-textMain font-bold text-2xl pt-2 truncate">Torneos</h1>
+                <div className="flex items-center gap-2 pt-2">
+                    <button
+                        onClick={() => setModalCrear(true)}
+                        className="btn-accent py-1.5 px-3 text-sm font-bold shrink-0"
+                    >
+                        + Crear torneo
+                    </button>
+                    <BotonAyuda onClick={abrir} />
+                </div>
             </div>
 
             {/* Tabs */}
@@ -167,14 +175,6 @@ export default function TorneosPage() {
                         </div>
                     )}
 
-                    <div className="fixed bottom-16 left-0 right-0 p-4 pb-2 bg-gradient-to-t from-background via-background/95 to-transparent z-40 flex justify-center pointer-events-none md:static md:bg-none md:p-0 md:pt-2 md:pointer-events-auto">
-                        <button
-                            onClick={() => setModalCrear(true)}
-                            className="btn-accent w-full md:w-auto px-8 pointer-events-auto shadow-xl shadow-background md:shadow-none"
-                        >
-                            + Crear torneo
-                        </button>
-                    </div>
                 </div>
             )}
 
