@@ -585,7 +585,6 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
             {/* BANNER TRANSFERENCIA */}
             {modoTransferencia && !modoAsignacion && (
                 <div className="bg-accent/15 border border-accent rounded-2xl px-4 py-3 flex items-center gap-3">
-                    <span className="text-2xl">🔄</span>
                     <div className="flex-1 min-w-0">
                         <p className="text-accent font-semibold text-sm">{contextoActual ? "Proponer traspaso" : "Elegí el reemplazo"}</p>
                         <p className="text-textMuted text-xs truncate">
