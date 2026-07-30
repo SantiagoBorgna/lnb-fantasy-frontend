@@ -196,33 +196,20 @@ export default function SalaDraftPage() {
         <div className="space-y-6">
             <header className="flex flex-col gap-2">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div className="text-center md:text-left flex-1">
+                    <div className="text-center md:text-left flex-1 flex flex-col md:block">
                         <button
                             onClick={() => navigate(`/t/${encodeId(torneoId)}`)}
-                            className="text-textMuted text-sm mb-1 flex items-center justify-center md:justify-start gap-1 hover:text-textMain transition-colors w-full md:w-auto"
+                            className="text-textMuted text-sm mb-2 flex items-center justify-start gap-1 hover:text-textMain transition-colors w-full md:w-auto self-start"
                         >
                             ← Volver al torneo
                         </button>
-                        <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-1">
-                            <h1 className="text-2xl font-black text-textMain tracking-tight">Sala de Draft</h1>
-                            <span className="text-xs bg-surface border border-border px-2.5 py-1 rounded-full text-textMuted font-bold">
-                                {draftState.cantidadParticipantes}/{draftState.maxParticipantes} participantes
-                            </span>
+                        <div className="flex flex-col md:flex-row items-center justify-center md:justify-start gap-3 mt-1">
+                            <h1 className="text-2xl font-black text-textMain tracking-tight w-full md:w-auto text-center md:text-left">Sala de Draft</h1>
                         </div>
                         <div className="text-textMuted text-sm mt-1">
                             {draftState.estado === 'PENDIENTE' && 'Esperando que el administrador inicie el draft...'}
                             {draftState.estado === 'EN_CURSO' && 'Draft en progreso. Elegí sabiamente.'}
-                            {draftState.estado === 'FINALIZADO' && (
-                                <div className="flex flex-col gap-2">
-                                    <span>El draft ha finalizado.</span>
-                                    <button 
-                                        onClick={() => navigate(`/t/${encodeId(torneoId)}`)} 
-                                        className="bg-accent text-white font-bold py-3 px-4 rounded-xl hover:bg-accent/90 transition-colors mt-2 w-fit"
-                                    >
-                                        Ir al Torneo
-                                    </button>
-                                </div>
-                            )}
+                            {draftState.estado === 'FINALIZADO' && 'El draft ha finalizado.'}
                         </div>
                     </div>
                     {draftState.estado === 'PENDIENTE' && (

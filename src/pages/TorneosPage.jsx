@@ -80,6 +80,9 @@ export default function TorneosPage() {
         setTablaModal({ torneo, filas })
     }
 
+    const idsEnMisTorneos = new Set(misTorneos.map(t => t.id))
+    const publicosFiltrados = publicos.filter(t => !idsEnMisTorneos.has(t.id))
+
     if (loading) return <LoadingSpinner mensaje="Cargando torneos..." />
 
     return (
@@ -187,11 +190,11 @@ export default function TorneosPage() {
                        px-4 py-2.5 text-textMain text-sm
                        placeholder-textMuted focus:outline-none focus:border-primary"
                     />
-                    {publicos.length === 0 ? (
+                    {publicosFiltrados.length === 0 ? (
                         <EmptyState titulo="Sin resultados" />
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                            {publicos.map(t => (
+                            {publicosFiltrados.map(t => (
                                 <button
                                     key={t.id}
                                     onClick={() => navigate(`/t/${encodeId(t.id)}`)}

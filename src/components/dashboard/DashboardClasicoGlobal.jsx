@@ -150,7 +150,7 @@ export default function DashboardClasicoGlobal({
                         {rankingFecha.length === 0 ? (
                             <p className="text-textMuted text-xs text-center py-3">No hay datos para esta jornada.</p>
                         ) : (
-                            rankingFecha.map(fila => (
+                            rankingFecha.filter((v,i,a)=>a.findIndex(t=>(t.equipoVirtualId === v.equipoVirtualId))===i).map(fila => (
                                 <div key={`jornada-${fila.equipoVirtualId}`} className="flex items-center gap-3">
                                     <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-black shrink-0 ${fila.posicion === 1 ? 'bg-yellow-500 text-white' : fila.posicion === 2 ? 'bg-gray-400 text-white' : fila.posicion === 3 ? 'bg-amber-700 text-white' : 'bg-border text-textMuted'}`}>
                                         {fila.posicion}
