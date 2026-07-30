@@ -1,6 +1,6 @@
 export default function Footer() {
     return (
-        <footer className="w-full mt-12 py-8 border-t border-border flex flex-col items-center justify-center gap-4 text-textMuted">
+        <footer className="w-full mt-8 py-4 mb-2 md:mb-0 border-t border-border flex flex-col items-center justify-center gap-3 text-textMuted">
             <div className="flex items-center gap-6">
                 <a
                     href="https://www.instagram.com/sexto.hombre.fantasy"
@@ -46,7 +46,7 @@ export default function Footer() {
                     </svg>
                 </a>
             </div>
-            <p className="text-sm font-medium">
+            <p className="text-[10px] md:text-sm font-medium text-center px-2">
                 &copy; {new Date().getFullYear()} Sexto Hombre Fantasy. Todos los derechos reservados.
             </p>
         </footer>

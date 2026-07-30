@@ -8,18 +8,18 @@ import { useAyudaStore } from '../store/ayudaStore'
  * @param pagina  Clave de la página (ej: 'dashboard', 'mercado')
  * @returns { abierto, abrir, cerrar }
  */
-export function useAyuda(pagina) {
+export function useAyuda(pagina, autoOpen = true) {
     const { fueVista, marcarVista } = useAyudaStore()
     const [abierto, setAbierto] = useState(false)
 
     // Abrir automáticamente la primera vez
     useEffect(() => {
-        if (!fueVista(pagina)) {
+        if (autoOpen && !fueVista(pagina)) {
             // Pequeño delay para que la página termine de renderizar
             const timer = setTimeout(() => setAbierto(true), 600)
             return () => clearTimeout(timer)
         }
-    }, [pagina])
+    }, [pagina, autoOpen])
 
     const abrir = () => setAbierto(true)
 

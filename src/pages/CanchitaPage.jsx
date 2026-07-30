@@ -474,6 +474,17 @@ export default function CanchitaPage() {
         autoGuardar(nueva)
     }
 
+    const hacerSexto = (elegido) => {
+        if (!esBanco(elegido.rol)) return
+        const nueva = jugadores.map(j => {
+            if (j.jugadorRealId === elegido.jugadorRealId) return { ...j, rol: 'SEXTO_HOMBRE' }
+            if (j.rol === 'SEXTO_HOMBRE') return { ...j, rol: 'SUPLENTE' }
+            return j
+        })
+        setJugadores(nueva)
+        autoGuardar(nueva)
+    }
+
     const abrirCambio = (jugador) => {
         setJugadorModal(null)
         setJugadorParaCambio(jugador)
@@ -860,6 +871,7 @@ export default function CanchitaPage() {
                 esTitularActual={jugadorModal ? ['TITULAR', 'CAPITAN'].includes(jugadorModal.rol) : false}
                 onCerrar={() => setJugadorModal(null)}
                 onHacerCapitan={jugadorModal && esTitular(jugadorModal.rol) ? hacerCapitan : null}
+                onHacerSexto={jugadorModal && esBanco(jugadorModal.rol) ? hacerSexto : null}
                 onCambiar={jugadorModal ? abrirCambio : null}
                 onTransferir={jugadorModal && !modoLectura ? handleTransferir : null}
             />

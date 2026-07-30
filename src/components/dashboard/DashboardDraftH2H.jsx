@@ -67,13 +67,13 @@ export default function DashboardDraftH2H({ rankingGlobal, contextoActual }) {
                                     </div>
                                 ) : (
                                     <div className="flex items-center justify-between">
-                                        <span className={clsx("flex-1 text-sm font-semibold text-right truncate", miLocalProx ? "text-primary" : "text-textMain")}>{proximoCruce.equipoLocalNombre}</span>
+                                        <span className={clsx("flex-1 text-sm font-semibold text-right line-clamp-2 leading-tight", miLocalProx ? "text-primary" : "text-textMain")}>{proximoCruce.equipoLocalNombre}</span>
                                         <div className="w-24 shrink-0 grid grid-cols-[1fr_auto_1fr] items-center gap-1 mx-2">
                                             <span className="text-right text-sm font-black text-textMuted">-</span>
                                             <span className="text-center text-textMuted text-xs font-semibold mx-1">vs</span>
                                             <span className="text-left text-sm font-black text-textMuted">-</span>
                                         </div>
-                                        <span className={clsx("flex-1 text-sm font-semibold text-left truncate", !miLocalProx ? "text-primary" : "text-textMain")}>{proximoCruce.equipoVisitanteNombre}</span>
+                                        <span className={clsx("flex-1 text-sm font-semibold text-left line-clamp-2 leading-tight", !miLocalProx ? "text-primary" : "text-textMain")}>{proximoCruce.equipoVisitanteNombre}</span>
                                     </div>
                                 )}
                             </div>
@@ -97,13 +97,13 @@ export default function DashboardDraftH2H({ rankingGlobal, contextoActual }) {
                                     </div>
                                 ) : (
                                     <div className="flex items-center justify-between">
-                                        <span className={clsx("flex-1 text-sm font-semibold text-right truncate", miLocalUlt ? "text-primary" : "text-textMain")}>{ultimoCruce.equipoLocalNombre}</span>
+                                        <span className={clsx("flex-1 text-sm font-semibold text-right line-clamp-2 leading-tight", miLocalUlt ? "text-primary" : "text-textMain")}>{ultimoCruce.equipoLocalNombre}</span>
                                         <div className="w-24 shrink-0 grid grid-cols-[1fr_auto_1fr] items-center gap-1 mx-2">
                                             <span className={clsx("text-right text-sm font-black", ganaLocal ? "text-accent" : "text-textMain")}>{Math.round(ultimoCruce.puntajeLocal)}</span>
                                             <span className="text-center text-textMuted text-xs font-semibold mx-1">-</span>
                                             <span className={clsx("text-left text-sm font-black", ganaVisita ? "text-accent" : "text-textMain")}>{Math.round(ultimoCruce.puntajeVisitante)}</span>
                                         </div>
-                                        <span className={clsx("flex-1 text-sm font-semibold text-left truncate", !miLocalUlt ? "text-primary" : "text-textMain")}>{ultimoCruce.equipoVisitanteNombre}</span>
+                                        <span className={clsx("flex-1 text-sm font-semibold text-left line-clamp-2 leading-tight", !miLocalUlt ? "text-primary" : "text-textMain")}>{ultimoCruce.equipoVisitanteNombre}</span>
                                     </div>
                                 )}
                             </div>

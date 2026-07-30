@@ -8,6 +8,7 @@ export default function JugadorModal({
     onHacerCapitan,
     onCambiar,
     onTransferir,
+    onHacerSexto,
 }) {
     if (!jugador) return null
 
@@ -43,6 +44,12 @@ export default function JugadorModal({
                     {onHacerCapitan && (
                         <button onClick={(e) => handleAccion(onHacerCapitan, e)} className="w-full py-3 px-4 rounded-xl font-bold bg-transparent border-2 border-yellow-400 text-yellow-400 active:scale-95 transition-transform">
                             Hacer Capitán
+                        </button>
+                    )}
+
+                    {onHacerSexto && (
+                        <button onClick={(e) => handleAccion(onHacerSexto, e)} className="w-full py-3 px-4 rounded-xl font-bold bg-transparent border-2 border-primary text-primary active:scale-95 transition-transform">
+                            Asignar Sexto Hombre
                         </button>
                     )}
 

@@ -99,7 +99,7 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
     const modoAsignacion = !!slotPendiente
     const modoTransferencia = !!transferenciaPendiente
 
-    const { abierto, abrir, cerrar } = useAyuda('mercado')
+    const { abierto, abrir, cerrar } = useAyuda('mercado', layout === 'page')
 
     const [esFaseRestringida, setEsFaseRestringida] = useState(false)
     const [misReclamos, setMisReclamos] = useState([])
@@ -674,7 +674,7 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
                                 {listaPrioridad.map(p => (
                                     <div key={p.equipoVirtualId || p.nombreUsuario} className={clsx("flex gap-3 text-sm items-center rounded px-2 py-1", p.nombreUsuario === usuario?.nombreDisplay ? "bg-accent/10 text-accent font-bold" : "text-textMain")}>
                                         <span className="opacity-50 min-w-[20px]">#{p.posicion}</span>
-                                        <span>{p.nombreUsuario}</span>
+                                        <span>{p.nombreEquipo || p.nombreUsuario}</span>
                                     </div>
                                 ))}
                             </div>
