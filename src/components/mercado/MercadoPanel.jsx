@@ -882,7 +882,7 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
             {activeTab === 'traspasos' && (
                 <>
                     <div className="gap-8 w-full max-w-7xl mx-auto items-start flex flex-col">
-                        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide w-full mb-4 px-1">
+                        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide w-full mb-4 px-1 md:justify-center">
                             {['TODAS', 'PENDIENTE', 'ACEPTADA', 'RECHAZADA', 'CANCELADA'].map((estado) => (
                                 <button
                                     key={estado}
@@ -1169,7 +1169,7 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
 
             {!busqueda && (
                 <div className="flex flex-col gap-3">
-                    <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide w-full">
+                    <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide w-full md:justify-center">
                         {POSICIONES
                             .filter(({ valor }) => contextoActual ? true : valor !== 'DT')
                             .map(({ label, valor }) => (

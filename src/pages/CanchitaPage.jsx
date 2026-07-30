@@ -25,6 +25,7 @@ import BotonAyuda from '../components/ui/BotonAyuda'
 import { AYUDA } from '../components/ui/ayudaContenido'
 import MercadoPanel from '../components/mercado/MercadoPanel'
 import ProponerTraspasoModal from '../components/mercado/ProponerTraspasoModal'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 export default function CanchitaPage() {
     const navigate = useNavigate()
@@ -33,12 +34,13 @@ export default function CanchitaPage() {
     const { usuario } = useAuthStore()
     const { showToast } = useUiStore()
 
+    const queryClient = useQueryClient()
+
     // ── Estado principal ─────────────────────────────────────────────────────
     const [plantel, setPlantel] = useState(null)
     const [jugadores, setJugadores] = useState([])
     const [jornadaEstado, setJornadaEstado] = useState('ABIERTA_A_CAMBIOS')
     const [jornadaActiva, setJornadaActiva] = useState(null)
-    const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
     const [jornadaProxima, setJornadaProxima] = useState(null)
 
@@ -56,7 +58,6 @@ export default function CanchitaPage() {
     const [jornadaVista, setJornadaVista] = useState(null)
     const [plantelVista, setPlantelVista] = useState(null)
     const [estadisticas, setEstadisticas] = useState({})
-    const [loadingVista, setLoadingVista] = useState(false)
 
     // ── DnD ──────────────────────────────────────────────────────────────────
     const [draggingId, setDraggingId] = useState(null)
@@ -102,9 +103,7 @@ export default function CanchitaPage() {
             }
             
             cancelarEntrada()
-            const actualizado = await getPlantel(contextoActual?.torneoDraft?.id || contextoActual || null, contextoActual?.usuario?.id || null)
-            setPlantel(actualizado)
-            setJugadores(actualizado.jugadores ?? [])
+            queryClient.invalidateQueries({ queryKey: ['plantel', contextoActual, usuario?.id] })
         } catch (e) {
             const mensajeBackend = typeof e.response?.data === 'string'
                 ? e.response.data
@@ -115,110 +114,114 @@ export default function CanchitaPage() {
         }
     }
 
-    // ── Carga inicial ────────────────────────────────────────────────────────
-    // ── Carga inicial ────────────────────────────────────────────────────────
-    const cargarDatos = async () => {
-        setLoading(true)
-        
-        let faseRestringidaRes = false;
-        if (contextoActual) {
-            try {
-                const { waiverApi } = await import('../api/waiverApi');
-                faseRestringidaRes = await waiverApi.obtenerFaseRestringida();
-            } catch (e) {
-                console.error("Error fetching fase restringida:", e);
-            }
+    // ── Carga inicial (React Query) ──────────────────────────────────────────
+    const torneoId = typeof contextoActual === 'object' ? contextoActual?.torneoDraft?.id : contextoActual;
+
+    const { data: faseRestringidaRes } = useQuery({
+        queryKey: ['faseRestringida', contextoActual],
+        queryFn: async () => {
+            const { waiverApi } = await import('../api/waiverApi');
+            return waiverApi.obtenerFaseRestringida();
+        },
+        enabled: !!contextoActual,
+        staleTime: 1000 * 60 * 5,
+    });
+
+    const { data: plantelRes, isFetching: loadingPlantel } = useQuery({
+        queryKey: ['plantel', contextoActual, usuario?.id],
+        queryFn: () => getPlantel(contextoActual, usuario?.id),
+        refetchOnWindowFocus: false,
+    });
+
+    const { data: activaRes } = useQuery({
+        queryKey: ['jornadaActiva'],
+        queryFn: getJornadaActiva,
+    });
+
+    const { data: proximaRes } = useQuery({
+        queryKey: ['jornadaProxima'],
+        queryFn: getJornadaProxima,
+    });
+
+    const { data: jornadasRes } = useQuery({
+        queryKey: ['jornadas'],
+        queryFn: getJornadas,
+    });
+
+    // Sincronizar queries principales con estado local
+    useEffect(() => {
+        setEsFaseRestringida(faseRestringidaRes || false);
+
+        if (plantelRes) {
+            setPlantel(plantelRes);
+            setJugadores(plantelRes.jugadores ?? []);
+        } else if (plantelRes === null) {
+            setPlantel(null);
+            setJugadores([]);
         }
-        
-        Promise.allSettled([
-            getPlantel(contextoActual, usuario?.id),
-            getJornadaActiva(),
-            getJornadaProxima(),
-            getJornadas(),
-        ]).then(([plantelRes, activaRes, proximaRes, jornadasRes]) => {
-            setEsFaseRestringida(faseRestringidaRes);
-            if (plantelRes.status === 'fulfilled' && plantelRes.value) {
-                setPlantel(plantelRes.value)
-                setJugadores(plantelRes.value.jugadores ?? [])
-            } else {
-                setPlantel(null)
-                setJugadores([])
-            }
 
-            // Lógica inteligente: Si no hay activa, usamos la próxima
-            const jornadaActualData = (activaRes.status === 'fulfilled' && activaRes.value)
-                ? activaRes.value
-                : (proximaRes.status === 'fulfilled' ? proximaRes.value : null);
+        const jornadaActualData = activaRes || proximaRes;
+        if (proximaRes) setJornadaProxima(proximaRes);
+        if (jornadaActualData) {
+            setJornadaEstado(jornadaActualData.estado);
+            setJornadaActiva(jornadaActualData);
+        }
 
-            if (proximaRes.status === 'fulfilled' && proximaRes.value) {
-                setJornadaProxima(proximaRes.value)
-            }
+        if (jornadasRes) {
+            const jActivaId = jornadaActualData?.id;
+            const anterior = jornadasRes
+                .filter(j => j.estado === 'FINALIZADA' && j.id !== jActivaId)
+                .sort((a, b) => b.numero - a.numero)[0];
+            setJornadaAnterior(anterior ?? null);
+        }
+    }, [faseRestringidaRes, plantelRes, activaRes, proximaRes, jornadasRes]);
 
-            if (jornadaActualData) {
-                setJornadaEstado(jornadaActualData.estado)
-                setJornadaActiva(jornadaActualData)
-            }
+    const esPlantelAdelantado = plantel && jornadaActiva && plantel.jornadaNumero > jornadaActiva.numero;
+    const jid = jornadaVista ?? (esPlantelAdelantado ? jornadaProxima?.id : jornadaActiva?.id);
 
-            if (jornadasRes.status === 'fulfilled') {
-                const jActivaId = jornadaActualData?.id
-                const anterior = jornadasRes.value
-                    .filter(j => j.estado === 'FINALIZADA' && j.id !== jActivaId)
-                    .sort((a, b) => b.numero - a.numero)[0]
-                setJornadaAnterior(anterior ?? null)
-            }
-        }).finally(() => setLoading(false))
-    }
+    const { data: estadisticasRes } = useQuery({
+        queryKey: ['estadisticas', jid, torneoId],
+        queryFn: () => getEstadisticasJornada(jid, torneoId || null),
+        enabled: !!jid && (jornadaEstado !== 'ABIERTA_A_CAMBIOS' || jornadaVista !== null),
+    });
 
-    // Recargar datos cuando cambie el contexto
-    useEffect(() => { cargarDatos() }, [contextoActual])
+    const { data: partidosFixtureRes } = useQuery({
+        queryKey: ['partidosJornada', jid],
+        queryFn: () => getPartidosJornada(jid),
+        enabled: !!jid,
+    });
 
     useEffect(() => {
-        const recargarAlVolver = () => {
-            if (!useTransferenciaStore.getState().pendiente) cargarDatos()
+        if (estadisticasRes) {
+            const mapa = {};
+            estadisticasRes.forEach(e => { mapa[e.jugadorRealId] = e; });
+            setEstadisticas(mapa);
         }
-        window.addEventListener('focus', recargarAlVolver)
-        return () => window.removeEventListener('focus', recargarAlVolver)
-    }, [])
-
-    useEffect(() => {
-        const esPlantelAdelantado = plantel && jornadaActiva && plantel.jornadaNumero > jornadaActiva.numero;
-        const jid = jornadaVista ?? (esPlantelAdelantado ? jornadaProxima?.id : jornadaActiva?.id)
-        if (!jid) return
-
-        // Traer estadísticas
-        if (jornadaEstado !== 'ABIERTA_A_CAMBIOS' || jornadaVista !== null) {
-            getEstadisticasJornada(jid, contextoActual?.torneoDraft?.id || null).then(lista => {
-                const mapa = {}
-                lista.forEach(e => { mapa[e.jugadorRealId] = e })
-                setEstadisticas(mapa)
-            }).catch(() => { })
+        if (partidosFixtureRes) {
+            setPartidosFixture(partidosFixtureRes);
         }
+    }, [estadisticasRes, partidosFixtureRes]);
 
-        // Traer el fixture de esta jornada
-        getPartidosJornada(jid)
-            .then(setPartidosFixture)
-            .catch(() => setPartidosFixture([]))
-
-    }, [jornadaVista, jornadaActiva, jornadaEstado, plantel, jornadaProxima])
+    const { data: plantelVistaRes, isFetching: loadingVista } = useQuery({
+        queryKey: ['plantelVista', jornadaVista, torneoId, usuario?.id],
+        queryFn: async () => {
+            const { getPlantelJornada, getPlantelHistoricoDeTorneo } = await import('../api/plantelApi');
+            return torneoId
+                ? getPlantelHistoricoDeTorneo(torneoId, jornadaVista, usuario?.id)
+                : getPlantelJornada(jornadaVista);
+        },
+        enabled: jornadaVista !== null,
+    });
 
     useEffect(() => {
         if (jornadaVista === null) {
-            setPlantelVista(null)
-            return
+            setPlantelVista(null);
+        } else if (plantelVistaRes) {
+            setPlantelVista(plantelVistaRes);
+        } else if (plantelVistaRes === null) {
+            setPlantelVista(null);
         }
-        setLoadingVista(true)
-        import('../api/plantelApi').then(({ getPlantelJornada, getPlantelHistoricoDeTorneo }) => {
-            const torneoId = typeof contextoActual === 'object' ? contextoActual?.torneoDraft?.id : contextoActual;
-            const prom = torneoId 
-               ? getPlantelHistoricoDeTorneo(torneoId, jornadaVista, usuario?.id)
-               : getPlantelJornada(jornadaVista);
-               
-            prom
-                .then(data => setPlantelVista(data))
-                .catch(() => setPlantelVista(null))
-                .finally(() => setLoadingVista(false))
-        })
-    }, [jornadaVista, contextoActual, usuario])
+    }, [jornadaVista, plantelVistaRes]);
 
     // ── Autoguardado silencioso ──────────────────────────────────────────────
     const autoGuardar = async (nuevosJugadores, nuevaFormacion) => {
@@ -245,7 +248,7 @@ export default function CanchitaPage() {
 
             setError(mensajeBackend);
             setTimeout(() => setError(''), 4500);
-            cargarDatos(); // Revertimos al estado válido si el backend rebotó la formación
+            queryClient.invalidateQueries({ queryKey: ['plantel', contextoActual, usuario?.id] });
         }
     }
 
@@ -330,7 +333,7 @@ export default function CanchitaPage() {
             } else {
                 await cambiarDt(nuevoDt.id);
             }
-            cargarDatos()
+            queryClient.invalidateQueries({ queryKey: ['plantel', contextoActual, usuario?.id] })
         } catch (e) {
             setError(e.response?.data?.mensaje ?? 'Error al cambiar de DT.')
             setTimeout(() => setError(''), 3000)
@@ -340,7 +343,6 @@ export default function CanchitaPage() {
     }
 
     // ── Funciones Core ───────────────────────────────────────────────────────
-    const esPlantelAdelantado = plantel && jornadaActiva && plantel.jornadaNumero > jornadaActiva.numero;
     const modoLectura = (jornadaEstado !== 'ABIERTA_A_CAMBIOS' && !esPlantelAdelantado) || jornadaVista !== null;
     const plantelActual = jornadaVista !== null ? plantelVista : plantel
     const jugadoresActuales = jornadaVista !== null ? (plantelVista?.jugadores ?? []) : jugadores
@@ -531,7 +533,7 @@ export default function CanchitaPage() {
     }
 
     // ── Render ───────────────────────────────────────────────────────────────
-    if (loading) return <LoadingSpinner mensaje="Cargando tu plantel..." />
+    if (loadingPlantel && !plantel) return <LoadingSpinner mensaje="Cargando tu plantel..." />
 
     // 1. Extraemos los Tabs a una constante para que no desaparezcan en los estados vacíos
     const TabsJornada = jornadaAnterior && (
@@ -860,7 +862,7 @@ export default function CanchitaPage() {
             {/* COLUMNA DERECHA (Mercado, solo en Tablet/Desktop) */}
             <div className="hidden md:block w-[55%] lg:w-1/2 shrink-0 relative border-l border-border">
                 <div id="mercado-scroll-container" className="absolute inset-0 overflow-y-auto pb-8 scrollbar-hide pl-4 md:pl-4 lg:pl-8 pr-1 lg:pr-2">
-                    <MercadoPanel layout="panel" onActionComplete={cargarDatos} />
+                    <MercadoPanel layout="panel" onActionComplete={() => queryClient.invalidateQueries({ queryKey: ['plantel', contextoActual, usuario?.id] })} />
                 </div>
             </div>
 
@@ -925,7 +927,7 @@ export default function CanchitaPage() {
                     onCerrar={() => setJugadorParaTraspaso(null)}
                     onExito={() => {
                         setJugadorParaTraspaso(null)
-                        cargarDatos()
+                        queryClient.invalidateQueries({ queryKey: ['plantel', contextoActual, usuario?.id] })
                     }}
                 />
             )}
