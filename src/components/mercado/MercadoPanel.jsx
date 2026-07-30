@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { getMercadoJugadores, getMercadoLibres, getJugadorStats } from '../../api/mercadoApi'
 import { getPlantel, realizarTransferencia } from '../../api/plantelApi'
 import LoadingSpinner from '../ui/LoadingSpinner'
@@ -66,6 +66,7 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
     const navigate = useNavigate()
     const { usuario } = useAuthStore()
     const { showToast } = useUiStore()
+    const queryClient = useQueryClient()
 
     const [modalJugador, setModalJugador] = useState(null)  // jugadorMercadoDto
     const [statsModal, setStatsModal] = useState(null)  // JugadorStatsResumenDto
@@ -460,8 +461,12 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
             }
 
             cancelarTransferencia()
-            if (onActionComplete) onActionComplete()
-            else navigate('/canchita')
+            if (onActionComplete) {
+                onActionComplete()
+            } else {
+                queryClient.invalidateQueries({ queryKey: ['plantel'] })
+                navigate('/canchita')
+            }
 
         } catch (e) {
             setErrorTransferencia(
@@ -601,16 +606,20 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
                 </div>
             )}
 
-            {ejecutandoTransferencia && (
-                <div className="flex items-center justify-center gap-2 py-2">
-                    <div className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin" />
-                    <p className="text-textMuted text-sm">Realizando transferencia...</p>
-                </div>
-            )}
             {errorTransferencia && (
                 <div className="bg-red-900/40 border border-red-700 text-red-400 rounded-2xl px-4 py-3 text-sm text-center">
                     {errorTransferencia}
                 </div>
+            )}
+
+            {ejecutandoTransferencia && createPortal(
+                <div className="fixed inset-0 z-[100] bg-black/60 flex items-center justify-center">
+                    <div className="bg-card p-6 rounded-2xl flex flex-col items-center shadow-lg border border-border animate-scale-up">
+                        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4" />
+                        <p className="text-textMain font-semibold">Procesando transferencia...</p>
+                    </div>
+                </div>,
+                document.body
             )}
 
             {contextoActual && (

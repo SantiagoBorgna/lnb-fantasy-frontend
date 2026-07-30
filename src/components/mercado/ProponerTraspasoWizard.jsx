@@ -204,7 +204,7 @@ export default function ProponerTraspasoWizard({ torneoId, equipoVirtualId, jorn
                                         </div>
                                         <div className="flex flex-col items-end">
                                             <span className="text-[10px] text-textMuted uppercase font-bold tracking-wider">Prom</span>
-                                            <span className="font-bold text-sm text-textMain">{j.promedioPuntos?.toFixed(1) || '0.0'}</span>
+                                            <span className="font-bold text-sm text-textMain">{(j.promedioPuntosUltimas3 || 0).toFixed(1)}</span>
                                         </div>
                                     </div>
                                 ))}
@@ -219,17 +219,24 @@ export default function ProponerTraspasoWizard({ torneoId, equipoVirtualId, jorn
                                         )}
                                     >
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center shrink-0">
-                                                <span className="text-primary font-bold text-xs">DT</span>
+                                            <div className="shrink-0">
+                                                <CamisetaSVG 
+                                                    colorPrincipal={plantelAjeno.dt.colorPrincipal}
+                                                    colorSecundario={plantelAjeno.dt.colorSecundario}
+                                                    numero="DT"
+                                                    estado={plantelAjeno.dt.estado}
+                                                    modelo={1}
+                                                    size={40}
+                                                />
                                             </div>
                                             <div>
-                                                <p className="font-bold text-textMain text-sm truncate max-w-[150px] md:max-w-[200px]">{plantelAjeno.dt.nombreCompleto} (DT)</p>
+                                                <p className="font-bold text-textMain text-sm truncate max-w-[150px] md:max-w-[200px]">{plantelAjeno.dt.nombreCompleto}</p>
                                                 <p className="text-xs text-textMuted">DT · {plantelAjeno.dt.equipoSigla}</p>
                                             </div>
                                         </div>
                                         <div className="flex flex-col items-end">
                                             <span className="text-[10px] text-textMuted uppercase font-bold tracking-wider">Prom</span>
-                                            <span className="font-bold text-sm text-textMain">{plantelAjeno.dt.promedioPuntos?.toFixed(1) || '0.0'}</span>
+                                            <span className="font-bold text-sm text-textMain">-</span>
                                         </div>
                                     </div>
                                 )}
@@ -273,7 +280,7 @@ export default function ProponerTraspasoWizard({ torneoId, equipoVirtualId, jorn
                                         </div>
                                         <div className="flex flex-col items-end">
                                             <span className="text-[10px] text-textMuted uppercase font-bold tracking-wider">Prom</span>
-                                            <span className="font-bold text-sm text-textMain">{j.promedioPuntos?.toFixed(1) || '0.0'}</span>
+                                            <span className="font-bold text-sm text-textMain">{(j.promedioPuntosUltimas3 || 0).toFixed(1)}</span>
                                         </div>
                                     </div>
                                 ))}
@@ -288,17 +295,24 @@ export default function ProponerTraspasoWizard({ torneoId, equipoVirtualId, jorn
                                         )}
                                     >
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center shrink-0">
-                                                <span className="text-primary font-bold text-xs">DT</span>
+                                            <div className="shrink-0">
+                                                <CamisetaSVG 
+                                                    colorPrincipal={plantelPropio.dt.colorPrincipal}
+                                                    colorSecundario={plantelPropio.dt.colorSecundario}
+                                                    numero="DT"
+                                                    estado={plantelPropio.dt.estado}
+                                                    modelo={1}
+                                                    size={40}
+                                                />
                                             </div>
                                             <div>
-                                                <p className="font-bold text-textMain text-sm truncate max-w-[150px] md:max-w-[200px]">{plantelPropio.dt.nombreCompleto} (DT)</p>
+                                                <p className="font-bold text-textMain text-sm truncate max-w-[150px] md:max-w-[200px]">{plantelPropio.dt.nombreCompleto}</p>
                                                 <p className="text-xs text-textMuted">DT · {plantelPropio.dt.equipoSigla}</p>
                                             </div>
                                         </div>
                                         <div className="flex flex-col items-end">
                                             <span className="text-[10px] text-textMuted uppercase font-bold tracking-wider">Prom</span>
-                                            <span className="font-bold text-sm text-textMain">{plantelPropio.dt.promedioPuntos?.toFixed(1) || '0.0'}</span>
+                                            <span className="font-bold text-sm text-textMain">-</span>
                                         </div>
                                     </div>
                                 )}
@@ -338,8 +352,15 @@ export default function ProponerTraspasoWizard({ torneoId, equipoVirtualId, jorn
                                         })}
                                         {dtPropio && (
                                             <div className="p-3 bg-card rounded-xl border border-border flex items-center gap-3">
-                                                <div className="w-9 h-9 bg-primary/20 rounded-full flex items-center justify-center shrink-0">
-                                                    <span className="text-primary font-bold text-[10px]">DT</span>
+                                                <div className="shrink-0">
+                                                    <CamisetaSVG 
+                                                        colorPrincipal={plantelPropio.dt?.colorPrincipal}
+                                                        colorSecundario={plantelPropio.dt?.colorSecundario}
+                                                        numero="DT"
+                                                        estado={plantelPropio.dt?.estado}
+                                                        modelo={1}
+                                                        size={36}
+                                                    />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <p className="text-textMain font-bold text-sm truncate">{plantelPropio.dt?.nombreCompleto}</p>
@@ -376,8 +397,15 @@ export default function ProponerTraspasoWizard({ torneoId, equipoVirtualId, jorn
                                         })}
                                         {dtAjeno && (
                                             <div className="p-3 bg-card rounded-xl border border-border flex items-center gap-3 shadow-sm">
-                                                <div className="w-9 h-9 bg-primary/20 rounded-full flex items-center justify-center shrink-0">
-                                                    <span className="text-primary font-bold text-[10px]">DT</span>
+                                                <div className="shrink-0">
+                                                    <CamisetaSVG 
+                                                        colorPrincipal={plantelAjeno.dt?.colorPrincipal}
+                                                        colorSecundario={plantelAjeno.dt?.colorSecundario}
+                                                        numero="DT"
+                                                        estado={plantelAjeno.dt?.estado}
+                                                        modelo={1}
+                                                        size={36}
+                                                    />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <p className="text-textMain font-bold text-sm truncate">{plantelAjeno.dt?.nombreCompleto}</p>
