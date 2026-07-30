@@ -34,6 +34,10 @@ export default function NotificacionesPrompt() {
             console.log('[DEBUG] 2. Permiso Notification:', permission)
             
             if (permission === 'granted') {
+                if (!VAPID_PUBLIC_KEY) {
+                    throw new Error('VITE_VAPID_PUBLIC_KEY no está configurada en las variables de entorno.')
+                }
+
                 const registration = await navigator.serviceWorker.ready
                 console.log('[DEBUG] 3. Service Worker Listo. Scope:', registration.scope)
                 

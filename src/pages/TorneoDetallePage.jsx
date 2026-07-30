@@ -873,7 +873,7 @@ export default function TorneoDetallePage() {
                             onClick={() => setModalEliminar(true)}
                             className="w-full py-3 text-red-500 font-bold border border-red-500/30 rounded-xl hover:bg-red-500/10 transition-colors"
                         >
-                            Borrar Torneo
+                            Eliminar Torneo
                         </button>
 
                         <button
@@ -897,7 +897,7 @@ export default function TorneoDetallePage() {
                           z-[70] p-6 space-y-4 animate-slide-up md:animate-none"
                         onClick={e => e.stopPropagation()}>
                         <div className="w-10 h-1 bg-border rounded-full mx-auto md:hidden" />
-                        <h3 className="text-textMain font-bold text-lg text-center">¿Borrar torneo?</h3>
+                        <h3 className="text-textMain font-bold text-lg text-center">¿Eliminar torneo?</h3>
                         <p className="text-textMuted text-sm text-center">
                             Esta acción es permanente y no se puede deshacer. Se eliminarán todos los participantes y datos asociados al torneo.
                         </p>
@@ -913,7 +913,7 @@ export default function TorneoDetallePage() {
                                 disabled={eliminandoTorneo}
                                 className="flex-1 py-2.5 rounded-xl text-white font-semibold bg-red-500 hover:bg-red-600 transition-colors disabled:opacity-50"
                             >
-                                {eliminandoTorneo ? 'Borrando...' : 'Sí, borrar'}
+                                {eliminandoTorneo ? 'Eliminando...' : 'Sí, eliminar'}
                             </button>
                         </div>
                     </div>
