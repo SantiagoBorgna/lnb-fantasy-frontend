@@ -8,6 +8,7 @@ import TopNav from './TopNav'
 import NotificacionesPrompt from './NotificacionesPrompt' 
 import ContextSwitcher from './ContextSwitcher'
 import { useUiStore } from '../../store/uiStore'
+import Footer from './Footer'
 
 import { getMisTorneos } from '../../api/torneoApi'
 import { useGameStore } from '../../store/gameStore'
@@ -80,8 +81,11 @@ export default function AppShell() {
                 <ContextSwitcher />
             </div>
 
-            <main className="flex-1 overflow-y-auto pb-20 px-4 pt-4 md:pb-8 md:px-8 xl:px-16 max-w-md md:max-w-none mx-auto w-full">
-                <Outlet />
+            <main className="flex-1 overflow-y-auto pb-20 px-4 pt-4 md:pb-8 md:px-8 xl:px-16 max-w-md md:max-w-none mx-auto w-full flex flex-col">
+                <div className="flex-1">
+                    <Outlet />
+                </div>
+                <Footer />
             </main>
             
             <BottomNav className="md:hidden" onLogout={() => setModalLogout(true)} />
