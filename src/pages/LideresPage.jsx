@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { getResumenLideres, getTopCategoria } from '../api/lideresApi'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
 import CamisetaSVG from '../components/jugador/CamisetaSVG'
@@ -8,44 +8,38 @@ import ModalAyuda from '../components/ui/ModalAyuda'
 import BotonAyuda from '../components/ui/BotonAyuda'
 import { AYUDA } from '../components/ui/ayudaContenido'
 import EmptyState from '../components/ui/EmptyState'
-
-
+import { useQuery } from '@tanstack/react-query'
 
 export default function LideresPage() {
-    const [categorias, setCategorias] = useState([])
-    const [loading, setLoading] = useState(true)
     const [categoriaAbierta, setCategoriaAbierta] = useState(null)
-    const [top5, setTop5] = useState([])
-    const [loadingTop, setLoadingTop] = useState(false)
     const pluralPartidos = (n) => `${n} ${n === 1 ? 'partido' : 'partidos'}`
 
     const { abierto, abrir, cerrar } = useAyuda('lideres')
 
-    useEffect(() => {
-        getResumenLideres()
-            .then(setCategorias)
-            .catch(console.error)
-            .finally(() => setLoading(false))
-    }, [])
+    const { data: categorias = [], isLoading: loading } = useQuery({
+        queryKey: ['resumenLideres'],
+        queryFn: getResumenLideres,
+        staleTime: 1000 * 60 * 30, // 30 mins
+    })
+
+    const slugs = {
+        'Puntos Fantasy': 'fantasy',
+        'Puntos': 'puntos',
+        'Rebotes': 'rebotes',
+        'Asistencias': 'asistencias',
+        'Robos': 'robos',
+        'Tapones': 'tapones',
+    }
+
+    const { data: top5 = [], isFetching: loadingTop } = useQuery({
+        queryKey: ['topCategoria', categoriaAbierta],
+        queryFn: () => getTopCategoria(slugs[categoriaAbierta] ?? categoriaAbierta.toLowerCase()),
+        enabled: !!categoriaAbierta,
+        staleTime: 1000 * 60 * 30, // 30 mins
+    })
 
     const abrirCategoria = (categoria) => {
         setCategoriaAbierta(categoria)
-        setLoadingTop(true)
-
-        // Mapear nombre de categoría al slug del endpoint
-        const slugs = {
-            'Puntos Fantasy': 'fantasy',
-            'Puntos': 'puntos',
-            'Rebotes': 'rebotes',
-            'Asistencias': 'asistencias',
-            'Robos': 'robos',
-            'Tapones': 'tapones',
-        }
-
-        getTopCategoria(slugs[categoria] ?? categoria.toLowerCase())
-            .then(setTop5)
-            .catch(console.error)
-            .finally(() => setLoadingTop(false))
     }
 
     if (loading) return <LoadingSpinner mensaje="Cargando líderes..." />
