@@ -115,6 +115,7 @@ export default function DashboardPage() {
                             modelo={usuario.modeloCamiseta}
                             numero=""
                             size={44}
+                            mostrarEstado={false}
                         />
                     </div>
                 )}

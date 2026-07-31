@@ -27,7 +27,8 @@ export default function CamisetaSVG({
     estado = 'DISPONIBLE',
     modelo = 1,
     size = 56,
-    className = ""
+    className = "",
+    mostrarEstado = true
 }) {
     // Generamos un ID único para la máscara para evitar bugs si hay muchos jugadores en pantalla
     const clipId = useId();
@@ -156,19 +157,23 @@ export default function CamisetaSVG({
             </text>
 
             {/* 6. Indicador de estado médico */}
-            <circle cx="85" cy="100" r="14" fill={cfg.color} stroke="#FFFFFF" strokeWidth="2" />
-            <text
-                x="85"
-                y="102"
-                textAnchor="middle"
-                dominantBaseline="middle"
-                fill="white"
-                fontSize="14"
-                fontWeight="700"
-                fontFamily="Inter, system-ui, sans-serif"
-            >
-                {cfg.label}
-            </text>
+            {mostrarEstado && (
+                <>
+                    <circle cx="85" cy="100" r="14" fill={cfg.color} stroke="#FFFFFF" strokeWidth="2" />
+                    <text
+                        x="85"
+                        y="102"
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        fill="white"
+                        fontSize="14"
+                        fontWeight="700"
+                        fontFamily="Inter, system-ui, sans-serif"
+                    >
+                        {cfg.label}
+                    </text>
+                </>
+            )}
         </svg>
     );
 }

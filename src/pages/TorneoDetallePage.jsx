@@ -813,7 +813,7 @@ export default function TorneoDetallePage() {
                                                 ajustesTipo === t ? "bg-card shadow text-textMain" : "text-textMuted"
                                             )}
                                         >
-                                            {t === 'PUBLICO' ? '🌐 Público' : '🔒 Privado'}
+                                            {t === 'PUBLICO' ? 'Público' : 'Privado'}
                                         </button>
                                     ))
                                 )}

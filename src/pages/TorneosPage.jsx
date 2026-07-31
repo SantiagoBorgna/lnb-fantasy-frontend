@@ -447,7 +447,7 @@ function ModalCrearTorneo({ onCreado, onCerrar }) {
                                         isPublicDisabled ? "text-textMuted/30 cursor-not-allowed" : "text-textMuted"
                                     )}
                                 >
-                                    {t === 'PUBLICO' ? '🌐 Público' : '🔒 Privado'}
+                                    {t === 'PUBLICO' ? 'Público' : 'Privado'}
                                 </button>
                             );
                         })}
@@ -470,7 +470,7 @@ function ModalCrearTorneo({ onCreado, onCerrar }) {
                                     modalidad === m ? "bg-card shadow text-textMain" : "text-textMuted"
                                 )}
                             >
-                                {m === 'CLASICO' ? '📈 Clásico' : '🎯 Draft'}
+                                {m === 'CLASICO' ? 'Clásico' : 'Draft'}
                             </button>
                         ))}
                     </div>
@@ -487,7 +487,7 @@ function ModalCrearTorneo({ onCreado, onCerrar }) {
                                         tipoPuntuacion === tp ? "bg-card shadow text-textMain" : "text-textMuted"
                                     )}
                                 >
-                                    {tp === 'GENERAL' ? '📊 Pts Totales' : '⚔️ Versus'}
+                                    {tp === 'GENERAL' ? 'Pts Totales' : 'Versus'}
                                 </button>
                             ))}
                         </div>
