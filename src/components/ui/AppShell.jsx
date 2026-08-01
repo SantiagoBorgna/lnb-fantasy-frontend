@@ -118,9 +118,9 @@ export default function AppShell() {
                         onClick={e => e.stopPropagation()}
                     >
                         <div className="w-10 h-1 bg-border rounded-full mx-auto md:hidden" />
-                        <h3 className="text-textMain font-bold text-lg">¿Cerrar sesión?</h3>
+                        <h3 className="text-textMain font-bold text-lg">¿Seguro que quieres salir?</h3>
                         <p className="text-textMuted text-sm">
-                            Vas a tener que volver a iniciar sesión con Google para entrar.
+                            Tendrás que volver a iniciar sesión.
                         </p>
                         <div className="space-y-2">
                             <button

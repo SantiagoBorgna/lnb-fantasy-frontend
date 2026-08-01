@@ -41,11 +41,42 @@ export const useDraftStore = create(
             // pero conserva los jugadores del banco
             setFormacion: (formacion) => {
                 const slotsActuales = get().slots
-                const banco = slotsActuales.slice(5)
                 const nuevosSlots = generarSlots(formacion)
-                // Conservar jugadores titulares si la nueva formación tiene el mismo
-                // número de slots en esa zona — sino se limpian
-                set({ formacion, slots: [...nuevosSlots.slice(0, 5), ...banco] })
+                
+                // 1. Extraer a todos los jugadores que tengamos elegidos
+                const jugadoresPrevios = slotsActuales.filter(s => s.jugador !== null)
+
+                // 2. Intentar ubicar a cada jugador previo en los nuevos slots
+                jugadoresPrevios.forEach(prev => {
+                    const pos = prev.jugador.posicion
+                    let posibleZona = 'FORWARD'
+                    if (pos === 'BASE' || pos === 'ESCOLTA') posibleZona = 'GUARD'
+                    if (pos === 'PIVOT') posibleZona = 'CENTER'
+
+                    // Preferencia: si era titular (index < 5), intentar meterlo de titular. 
+                    // Si no hay lugar, va al banco (index >= 5). Si era suplente, va al banco directo.
+                    let slotLibre = null
+                    
+                    if (prev.index < 5) {
+                        // Tratar de buscar titular libre
+                        slotLibre = nuevosSlots.find(s => s.index < 5 && s.zona === posibleZona && !s.jugador)
+                    }
+
+                    // Si no encontró o si originalmente era del banco, buscar en el banco
+                    if (!slotLibre) {
+                        slotLibre = nuevosSlots.find(s => s.index >= 5 && s.zona === posibleZona && !s.jugador)
+                    }
+
+                    if (slotLibre) {
+                        slotLibre.jugador = prev.jugador
+                        // Mantenemos el rol de CAPITAN si lo tenía y terminó siendo titular
+                        if (prev.rol === 'CAPITAN' && slotLibre.index < 5) {
+                            slotLibre.rol = 'CAPITAN'
+                        }
+                    }
+                })
+
+                set({ formacion, slots: nuevosSlots })
             },
 
             // El usuario tocó un slot vacío → guardar cuál está pendiente
