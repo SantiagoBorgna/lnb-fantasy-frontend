@@ -40,6 +40,7 @@ export default function SalaDraftPage() {
     const [dtsDisponibles, setDtsDisponibles] = useState([])
     const [dtsTodos, setDtsTodos] = useState([])
     const [busqueda, setBusqueda] = useState('')
+    const [filtroPosicion, setFiltroPosicion] = useState(null)
     const [procesando, setProcesando] = useState(false)
     const [error, setError] = useState('')
 
@@ -302,6 +303,29 @@ export default function SalaDraftPage() {
                                     onChange={e => setBusqueda(e.target.value)}
                                     className="w-full bg-surface border border-border rounded-xl px-4 py-2 text-sm text-textMain focus:outline-none focus:border-accent transition-colors"
                                 />
+                                {turnoActual?.ronda !== 11 && (
+                                    <div className="flex gap-2 mt-3 overflow-x-auto scrollbar-hide pb-1">
+                                        {[
+                                            { label: 'Todos', valor: null },
+                                            { label: 'BAS/ESC', valor: 'GUARD' },
+                                            { label: 'ALE/ALA', valor: 'FORWARD' },
+                                            { label: 'PIVOT', valor: 'CENTER' }
+                                        ].map(f => (
+                                            <button
+                                                key={f.label}
+                                                onClick={() => setFiltroPosicion(f.valor)}
+                                                className={clsx(
+                                                    "px-3 py-1 text-[11px] font-bold rounded-full whitespace-nowrap transition-colors",
+                                                    filtroPosicion === f.valor 
+                                                        ? "bg-accent text-white" 
+                                                        : "bg-surface border border-border text-textMuted hover:text-textMain"
+                                                )}
+                                            >
+                                                {f.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                             
                             {/* Resumen del Plantel del Usuario */}
@@ -362,6 +386,10 @@ export default function SalaDraftPage() {
                                 jugadoresDisponibles
                                     .filter(j => j.nombreCompleto.toLowerCase().includes(busqueda.toLowerCase()))
                                     .filter(j => {
+                                        if (filtroPosicion === 'GUARD' && j.posicion !== 'BASE' && j.posicion !== 'ESCOLTA') return false;
+                                        if (filtroPosicion === 'FORWARD' && j.posicion !== 'ALERO' && j.posicion !== 'ALA_PIVOT') return false;
+                                        if (filtroPosicion === 'CENTER' && j.posicion !== 'PIVOT') return false;
+
                                         const countTeam = misJugadores.filter(mj => mj.equipoNombre === j.equipoNombre).length;
                                         if (countTeam >= 2) return false;
                                         if (j.posicion === 'BASE' || j.posicion === 'ESCOLTA') return basesEscoltas.length < 4;
@@ -369,7 +397,7 @@ export default function SalaDraftPage() {
                                         if (j.posicion === 'PIVOT') return pivots.length < 4;
                                         return true;
                                     })
-                                    .sort((a, b) => a.nombreCompleto.localeCompare(b.nombreCompleto))
+                                    .sort((a, b) => (b.valorMercadoActual || 0) - (a.valorMercadoActual || 0) || a.nombreCompleto.localeCompare(b.nombreCompleto))
                                     .map(j => (
                                     <div key={j.id} className="flex items-center gap-3 p-3 rounded-xl bg-surface border border-border">
                                         <div className="shrink-0 w-10 h-10 bg-card rounded-lg flex items-center justify-center">
