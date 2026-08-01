@@ -216,7 +216,7 @@ export default function SalaDraftPage() {
     const esMiTurno = turnoActual?.usuarioId === usuario?.id
 
     const esFinalizado = draftState?.estado === 'FINALIZADO';
-    const misPicks = (esFinalizado && draftState?.turnos) ? draftState.turnos.filter(t => t.usuarioId === usuario?.id && t.completado) : [];
+    const misPicks = draftState?.turnos ? draftState.turnos.filter(t => t.usuarioId === usuario?.id && t.completado) : [];
     const misJugadoresIds = misPicks.filter(t => t.jugadorRealIdElegido).map(t => t.jugadorRealIdElegido);
     const miDtId = misPicks.find(t => t.dtIdElegido)?.dtIdElegido;
 
@@ -317,7 +317,7 @@ export default function SalaDraftPage() {
                                                 className={clsx(
                                                     "px-3 py-1 text-[11px] font-bold rounded-full whitespace-nowrap transition-colors",
                                                     filtroPosicion === f.valor 
-                                                        ? "bg-accent text-white" 
+                                                        ? "bg-primary text-white" 
                                                         : "bg-surface border border-border text-textMuted hover:text-textMain"
                                                 )}
                                             >
@@ -410,7 +410,7 @@ export default function SalaDraftPage() {
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <p className="font-bold text-sm text-textMain truncate">{j.nombreCompleto}</p>
-                                            <p className="text-xs text-textMuted truncate">{j.posicion} {j.equipoRealNombre}</p>
+                                            <p className="text-xs text-textMuted truncate">{j.posicion} {j.equipoNombre}</p>
                                         </div>
                                         <button
                                             onClick={() => handlePick(j, false)}
