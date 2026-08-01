@@ -95,10 +95,8 @@ export default function SalaDraftPage() {
         if (draftState?.estado === 'FINALIZADO' && !miPlantel && usuario?.id) {
             getPlantel(torneoId, usuario.id).then(plantel => {
                 setMiPlantel(plantel)
-                const titulares = plantel.jugadores.filter(j => !['SUPLENTE', 'SEXTO_HOMBRE'].includes(j.posicionPlantel))
-                const suplentes = plantel.jugadores.filter(j => ['SUPLENTE', 'SEXTO_HOMBRE'].includes(j.posicionPlantel))
-                if (titulares.length > 0) setCapitanId(String(titulares[0].jugadorRealId || titulares[0].id))
-                if (suplentes.length > 0) setSextoHombreId(String(suplentes[0].jugadorRealId || suplentes[0].id))
+                setCapitanId('')
+                setSextoHombreId('')
             }).catch(console.error)
         }
 
@@ -517,31 +515,31 @@ export default function SalaDraftPage() {
                             <div className="mt-8 bg-surface border border-border rounded-xl p-6">
                                 <h3 className="text-lg font-black text-textMain mb-4">Roles de tu equipo</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="flex flex-col gap-2">
+                                    <div className="flex flex-col gap-2 min-w-0">
                                         <label className="text-sm font-bold text-textMain">Capitán (Puntúa doble)</label>
                                         <select 
                                             value={capitanId} 
                                             onChange={e => setCapitanId(e.target.value)}
-                                            className="w-full bg-card border border-border rounded-xl px-4 py-3 text-sm text-textMain focus:outline-none focus:border-accent"
+                                            className="w-full bg-card border border-border rounded-xl px-4 py-3 text-sm text-textMain focus:outline-none focus:border-accent truncate"
                                         >
                                             <option value="">Seleccionar Capitán</option>
-                                            {miPlantel.jugadores.filter(j => !['SUPLENTE', 'SEXTO_HOMBRE'].includes(j.posicionPlantel)).map(j => (
-                                                <option key={j.jugadorRealId} value={j.jugadorRealId}>
+                                            {miPlantel.jugadores.map(j => (
+                                                <option key={j.jugadorRealId} value={j.jugadorRealId} disabled={String(j.jugadorRealId) === sextoHombreId}>
                                                     {j.jugador?.nombreCompleto || j.nombreCompleto || 'Jugador'}
                                                 </option>
                                             ))}
                                         </select>
                                     </div>
-                                    <div className="flex flex-col gap-2">
+                                    <div className="flex flex-col gap-2 min-w-0">
                                         <label className="text-sm font-bold text-textMain">Sexto Hombre (Puntúa mitad)</label>
                                         <select 
                                             value={sextoHombreId} 
                                             onChange={e => setSextoHombreId(e.target.value)}
-                                            className="w-full bg-card border border-border rounded-xl px-4 py-3 text-sm text-textMain focus:outline-none focus:border-accent"
+                                            className="w-full bg-card border border-border rounded-xl px-4 py-3 text-sm text-textMain focus:outline-none focus:border-accent truncate"
                                         >
                                             <option value="">Seleccionar Sexto Hombre</option>
-                                            {miPlantel.jugadores.filter(j => ['SUPLENTE', 'SEXTO_HOMBRE'].includes(j.posicionPlantel)).map(j => (
-                                                <option key={j.jugadorRealId} value={j.jugadorRealId}>
+                                            {miPlantel.jugadores.map(j => (
+                                                <option key={j.jugadorRealId} value={j.jugadorRealId} disabled={String(j.jugadorRealId) === capitanId}>
                                                     {j.jugador?.nombreCompleto || j.nombreCompleto || 'Jugador'}
                                                 </option>
                                             ))}
@@ -551,7 +549,7 @@ export default function SalaDraftPage() {
                                 <div className="mt-6 flex justify-end">
                                     <button
                                         onClick={handleContinuarTorneo}
-                                        disabled={procesandoRoles || !capitanId || !sextoHombreId}
+                                        disabled={procesandoRoles || !capitanId || !sextoHombreId || capitanId === sextoHombreId}
                                         className="bg-accent text-white font-bold py-3 px-8 rounded-xl disabled:opacity-50 hover:bg-accent/80 transition-colors shadow-lg shadow-accent/20"
                                     >
                                         {procesandoRoles ? 'Guardando...' : 'Guardar y Continuar al Torneo'}
