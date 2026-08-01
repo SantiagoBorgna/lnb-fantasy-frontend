@@ -138,24 +138,58 @@ export default function SalaDraftPage() {
         }
         setProcesandoRoles(true)
         try {
+            const getValidFormation = (g, f, c) => {
+                const formations = ['1-2-2', '1-3-1', '2-1-2', '2-2-1', '3-1-1'];
+                for (let form of formations) {
+                    const [x, y, z] = form.split('-').map(Number);
+                    if (x <= g - 1 && y <= f - 1 && z <= c - 1) return form;
+                }
+                return '1-2-2';
+            };
+            const autoFormacion = getValidFormation(basesEscoltas.length, alerosAlapivots.length, pivots.length);
+            const [reqG, reqF, reqC] = autoFormacion.split('-').map(Number);
+            let remG = reqG, remF = reqF, remC = reqC;
+
+            miPlantel.jugadores.forEach(j => {
+                const id = j.jugadorRealId || j.id;
+                if (id === Number(capitanId)) {
+                    if (j.posicion === 'BASE' || j.posicion === 'ESCOLTA') remG--;
+                    else if (j.posicion === 'ALERO' || j.posicion === 'ALA_PIVOT') remF--;
+                    else if (j.posicion === 'PIVOT') remC--;
+                }
+            });
+
+            const nuevosJugadores = miPlantel.jugadores.map(j => {
+                const id = j.jugadorRealId || j.id;
+                let rolFinal = 'SUPLENTE';
+                
+                if (id === Number(capitanId)) {
+                    rolFinal = 'CAPITAN';
+                } else if (id === Number(sextoHombreId)) {
+                    rolFinal = 'SEXTO_HOMBRE';
+                } else {
+                    if (j.posicion === 'BASE' || j.posicion === 'ESCOLTA') {
+                        if (remG > 0) { rolFinal = 'TITULAR'; remG--; }
+                    }
+                    else if (j.posicion === 'ALERO' || j.posicion === 'ALA_PIVOT') {
+                        if (remF > 0) { rolFinal = 'TITULAR'; remF--; }
+                    }
+                    else if (j.posicion === 'PIVOT') {
+                        if (remC > 0) { rolFinal = 'TITULAR'; remC--; }
+                    }
+                }
+                
+                return {
+                    jugadorRealId: id,
+                    rol: rolFinal
+                };
+            });
+
             const dto = {
                 torneoId: Number(torneoId),
                 dtId: miDt.id,
-                formacion: miPlantel.formacion || '1-2-2',
-                jugadores: miPlantel.jugadores.map(j => {
-                    const id = j.jugadorRealId || j.id;
-                    let rolFinal = j.posicionPlantel;
-                    if (id === Number(capitanId)) rolFinal = 'CAPITAN';
-                    else if (id === Number(sextoHombreId)) rolFinal = 'SEXTO_HOMBRE';
-                    else {
-                        if (rolFinal === 'CAPITAN') rolFinal = 'TITULAR';
-                        if (rolFinal === 'SEXTO_HOMBRE') rolFinal = 'SUPLENTE';
-                    }
-                    return {
-                        jugadorRealId: id,
-                        rol: rolFinal
-                    };
-                })
+                formacion: autoFormacion,
+                jugadores: nuevosJugadores
             }
             await guardarPlantel(dto)
             navigate(`/t/${encodeId(torneoId)}`)
