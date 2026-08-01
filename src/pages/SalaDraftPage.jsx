@@ -516,7 +516,7 @@ export default function SalaDraftPage() {
                                 <h3 className="text-lg font-black text-textMain mb-4">Roles de tu equipo</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="flex flex-col gap-2 min-w-0">
-                                        <label className="text-sm font-bold text-textMain">Capitán (Puntúa doble)</label>
+                                        <label className="text-sm font-bold text-textMain">Capitán</label>
                                         <select 
                                             value={capitanId} 
                                             onChange={e => setCapitanId(e.target.value)}
@@ -531,7 +531,7 @@ export default function SalaDraftPage() {
                                         </select>
                                     </div>
                                     <div className="flex flex-col gap-2 min-w-0">
-                                        <label className="text-sm font-bold text-textMain">Sexto Hombre (Puntúa mitad)</label>
+                                        <label className="text-sm font-bold text-textMain">Sexto Hombre</label>
                                         <select 
                                             value={sextoHombreId} 
                                             onChange={e => setSextoHombreId(e.target.value)}
