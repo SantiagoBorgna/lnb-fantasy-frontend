@@ -95,8 +95,8 @@ export default function SalaDraftPage() {
         if (draftState?.estado === 'FINALIZADO' && !miPlantel && usuario?.id) {
             getPlantel(torneoId, usuario.id).then(plantel => {
                 setMiPlantel(plantel)
-                const titulares = plantel.jugadores.filter(j => j.posicionPlantel !== 'SUPLENTE')
-                const suplentes = plantel.jugadores.filter(j => j.posicionPlantel === 'SUPLENTE')
+                const titulares = plantel.jugadores.filter(j => !['SUPLENTE', 'SEXTO_HOMBRE'].includes(j.posicionPlantel))
+                const suplentes = plantel.jugadores.filter(j => ['SUPLENTE', 'SEXTO_HOMBRE'].includes(j.posicionPlantel))
                 if (titulares.length > 0) setCapitanId(String(titulares[0].jugadorRealId || titulares[0].id))
                 if (suplentes.length > 0) setSextoHombreId(String(suplentes[0].jugadorRealId || suplentes[0].id))
             }).catch(console.error)
@@ -243,12 +243,14 @@ export default function SalaDraftPage() {
             <header className="flex flex-col gap-2">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="text-center md:text-left flex-1 flex flex-col md:block">
-                        <button
-                            onClick={() => navigate(`/t/${encodeId(torneoId)}`)}
-                            className="text-textMuted text-sm mb-2 flex items-center justify-start gap-1 hover:text-textMain transition-colors w-full md:w-auto self-start"
-                        >
-                            ← Volver al torneo
-                        </button>
+                        {draftState?.estado !== 'FINALIZADO' && (
+                            <button
+                                onClick={() => navigate(`/t/${encodeId(torneoId)}`)}
+                                className="text-textMuted text-sm mb-2 flex items-center justify-start gap-1 hover:text-textMain transition-colors w-full md:w-auto self-start"
+                            >
+                                ← Volver al torneo
+                            </button>
+                        )}
                         <div className="flex flex-col md:flex-row items-center justify-center md:justify-start gap-3 mt-1">
                             <h1 className="text-2xl font-black text-textMain tracking-tight w-full md:w-auto text-center md:text-left">Sala de Draft</h1>
                         </div>
@@ -520,10 +522,10 @@ export default function SalaDraftPage() {
                                         <select 
                                             value={capitanId} 
                                             onChange={e => setCapitanId(e.target.value)}
-                                            className="bg-card border border-border rounded-xl px-4 py-3 text-sm text-textMain focus:outline-none focus:border-accent"
+                                            className="w-full bg-card border border-border rounded-xl px-4 py-3 text-sm text-textMain focus:outline-none focus:border-accent"
                                         >
                                             <option value="">Seleccionar Capitán</option>
-                                            {miPlantel.jugadores.filter(j => j.posicionPlantel !== 'SUPLENTE').map(j => (
+                                            {miPlantel.jugadores.filter(j => !['SUPLENTE', 'SEXTO_HOMBRE'].includes(j.posicionPlantel)).map(j => (
                                                 <option key={j.jugadorRealId} value={j.jugadorRealId}>
                                                     {j.jugador?.nombreCompleto || j.nombreCompleto || 'Jugador'}
                                                 </option>
@@ -535,10 +537,10 @@ export default function SalaDraftPage() {
                                         <select 
                                             value={sextoHombreId} 
                                             onChange={e => setSextoHombreId(e.target.value)}
-                                            className="bg-card border border-border rounded-xl px-4 py-3 text-sm text-textMain focus:outline-none focus:border-accent"
+                                            className="w-full bg-card border border-border rounded-xl px-4 py-3 text-sm text-textMain focus:outline-none focus:border-accent"
                                         >
                                             <option value="">Seleccionar Sexto Hombre</option>
-                                            {miPlantel.jugadores.filter(j => j.posicionPlantel === 'SUPLENTE').map(j => (
+                                            {miPlantel.jugadores.filter(j => ['SUPLENTE', 'SEXTO_HOMBRE'].includes(j.posicionPlantel)).map(j => (
                                                 <option key={j.jugadorRealId} value={j.jugadorRealId}>
                                                     {j.jugador?.nombreCompleto || j.nombreCompleto || 'Jugador'}
                                                 </option>
