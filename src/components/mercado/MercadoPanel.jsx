@@ -372,7 +372,7 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
                 data = await getMercadoJugadores(params)
             }
         }
-        return data.filter(j => !idsElegidosDraft.includes(String(j.id || j.jugadorRealId)))
+        return data
     }
 
     const posicionInicialPorZona = {
@@ -429,10 +429,14 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
         return () => clearTimeout(timer)
     }, [busqueda])
 
-    const { data: jugadores = [], isFetching: loadingJugadores } = useQuery({
+    const { data: jugadoresRaw = [], isFetching: loadingJugadores } = useQuery({
         queryKey: ['jugadoresMercado', contextoActual, posicion, orden, debouncedBusqueda],
         queryFn: () => fetchYFiltrar({ posicion: posicion ?? undefined, orden, nombre: debouncedBusqueda.trim() }),
     })
+
+    const jugadores = useMemo(() => {
+        return jugadoresRaw.filter(j => !idsElegidosDraft.includes(String(j.id || j.jugadorRealId)))
+    }, [jugadoresRaw, idsElegidosDraft])
 
     const limpiarBusqueda = useCallback(() => {
         setBusqueda('')
@@ -548,7 +552,6 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
             {/* BANNER ONBOARDING*/}
             {modoAsignacion && (
                 <div className="bg-primary/20 border border-primary rounded-2xl px-4 py-3 flex items-center gap-3">
-                    <span className="text-2xl">👆</span>
                     <div className="flex-1 min-w-0">
                         <p className="text-primary font-semibold text-sm">{contextoActual ? "Seleccioná un jugador" : "Elegí un jugador"}</p>
                         <p className="text-textMuted text-xs">Posición: {ZONA_LABEL[slotPendiente.zona] || slotPendiente.zona}</p>
@@ -1161,7 +1164,19 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
                 <div className="flex flex-col gap-3">
                     <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide w-full md:justify-center">
                         {POSICIONES
-                            .filter(({ valor }) => contextoActual ? true : valor !== 'DT')
+                            .filter(({ valor }) => {
+                                if (!contextoActual && valor === 'DT') return false;
+                                if (modoAsignacion && slotPendiente?.zona !== 'SUPLENTE') {
+                                    const zonaAPosiciones = {
+                                        GUARD: ['BASE', 'ESCOLTA'],
+                                        FORWARD: ['ALERO', 'ALA_PIVOT'],
+                                        CENTER: ['PIVOT']
+                                    };
+                                    const valid = zonaAPosiciones[slotPendiente?.zona] || [];
+                                    if (valor === null || !valid.includes(valor)) return false;
+                                }
+                                return true;
+                            })
                             .map(({ label, valor }) => (
                             <button
                                 key={label}

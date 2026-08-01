@@ -1,7 +1,6 @@
-﻿import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
-import { getPlantel, guardarPlantel } from '../api/plantelApi'
 import { getEstadoDraft, iniciarDraft, elegirJugadorDraft } from '../api/draftApi'
 import { getMercadoJugadores } from '../api/mercadoApi'
 import { encodeId, decodeId } from '../utils/urlParams'
@@ -20,6 +19,7 @@ function TurnoCountdown({ limiteTiempo, esMiTurno }) {
 }
 
 import api from '../api/axiosClient'
+import { getPlantel, guardarPlantel } from '../api/plantelApi'
 
 async function getDirectoresTecnicos() {
     const res = await api.get('/dt')
@@ -43,11 +43,11 @@ export default function SalaDraftPage() {
     const [procesando, setProcesando] = useState(false)
     const [error, setError] = useState('')
 
+    // Selección de roles post-draft
     const [miPlantel, setMiPlantel] = useState(null)
     const [capitanId, setCapitanId] = useState('')
     const [sextoHombreId, setSextoHombreId] = useState('')
     const [procesandoRoles, setProcesandoRoles] = useState(false)
-
 
     // Modal state
     const [confirmModal, setConfirmModal] = useState({ open: false, action: null, message: '', title: '' })
@@ -90,7 +90,18 @@ export default function SalaDraftPage() {
 
     useEffect(() => {
         cargarDatos()
-        // Polling cada 5 segundos si el draft estÃ¡ en curso
+        
+        if (draftState?.estado === 'FINALIZADO' && !miPlantel && usuario?.id) {
+            getPlantel(torneoId, usuario.id).then(plantel => {
+                setMiPlantel(plantel)
+                const titulares = plantel.jugadores.filter(j => j.posicionPlantel !== 'SUPLENTE')
+                const suplentes = plantel.jugadores.filter(j => j.posicionPlantel === 'SUPLENTE')
+                if (titulares.length > 0) setCapitanId(String(titulares[0].jugadorRealId || titulares[0].id))
+                if (suplentes.length > 0) setSextoHombreId(String(suplentes[0].jugadorRealId || suplentes[0].id))
+            }).catch(console.error)
+        }
+
+        // Polling cada 5 segundos si el draft está en curso
         const interval = setInterval(() => {
             if (draftState?.estado === 'EN_CURSO') {
                 getEstadoDraft(torneoId).then(estado => {
@@ -119,18 +130,43 @@ export default function SalaDraftPage() {
             }
         }, 5000)
         return () => clearInterval(interval)
-    }, [torneoId, draftState?.estado])
+    }, [torneoId, draftState?.estado, usuario?.id, miPlantel])
+
+    const handleContinuarTorneo = async () => {
+        if (!miPlantel || !capitanId || !sextoHombreId) {
+            showToast("Debes elegir Capitán y Sexto Hombre")
+            return
+        }
+        setProcesandoRoles(true)
+        try {
+            const dto = {
+                formacion: miPlantel.formacion || '1-2-2',
+                capitanId: Number(capitanId),
+                sextoHombreId: Number(sextoHombreId),
+                posiciones: miPlantel.jugadores.map(j => ({
+                    jugadorRealId: j.jugadorRealId || j.id,
+                    posicionPlantel: j.posicionPlantel
+                }))
+            }
+            await guardarPlantel(torneoId, dto)
+            navigate(`/t/${encodeId(torneoId)}`)
+        } catch (e) {
+            setError(e.response?.data?.mensaje || "Error al guardar los roles")
+        } finally {
+            setProcesandoRoles(false)
+        }
+    }
 
     const handleIniciarDraft = async () => {
         setConfirmModal({
             open: true,
             title: "Confirmar inicio",
-            message: "Â¿Seguro que querÃ©s iniciar el draft ahora?",
+            message: "¿Seguro que querés iniciar el draft ahora?",
             action: async () => {
                 setProcesando(true)
                 try {
                     await iniciarDraft(torneoId)
-                    showToast("Draft iniciado con Ã©xito")
+                    showToast("Draft iniciado con éxito")
                     cargarDatos()
                 } catch (e) {
                     const errorMsg = typeof e.response?.data === 'string' ? e.response.data : (e.response?.data?.message || e.response?.data?.mensaje || e.response?.data?.error || "Error al iniciar")
@@ -146,8 +182,8 @@ export default function SalaDraftPage() {
     const handlePick = async (item, isDt = false) => {
         setConfirmModal({
             open: true,
-            title: isDt ? "Elegir Director TÃ©cnico" : "Elegir jugador",
-            message: `Â¿EstÃ¡s seguro de elegir a ${item.nombreCompleto}?`,
+            title: isDt ? "Elegir Director Técnico" : "Elegir jugador",
+            message: `¿Estás seguro de elegir a ${item.nombreCompleto}?`,
             action: async () => {
                 setProcesando(true)
                 try {
@@ -171,7 +207,7 @@ export default function SalaDraftPage() {
     }
 
     if (loading) return <LoadingSpinner className="mt-20" />
-    if (!draftState && error) return <EmptyState icon="âš ï¸" title="Error" description={error} />
+    if (!draftState && error) return <EmptyState icon="⚠️" title="Error" description={error} />
     if (!draftState) return null
 
     const esAdmin = usuario?.id === draftState.adminId
@@ -195,7 +231,7 @@ export default function SalaDraftPage() {
         const partes = nombreCompleto.split(',');
         if (partes.length === 2) {
             const apellido = partes[0].trim().toUpperCase();
-            const nombres = partes[1].trim().toLowerCase().replace(/(^\w|\s\w|Ã¡|Ã©|Ã­|Ã³|Ãº|Ã±)/g, m => m.toUpperCase());
+            const nombres = partes[1].trim().toLowerCase().replace(/(^\w|\s\w|á|é|í|ó|ú|ñ)/g, m => m.toUpperCase());
             return `${apellido}, ${nombres}`;
         }
         return nombreCompleto;
@@ -210,14 +246,14 @@ export default function SalaDraftPage() {
                             onClick={() => navigate(`/t/${encodeId(torneoId)}`)}
                             className="text-textMuted text-sm mb-2 flex items-center justify-start gap-1 hover:text-textMain transition-colors w-full md:w-auto self-start"
                         >
-                            â† Volver al torneo
+                            ← Volver al torneo
                         </button>
                         <div className="flex flex-col md:flex-row items-center justify-center md:justify-start gap-3 mt-1">
                             <h1 className="text-2xl font-black text-textMain tracking-tight w-full md:w-auto text-center md:text-left">Sala de Draft</h1>
                         </div>
                         <div className="text-textMuted text-sm mt-1">
                             {draftState.estado === 'PENDIENTE' && 'Esperando que el administrador inicie el draft...'}
-                            {draftState.estado === 'EN_CURSO' && 'Draft en progreso. ElegÃ­ sabiamente.'}
+                            {draftState.estado === 'EN_CURSO' && 'Draft en progreso. Elegí sabiamente.'}
                             {draftState.estado === 'FINALIZADO' && 'El draft ha finalizado.'}
                         </div>
                     </div>
@@ -241,7 +277,7 @@ export default function SalaDraftPage() {
             {draftState.estado === 'EN_CURSO' && turnoActual && (
                 <div className={clsx("p-4 rounded-xl border", esMiTurno ? "bg-accent/10 border-accent text-accent" : "bg-card border-border")}>
                     <h2 className="font-bold text-lg mb-1">
-                        {esMiTurno ? "Â¡ES TU TURNO!" : `Turno de: ${turnoActual.nombreEquipo}`}
+                        {esMiTurno ? "¡ES TU TURNO!" : `Turno de: ${turnoActual.nombreEquipo}`}
                     </h2>
                     <p className="text-sm opacity-80">
                         Ronda {turnoActual.ronda} - Pick #{turnoActual.numeroTurnoGlobal}
@@ -270,7 +306,7 @@ export default function SalaDraftPage() {
                             
                             {/* Resumen del Plantel del Usuario */}
                             <div className="bg-surface rounded-xl p-3 border border-border">
-                                <h4 className="text-xs font-bold text-textMain mb-2 uppercase tracking-wider">Tu Plantel (MÃ­n 2, MÃ¡x 4 por grupo)</h4>
+                                <h4 className="text-xs font-bold text-textMain mb-2 uppercase tracking-wider">Tu Plantel (Mín 2, Máx 4 por grupo)</h4>
                                 <div className="grid grid-cols-3 gap-2 text-center text-xs">
                                     <div className="bg-card border border-border rounded p-1.5">
                                         <div className="text-textMuted font-medium text-[10px]">BASE/ESC</div>
@@ -296,7 +332,7 @@ export default function SalaDraftPage() {
                         <div className="flex-1 overflow-y-auto p-4 space-y-2">
                             {turnoActual?.ronda === 11 && (
                                 <div className="bg-accent/10 border-l-4 border-accent p-3 mb-4 rounded-r-xl">
-                                    <p className="text-sm text-accent font-bold">Â¡Ronda 11! Es hora de elegir tu Director TÃ©cnico.</p>
+                                    <p className="text-sm text-accent font-bold">¡Ronda 11! Es hora de elegir tu Director Técnico.</p>
                                 </div>
                             )}
 
@@ -307,11 +343,11 @@ export default function SalaDraftPage() {
                                     .map(dt => (
                                     <div key={dt.id} className="flex items-center gap-3 p-3 rounded-xl bg-surface border border-border">
                                         <div className="shrink-0 w-10 h-10 bg-card rounded-lg flex items-center justify-center">
-                                            <span className="text-lg">ðŸ‘”</span>
+                                            <span className="text-lg">👔</span>
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <p className="font-bold text-sm text-textMain truncate">{dt.nombreCompleto}</p>
-                                            <p className="text-xs text-textMuted truncate">DT Â· {dt.equipoSigla || dt.equipoNombre}</p>
+                                            <p className="text-xs text-textMuted truncate">DT · {dt.equipoSigla || dt.equipoNombre}</p>
                                         </div>
                                         <button
                                             onClick={() => handlePick(dt, true)}
@@ -374,7 +410,7 @@ export default function SalaDraftPage() {
                                     !t.completado && t.id !== draftState.turnoActualId && "opacity-50"
                                 )}>
                                     <div className="flex justify-between items-center text-xs text-textMuted">
-                                        <span>Ronda {t.ronda} â€¢ Pick #{t.numeroTurnoGlobal}</span>
+                                        <span>Ronda {t.ronda} • Pick #{t.numeroTurnoGlobal}</span>
                                         <span className="font-semibold">{t.nombreEquipo}</span>
                                     </div>
                                     {t.completado ? (
@@ -435,7 +471,7 @@ export default function SalaDraftPage() {
                             </div>
                             
                             <div className="bg-surface border border-border rounded-xl p-4 flex flex-col gap-3">
-                                <h3 className="text-xs font-bold text-textMuted uppercase tracking-wider border-b border-border pb-2">Director TÃ©cnico</h3>
+                                <h3 className="text-xs font-bold text-textMuted uppercase tracking-wider border-b border-border pb-2">Director Técnico</h3>
                                 {miDt ? (
                                     <div className="flex flex-col">
                                         <span className="text-sm font-bold text-textMain">{formatNombre(miDt.nombreCompleto)}</span>
@@ -448,53 +484,56 @@ export default function SalaDraftPage() {
                         </div>
 
                         {miPlantel && (
-                            <div className="mt-8 p-4 bg-surface rounded-xl border border-border">
-                                <h3 className="text-lg font-bold text-textMain mb-2">Elige tus Lideres</h3>
-                                <p className="text-sm text-textMuted mb-4">El Capitán suma x1.5 y el Sexto Hombre x0.75. ¡Son clave!</p>
-                                
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                                    <div>
-                                        <label className="block text-sm font-semibold mb-2">Capitán</label>
+                            <div className="mt-8 bg-surface border border-border rounded-xl p-6">
+                                <h3 className="text-lg font-black text-textMain mb-4">Roles de tu equipo</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-sm font-bold text-textMain">Capitán (Puntúa doble)</label>
                                         <select 
                                             value={capitanId} 
                                             onChange={e => setCapitanId(e.target.value)}
-                                            className="w-full bg-card border border-border rounded-lg p-3 text-textMain font-medium focus:border-accent focus:outline-none"
+                                            className="bg-card border border-border rounded-xl px-4 py-3 text-sm text-textMain focus:outline-none focus:border-accent"
                                         >
-                                            <option value="">-- Seleccionar Capitán --</option>
-                                            {miPlantel.jugadores.filter(j => j.jugadorReal.id !== Number(sextoHombreId)).map(j => (
-                                                <option key={j.jugadorReal.id} value={j.jugadorReal.id}>{j.jugadorReal.nombreCompleto} ({j.jugadorReal.posicion})</option>
+                                            <option value="">Seleccionar Capitán</option>
+                                            {miPlantel.jugadores.filter(j => j.posicionPlantel !== 'SUPLENTE').map(j => (
+                                                <option key={j.jugadorRealId} value={j.jugadorRealId}>
+                                                    {j.jugador?.nombreCompleto || j.nombreCompleto || 'Jugador'}
+                                                </option>
                                             ))}
                                         </select>
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-semibold mb-2">Sexto Hombre</label>
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-sm font-bold text-textMain">Sexto Hombre (Puntúa mitad)</label>
                                         <select 
                                             value={sextoHombreId} 
                                             onChange={e => setSextoHombreId(e.target.value)}
-                                            className="w-full bg-card border border-border rounded-lg p-3 text-textMain font-medium focus:border-accent focus:outline-none"
+                                            className="bg-card border border-border rounded-xl px-4 py-3 text-sm text-textMain focus:outline-none focus:border-accent"
                                         >
-                                            <option value="">-- Seleccionar Sexto Hombre --</option>
-                                            {miPlantel.jugadores.filter(j => j.jugadorReal.id !== Number(capitanId)).map(j => (
-                                                <option key={j.jugadorReal.id} value={j.jugadorReal.id}>{j.jugadorReal.nombreCompleto} ({j.jugadorReal.posicion})</option>
+                                            <option value="">Seleccionar Sexto Hombre</option>
+                                            {miPlantel.jugadores.filter(j => j.posicionPlantel === 'SUPLENTE').map(j => (
+                                                <option key={j.jugadorRealId} value={j.jugadorRealId}>
+                                                    {j.jugador?.nombreCompleto || j.nombreCompleto || 'Jugador'}
+                                                </option>
                                             ))}
                                         </select>
                                     </div>
                                 </div>
-
-                                <button
-                                    onClick={handleContinuarTorneo}
-                                    disabled={procesandoRoles || !capitanId || !sextoHombreId}
-                                    className="w-full py-4 rounded-xl font-black bg-primary text-white hover:bg-primary/90 active:scale-95 transition-all shadow-lg shadow-primary/20 disabled:opacity-50 disabled:active:scale-100 disabled:cursor-not-allowed"
-                                >
-                                    {procesandoRoles ? 'Guardando...' : 'Ir al Torneo'}
-                                </button>
+                                <div className="mt-6 flex justify-end">
+                                    <button
+                                        onClick={handleContinuarTorneo}
+                                        disabled={procesandoRoles || !capitanId || !sextoHombreId}
+                                        className="bg-accent text-white font-bold py-3 px-8 rounded-xl disabled:opacity-50 hover:bg-accent/80 transition-colors shadow-lg shadow-accent/20"
+                                    >
+                                        {procesandoRoles ? 'Guardando...' : 'Guardar y Continuar al Torneo'}
+                                    </button>
+                                </div>
                             </div>
                         )}
                     </div>
                 </div>
             )}
 
-            {/* ðŸ”® Modal ConfirmaciÃ³n ðŸ”® */}
+            {/* 🔮 Modal Confirmación 🔮 */}
             {confirmModal.open && createPortal(
                 <>
                     <div className="fixed inset-0 bg-black/70 z-[60]" onClick={() => setConfirmModal({ open: false, action: null, message: '', title: '' })} />
@@ -502,7 +541,7 @@ export default function SalaDraftPage() {
                           bg-card border-t border-border rounded-t-3xl md:rounded-3xl
                           z-[70] p-6 space-y-4 animate-slide-up md:animate-none">
                         <div className="w-10 h-1 bg-border rounded-full mx-auto md:hidden" />
-                        <h3 className="text-textMain font-bold text-lg">{confirmModal.title || 'Confirmar acciÃ³n'}</h3>
+                        <h3 className="text-textMain font-bold text-lg">{confirmModal.title || 'Confirmar acción'}</h3>
                         <p className="text-textMuted text-sm">{confirmModal.message}</p>
                         <div className="space-y-2 mt-4">
                             <button
@@ -510,7 +549,7 @@ export default function SalaDraftPage() {
                                 disabled={procesando}
                                 className="w-full py-3 rounded-xl font-semibold bg-accent border border-accent text-white active:scale-95 transition-transform disabled:opacity-50"
                             >
-                                {procesando ? 'Procesando...' : 'SÃ­, confirmar'}
+                                {procesando ? 'Procesando...' : 'Sí, confirmar'}
                             </button>
                             <button
                                 onClick={() => !procesando && setConfirmModal({ open: false, action: null, message: '', title: '' })}
@@ -525,7 +564,7 @@ export default function SalaDraftPage() {
                 document.body
             )}
 
-            {/* ðŸš¨ Modal Error ðŸš¨ */}
+            {/* 🚨 Modal Error 🚨 */}
             {error && createPortal(
                 <>
                     <div className="fixed inset-0 bg-black/70 z-[80]" onClick={() => setError('')} />
@@ -533,9 +572,9 @@ export default function SalaDraftPage() {
                           bg-card border border-red-500/30 rounded-3xl
                           z-[90] p-6 space-y-4 animate-scale-in text-center shadow-2xl shadow-red-500/10">
                         <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto text-red-500 mb-2">
-                            <span className="text-3xl">âš ï¸</span>
+                            <span className="text-3xl">⚠️</span>
                         </div>
-                        <h3 className="text-textMain font-black text-xl">AcciÃ³n InvÃ¡lida</h3>
+                        <h3 className="text-textMain font-black text-xl">Acción Inválida</h3>
                         <p className="text-textMuted text-sm font-medium leading-relaxed">{error}</p>
                         <div className="mt-6 pt-2">
                             <button
@@ -552,4 +591,3 @@ export default function SalaDraftPage() {
         </div>
     )
 }
-

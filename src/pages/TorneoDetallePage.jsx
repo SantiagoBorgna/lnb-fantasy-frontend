@@ -173,9 +173,8 @@ export default function TorneoDetallePage() {
 
     // Mi fila en la tabla activa (solo para mostrar el banner de posición, se basará en el tab en movil o general en PC)
     const miFila = useMemo(() => {
-        const tabla = tab === 'jornada' ? tablaJornada : tablaGeneral
-        return tabla.find(f => f.nombreUsuario === usuario?.nombreDisplay)
-    }, [tab, tablaGeneral, tablaJornada, usuario])
+        return tablaGeneral.find(f => f.nombreUsuario === usuario?.nombreDisplay)
+    }, [tablaGeneral, usuario])
 
     const handleSalir = async () => {
         try {
