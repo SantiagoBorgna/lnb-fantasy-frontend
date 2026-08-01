@@ -139,15 +139,25 @@ export default function SalaDraftPage() {
         setProcesandoRoles(true)
         try {
             const dto = {
+                torneoId: Number(torneoId),
+                dtId: miDt.id,
                 formacion: miPlantel.formacion || '1-2-2',
-                capitanId: Number(capitanId),
-                sextoHombreId: Number(sextoHombreId),
-                posiciones: miPlantel.jugadores.map(j => ({
-                    jugadorRealId: j.jugadorRealId || j.id,
-                    posicionPlantel: j.posicionPlantel
-                }))
+                jugadores: miPlantel.jugadores.map(j => {
+                    const id = j.jugadorRealId || j.id;
+                    let rolFinal = j.posicionPlantel;
+                    if (id === Number(capitanId)) rolFinal = 'CAPITAN';
+                    else if (id === Number(sextoHombreId)) rolFinal = 'SEXTO_HOMBRE';
+                    else {
+                        if (rolFinal === 'CAPITAN') rolFinal = 'TITULAR';
+                        if (rolFinal === 'SEXTO_HOMBRE') rolFinal = 'SUPLENTE';
+                    }
+                    return {
+                        jugadorRealId: id,
+                        rol: rolFinal
+                    };
+                })
             }
-            await guardarPlantel(torneoId, dto)
+            await guardarPlantel(dto)
             navigate(`/t/${encodeId(torneoId)}`)
         } catch (e) {
             setError(e.response?.data?.mensaje || "Error al guardar los roles")
