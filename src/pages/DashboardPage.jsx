@@ -97,7 +97,7 @@ export default function DashboardPage() {
             </div>
 
             {/* ── Header ── */}
-            <div className="flex items-center gap-3 pt-2 cursor-pointer md:hover:opacity-80" onClick={() => setModalPerfilAbierto(true)}>
+            <div className="flex items-center gap-3 !mt-0 md:!mt-2 cursor-pointer md:hover:opacity-80" onClick={() => setModalPerfilAbierto(true)}>
                 <div className="w-12 h-12 rounded-full bg-primary flex items-center
                         justify-center text-white font-bold text-lg shrink-0 overflow-hidden">
                     {usuario?.avatarUrl ? (

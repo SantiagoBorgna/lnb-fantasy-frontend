@@ -81,7 +81,7 @@ export default function AppShell() {
                 <ContextSwitcher />
             </div>
 
-            <main className="flex-1 overflow-y-auto pb-20 px-4 pt-4 md:pb-8 md:px-8 xl:px-16 max-w-md md:max-w-none mx-auto w-full flex flex-col">
+            <main className="flex-1 overflow-y-auto pb-20 px-4 pt-4 md:pb-2 md:px-8 xl:px-16 max-w-md md:max-w-none mx-auto w-full flex flex-col">
                 <div className="flex-1">
                     <Outlet />
                 </div>
