@@ -3,7 +3,8 @@ import { createPortal } from 'react-dom'
 import { waiverApi } from '../../api/waiverApi'
 import { realizarTransferencia } from '../../api/plantelApi'
 import { useUiStore } from '../../store/uiStore'
-
+import CamisetaSVG from '../jugador/CamisetaSVG'
+import clsx from 'clsx'
 export default function SeleccionarSalienteModal({ 
     torneoId, 
     jugadorEntrante, 
@@ -112,14 +113,32 @@ export default function SeleccionarSalienteModal({
                         <p className="text-center text-textMuted text-sm mt-4">No tenés jugadores compatibles para soltar.</p>
                     ) : (
                         jugadoresCompatibles.map((j, i) => (
-                            <div key={j.id ? `${j.id}-${i}` : i} className="bg-card border border-border rounded-xl p-3 flex justify-between items-center">
-                                <div>
-                                    <p className="font-bold text-sm text-textMain">{j.nombreCompleto || j.nombre}</p>
-                                    <p className="text-xs text-textMuted">{j.posicion} · {j.equipoSigla}</p>
+                            <div key={j.id ? `${j.id}-${i}` : i} className="p-3 bg-card rounded-xl border border-border flex items-center justify-between gap-3 shadow-sm hover:border-white/20 transition-colors">
+                                <div className="flex items-center gap-3 flex-1 min-w-0">
+                                    <div className="shrink-0">
+                                        <CamisetaSVG 
+                                            colorPrincipal={j.colorPrincipal}
+                                            colorSecundario={j.colorSecundario}
+                                            numero={isDT ? "DT" : j.numeroCamiseta}
+                                            estado={j.estado}
+                                            modelo={isDT ? 1 : j.modeloCamiseta}
+                                            size={36}
+                                        />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-textMain font-bold text-sm truncate">{j.nombreCompleto || j.nombre}</p>
+                                        <p className="text-textMuted text-xs truncate">{j.posicion} · {j.equipoSigla}</p>
+                                    </div>
+                                    {!isDT && (
+                                        <div className="flex flex-col items-end shrink-0 md:mr-2">
+                                            <span className="text-[10px] text-textMuted uppercase font-bold tracking-wider">Prom</span>
+                                            <span className="font-bold text-sm text-textMain">{(j.promedioPuntosUltimas3 || 0).toFixed(1)}</span>
+                                        </div>
+                                    )}
                                 </div>
                                 <button 
                                     onClick={() => handleConfirmar(j)}
-                                    className="bg-red-500/20 text-red-400 border border-red-500/50 px-3 py-1.5 rounded-lg text-sm font-semibold active:scale-95 transition-transform"
+                                    className="bg-red-500/20 text-red-400 border border-red-500/50 px-3 py-1.5 rounded-lg text-sm font-semibold active:scale-95 transition-transform whitespace-nowrap shrink-0"
                                 >
                                     {esFaseRestringida ? 'Soltar y reclamar' : 'Soltar y fichar'}
                                 </button>

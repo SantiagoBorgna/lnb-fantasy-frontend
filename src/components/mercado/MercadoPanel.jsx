@@ -17,6 +17,7 @@ import { AYUDA } from '../ui/ayudaContenido'
 import { useGameStore } from '../../store/gameStore'
 import { useAuthStore } from '../../store/authStore'
 import SeleccionarSalienteModal from './SeleccionarSalienteModal'
+import ConfirmarTransferenciaModal from './ConfirmarTransferenciaModal'
 import AlertModal from '../ui/AlertModal'
 
 const ZONA_LABEL = {
@@ -58,6 +59,7 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
 
     const [ejecutandoTransferencia, setEjecutandoTransferencia] = useState(false)
     const [errorTransferencia, setErrorTransferencia] = useState('')
+    const [jugadorAConfirmar, setJugadorAConfirmar] = useState(null)
 
     const [listaPrioridad, setListaPrioridad] = useState([])
 
@@ -443,9 +445,17 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
         setDebouncedBusqueda('')
     }, [])
 
-    const handleElegirReemplazo = async (jugadorEntra) => {
+    const handleElegirReemplazo = (jugadorEntra) => {
+        setJugadorAConfirmar(jugadorEntra)
+    }
+
+    const ejecutarTransferencia = async () => {
+        if (!jugadorAConfirmar) return
         setEjecutandoTransferencia(true)
         setErrorTransferencia('')
+        
+        const jugadorEntra = jugadorAConfirmar;
+        setJugadorAConfirmar(null)
 
         try {
             if (contextoActual && esFaseRestringida) {
@@ -1404,6 +1414,32 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
                 titulo={alertConfig.titulo}
                 mensaje={alertConfig.mensaje}
             />
+            {jugadorAConfirmar && (
+                <ConfirmarTransferenciaModal
+                    torneoId={contextoActual}
+                    jugadorSaliente={{
+                        id: transferenciaPendiente.jugadorSaleId,
+                        jugadorRealId: transferenciaPendiente.jugadorSaleId,
+                        precioDeCompra: transferenciaPendiente.precioCompraSale,
+                        valorMercadoActual: transferenciaPendiente.valorSale,
+                        nombreCompleto: transferenciaPendiente.nombreSale,
+                        posicion: transferenciaPendiente.posicion,
+                        equipoSigla: transferenciaPendiente.equipoSigla,
+                        colorPrincipal: transferenciaPendiente.colorPrincipal,
+                        colorSecundario: transferenciaPendiente.colorSecundario,
+                        numeroCamiseta: transferenciaPendiente.numeroCamiseta,
+                        modeloCamiseta: transferenciaPendiente.modeloCamiseta,
+                        estado: transferenciaPendiente.estado
+                    }}
+                    jugadorEntrante={jugadorAConfirmar}
+                    plantelActivo={plantelActivo}
+                    poderDeCompraActual={plantelActivo?.presupuestoRestante || 0}
+                    esFaseRestringida={esFaseRestringida}
+                    loading={ejecutandoTransferencia}
+                    onConfirmar={ejecutarTransferencia}
+                    onCancelar={() => setJugadorAConfirmar(null)}
+                />
+            )}
         </div>
     )
 }
