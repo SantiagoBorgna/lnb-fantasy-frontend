@@ -59,7 +59,7 @@ export default function ConfirmarTransferenciaModal({
             <div className="fixed inset-0 bg-black/60 z-[60]" onClick={!loading ? onCancelar : undefined} />
             <div className="fixed bottom-0 left-0 right-0 md:top-1/2 md:-translate-y-1/2 md:bottom-auto max-w-md mx-auto bg-card rounded-t-3xl md:rounded-3xl z-[60] flex flex-col overflow-hidden animate-slide-up md:animate-scale-up">
                 <div className="p-4 border-b border-white/10 flex justify-between items-center bg-surface/50">
-                    <h2 className="text-xl font-bold text-textMain">Confirmar {isDT ? 'Cambio de DT' : 'Transferencia'}</h2>
+                    <h2 className="text-xl font-bold text-textMain">{esFaseRestringida ? 'Confirmar Reclamo' : (isDT ? 'Cambio de DT' : 'Confirmar Transferencia')}</h2>
                     {!loading && <button onClick={onCancelar} className="text-textMuted text-2xl px-2">&times;</button>}
                 </div>
 

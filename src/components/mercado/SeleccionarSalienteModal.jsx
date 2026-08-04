@@ -140,7 +140,7 @@ export default function SeleccionarSalienteModal({
                                     onClick={() => handleConfirmar(j)}
                                     className="bg-red-500/20 text-red-400 border border-red-500/50 px-3 py-1.5 rounded-lg text-sm font-semibold active:scale-95 transition-transform whitespace-nowrap shrink-0"
                                 >
-                                    {esFaseRestringida ? 'Soltar y reclamar' : 'Soltar y fichar'}
+                                    Soltar
                                 </button>
                             </div>
                         ))

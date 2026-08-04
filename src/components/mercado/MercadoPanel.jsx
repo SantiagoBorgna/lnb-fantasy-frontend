@@ -475,6 +475,7 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
             }
 
             cancelarTransferencia()
+            setEjecutandoTransferencia(false)
             if (onActionComplete) {
                 onActionComplete()
             } else {

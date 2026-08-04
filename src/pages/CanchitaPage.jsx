@@ -517,7 +517,14 @@ export default function CanchitaPage() {
             posicion: jugador.posicion,
             zona,
             nombreSale: jugador.nombreCompleto,
-            valorSale: jugador.valorMercadoActual
+            valorSale: jugador.valorMercadoActual,
+            precioCompraSale: jugador.precioDeCompra || jugador.valorMercadoActual,
+            colorPrincipal: jugador.colorPrincipal,
+            colorSecundario: jugador.colorSecundario,
+            numeroCamiseta: jugador.numeroCamiseta,
+            modeloCamiseta: jugador.modeloCamiseta,
+            estado: jugador.estado,
+            equipoSigla: jugador.equipoSigla
         })
         if (window.innerWidth < 768) {
             navigate('/mercado')
