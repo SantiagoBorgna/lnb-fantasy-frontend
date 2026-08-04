@@ -9,8 +9,8 @@ const SponsorsBanner = ({ className = '' }) => {
     ];
 
     return (
-        <div className={`w-full bg-background border border-border rounded-xl py-4 flex flex-col items-center justify-center gap-3 ${className}`}>
-            <p className="text-[10px] text-textMuted uppercase tracking-widest font-bold">Apoyado por</p>
+        <div className={`w-full bg-background py-4 flex flex-col items-center justify-center gap-3 ${className}`}>
+            <p className="text-[10px] text-textMuted uppercase tracking-widest font-bold">Nos acompañan</p>
             <div className="flex flex-row flex-wrap items-center justify-center gap-6 md:gap-12 px-4">
                 {sponsors.map(s => (
                     <img 
