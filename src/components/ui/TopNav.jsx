@@ -23,7 +23,9 @@ export default function TopNav({ onLogout, className }) {
     return (
         <nav className={clsx("relative bg-card border-b border-border h-16 flex items-center justify-between px-6 shrink-0", className)}>
             <div className="flex items-center gap-4 z-10">
-                <img src="/icons/logo-redondo.png" alt="Sexto Hombre Fantasy" className="h-10 object-contain pointer-events-none drop-shadow-[0_0_1px_#ffffff]" />
+                <NavLink to="/" className="shrink-0 hover:scale-105 transition-transform">
+                    <img src="/icons/logo-redondo.png" alt="Sexto Hombre Fantasy" className="h-10 object-contain drop-shadow-[0_0_1px_#ffffff]" />
+                </NavLink>
                 <ContextSwitcher />
             </div>
 
