@@ -10,7 +10,7 @@ export default function SeleccionarSalienteModal({
     jugadorEntrante, 
     plantelActivo,
     onCerrar, 
-    onExito 
+    onElegir 
 }) {
     const [esFaseRestringida, setEsFaseRestringida] = useState(false)
     const [loading, setLoading] = useState(true)
@@ -52,42 +52,8 @@ export default function SeleccionarSalienteModal({
         jugadoresCompatibles = plantelActivo.jugadores.filter(j => ZONA_POS[j.posicion] === zonaEntrante)
     }
 
-    const handleConfirmar = async (saliente) => {
-        try {
-            if (esFaseRestringida) {
-                if (isDT) {
-                    await waiverApi.registrarReclamo({
-                        torneoId,
-                        dtEntranteId: jugadorEntrante.id || jugadorEntrante.jugadorRealId,
-                        dtSalienteId: saliente.dtId || saliente.id
-                    })
-                } else {
-                    await waiverApi.registrarReclamo({
-                        torneoId,
-                        jugadorEntranteId: jugadorEntrante.id || jugadorEntrante.jugadorRealId,
-                        jugadorSalienteId: saliente.jugadorRealId || saliente.id
-                    })
-                }
-                showToast("Se creó tu reclamo exitosamente.");
-            } else {
-                if (isDT) {
-                    const { cambiarDt } = await import('../../api/plantelApi')
-                    await cambiarDt(jugadorEntrante.id || jugadorEntrante.jugadorRealId, torneoId)
-                } else {
-                    await realizarTransferencia({
-                        jugadorSaleId: saliente.jugadorRealId || saliente.id,
-                        jugadorEntraId: jugadorEntrante.id || jugadorEntrante.jugadorRealId,
-                        torneoId: torneoId,
-                        rolEntrante: saliente.rol
-                    })
-                }
-                showToast("Fichaje exitoso.");
-            }
-            onExito()
-        } catch (e) {
-            showToast(e.response?.data?.mensaje || "Error al realizar el traspaso", "error")
-            onCerrar()
-        }
+    const handleConfirmar = (saliente) => {
+        onElegir(saliente);
     }
 
     return createPortal(

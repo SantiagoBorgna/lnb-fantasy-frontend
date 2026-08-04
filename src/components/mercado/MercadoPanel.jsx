@@ -77,7 +77,7 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
     const [jugadorEntranteParaCambio, setJugadorEntranteParaCambio] = useState(null)
     const [loadingStatsModal, setLoadingStatsModal] = useState(false)
 
-    const { iniciarDesdeEntrada } = useTransferenciaStore()
+    const { iniciarDesdeEntrada, iniciarTransferencia } = useTransferenciaStore()
 
     const iniciarTransferenciaDesdeEntrada = (jugador) => {
         if (contextoActual) {
@@ -1394,18 +1394,29 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
                     jugadorEntrante={jugadorEntranteParaCambio}
                     plantelActivo={plantelActivo}
                     onCerrar={() => setJugadorEntranteParaCambio(null)}
-                    onExito={() => {
-                        setJugadorEntranteParaCambio(null);
-                        // Recargar reclamos y transacciones
-                        import('../../api/waiverApi').then(m => {
-                            m.waiverApi.obtenerMisReclamos(contextoActual).then(setMisReclamos);
-                            m.waiverApi.obtenerHistorialTransacciones(contextoActual, 0).then(res => {
-                                setTransacciones(res.content || res);
-                                setHasMoreTransacciones(res.last === false);
-                                setTransaccionesPage(0);
-                            });
+                    onElegir={(saliente) => {
+                        const zonas = { GUARD: 'BASE', FORWARD: 'ALERO', CENTER: 'PIVOT' };
+                        const esTitular = (r) => r && r.startsWith('TITULAR_');
+                        const idxTitular = esTitular(saliente.rol) ? parseInt(saliente.rol.replace('TITULAR_', '')) - 1 : 0;
+                        const zona = esTitular(saliente.rol) ? (zonas[idxTitular] ?? null) : null;
+                        
+                        iniciarTransferencia({
+                            jugadorSaleId: saliente.jugadorRealId || saliente.dtId || saliente.id,
+                            rolSaliente: saliente.rol,
+                            posicion: saliente.posicion,
+                            zona,
+                            nombreSale: saliente.nombreCompleto,
+                            valorSale: saliente.valorMercadoActual,
+                            precioCompraSale: saliente.precioDeCompra || saliente.valorMercadoActual,
+                            colorPrincipal: saliente.colorPrincipal,
+                            colorSecundario: saliente.colorSecundario,
+                            numeroCamiseta: saliente.numeroCamiseta,
+                            modeloCamiseta: saliente.modeloCamiseta,
+                            estado: saliente.estado,
+                            equipoSigla: saliente.equipoSigla
                         });
-                        showToast(esFaseRestringida ? "Reclamo registrado exitosamente" : "Fichaje exitoso");
+                        setJugadorEntranteParaCambio(null);
+                        setJugadorAConfirmar(jugadorEntranteParaCambio);
                     }}
                 />
             )}

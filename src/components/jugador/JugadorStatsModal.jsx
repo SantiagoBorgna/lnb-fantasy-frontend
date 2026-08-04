@@ -2,7 +2,7 @@ import { createPortal } from 'react-dom'
 import CamisetaSVG from './CamisetaSVG'
 import clsx from 'clsx'
 
-export default function JugadorStatsModal({ jugador, stats, onCerrar }) {
+export default function JugadorStatsModal({ jugador, stats, onCerrar, esDraft }) {
     if (!jugador) return null
 
     const jugoHoy = stats?.jugó
@@ -21,7 +21,7 @@ export default function JugadorStatsModal({ jugador, stats, onCerrar }) {
                     <div className="flex-1">
                         <h3 className="text-textMain font-bold text-lg md:text-xl leading-tight">{jugador.nombreCompleto}</h3>
                         <p className="text-textMuted text-sm md:text-base">{jugador.equipoSigla} · {jugador.posicion}</p>
-                        <p className="text-textMuted text-xs md:text-sm mt-0.5">{jugador.valorMercadoActual?.toFixed(1)} cr</p>
+                        {!esDraft && <p className="text-textMuted text-xs md:text-sm mt-0.5">{jugador.valorMercadoActual?.toFixed(1)} cr</p>}
                     </div>
                     {/* Puntaje Principal */}
                     <div className="text-right">

@@ -637,9 +637,11 @@ export default function CanchitaPage() {
                 <div className="flex items-center justify-end gap-3">
                     <div className="text-right">
                         {modoLectura ? (
-                            <p className="text-accent font-bold text-lg">
-                                {puntajeEnVivo.toFixed(1)} pts
-                            </p>
+                            !contextoActual && (
+                                <p className="text-accent font-bold text-lg">
+                                    {puntajeEnVivo.toFixed(1)} pts
+                                </p>
+                            )
                         ) : contextoActual ? null : (
                             <>
                                 <p className="text-accent font-bold text-lg">{plantel?.presupuestoRestante?.toFixed(1)} cr</p>
@@ -705,9 +707,7 @@ export default function CanchitaPage() {
             )}
 
             {pendienteEntrada && (
-                <div className="bg-primary/20 border border-primary rounded-2xl
-                 px-4 py-3 flex items-center gap-3">
-                    <span className="text-2xl">👇</span>
+                <div className="bg-primary/20 border border-primary rounded-2xl px-4 py-3 flex items-center gap-3">
                     <div className="flex-1 min-w-0">
                         <p className="text-primary font-semibold text-sm">
                             ¿Quién sale por {pendienteEntrada.nombreCompleto.split(',')[0]}? <span className="opacity-75 font-normal text-xs ml-1">({pendienteEntrada.posicion})</span>
@@ -878,7 +878,7 @@ export default function CanchitaPage() {
             />
 
             {jugadorStats && (
-                <JugadorStatsModal jugador={jugadorStats.jugador} stats={jugadorStats.stats} onCerrar={() => setJugadorStats(null)} />
+                <JugadorStatsModal jugador={jugadorStats.jugador} stats={jugadorStats.stats} onCerrar={() => setJugadorStats(null)} esDraft={!!contextoActual} />
             )}
 
             {jugadorParaCambio && (
