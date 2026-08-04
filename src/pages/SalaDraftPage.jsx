@@ -391,7 +391,7 @@ export default function SalaDraftPage() {
                                     <div className="bg-card border border-border rounded p-1.5">
                                         <div className="text-textMuted font-medium text-[10px]">PIVOT</div>
                                         <div className="font-black text-textMain">
-                                            {draftState.turnos.filter(t => t.usuarioId === usuario?.id && t.completado).map(t => jugadoresTodos.find(j => j.id === t.jugadorRealIdElegido)).filter(j => j && j.posicion === 'PIVOT').length}/4
+                                            {draftState.turnos.filter(t => t.usuarioId === usuario?.id && t.completado).map(t => jugadoresTodos.find(j => j.id === t.jugadorRealIdElegido)).filter(j => j && j.posicion === 'PIVOT').length}/3
                                         </div>
                                     </div>
                                 </div>
@@ -438,7 +438,7 @@ export default function SalaDraftPage() {
                                         if (countTeam >= 2) return false;
                                         if (j.posicion === 'BASE' || j.posicion === 'ESCOLTA') return basesEscoltas.length < 4;
                                         if (j.posicion === 'ALERO' || j.posicion === 'ALA_PIVOT') return alerosAlapivots.length < 4;
-                                        if (j.posicion === 'PIVOT') return pivots.length < 4;
+                                        if (j.posicion === 'PIVOT') return pivots.length < 3;
                                         return true;
                                     })
                                     .sort((a, b) => (b.valorMercadoActual || 0) - (a.valorMercadoActual || 0) || a.nombreCompleto.localeCompare(b.nombreCompleto))
