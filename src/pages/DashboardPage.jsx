@@ -189,7 +189,7 @@ export default function DashboardPage() {
             )}
 
             {/* Banner Sponsors: PC (Al fondo del dashboard) */}
-            <div className="hidden md:block pt-4">
+            <div className="hidden md:block">
                 <SponsorsBanner />
             </div>
 
