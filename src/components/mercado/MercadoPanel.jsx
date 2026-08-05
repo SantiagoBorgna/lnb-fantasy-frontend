@@ -81,7 +81,26 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
 
     const iniciarTransferenciaDesdeEntrada = (jugador) => {
         if (contextoActual) {
-            setJugadorEntranteParaCambio(jugador)
+            const isDT = !jugador.posicion || jugador.posicion === 'DT';
+            if (isDT && plantelActivo?.dt) {
+                iniciarTransferencia({
+                    jugadorSaleId: plantelActivo.dt.dtId || plantelActivo.dt.id,
+                    rolSaliente: 'TITULAR',
+                    posicion: 'DT',
+                    nombreSale: plantelActivo.dt.nombreCompleto,
+                    valorSale: 0,
+                    precioCompraSale: 0,
+                    colorPrincipal: plantelActivo.dt.colorPrincipal,
+                    colorSecundario: plantelActivo.dt.colorSecundario,
+                    numeroCamiseta: 'DT',
+                    modeloCamiseta: null,
+                    estado: plantelActivo.dt.estado || 'DISPONIBLE',
+                    equipoSigla: plantelActivo.dt.equipoSigla
+                });
+                setJugadorAConfirmar(jugador);
+            } else {
+                setJugadorEntranteParaCambio(jugador)
+            }
         } else {
             iniciarDesdeEntrada(jugador)
             if (onActionComplete) onActionComplete()
@@ -458,20 +477,29 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
         setJugadorAConfirmar(null)
 
         try {
+            const isDT = !jugadorEntra.posicion || jugadorEntra.posicion === 'DT';
+            
             if (contextoActual && esFaseRestringida) {
                 const { waiverApi } = await import('../../api/waiverApi')
                 await waiverApi.registrarReclamo({
                     torneoId: contextoActual,
-                    jugadorEntranteId: jugadorEntra.id || jugadorEntra.jugadorRealId,
-                    jugadorSalienteId: transferenciaPendiente.jugadorSaleId,
+                    jugadorEntranteId: isDT ? null : (jugadorEntra.id || jugadorEntra.jugadorRealId),
+                    jugadorSalienteId: isDT ? null : transferenciaPendiente.jugadorSaleId,
+                    dtEntranteId: isDT ? (jugadorEntra.id || jugadorEntra.jugadorRealId) : null,
+                    dtSalienteId: isDT ? transferenciaPendiente.jugadorSaleId : null,
                 })
             } else {
-                await realizarTransferencia({
-                    torneoId: contextoActual,
-                    jugadorSaleId: transferenciaPendiente.jugadorSaleId,
-                    jugadorEntraId: jugadorEntra.id || jugadorEntra.jugadorRealId,
-                    rolEntrante: transferenciaPendiente.rolSaliente,
-                })
+                if (isDT) {
+                    const { cambiarDt } = await import('../../api/plantelApi')
+                    await cambiarDt(jugadorEntra.id || jugadorEntra.jugadorRealId, contextoActual)
+                } else {
+                    await realizarTransferencia({
+                        torneoId: contextoActual,
+                        jugadorSaleId: transferenciaPendiente.jugadorSaleId,
+                        jugadorEntraId: jugadorEntra.id || jugadorEntra.jugadorRealId,
+                        rolEntrante: transferenciaPendiente.rolSaliente,
+                    })
+                }
             }
 
             cancelarTransferencia()

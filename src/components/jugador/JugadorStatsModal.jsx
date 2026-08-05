@@ -7,15 +7,18 @@ import { getJugadorStats } from '../../api/mercadoApi'
 export default function JugadorStatsModal({ jugador, stats, onCerrar, esDraft, mostrarPromedios }) {
     if (!jugador) return null
 
+    const isDT = !jugador.posicion;
     const jugoHoy = !mostrarPromedios && stats?.jugó
 
     const { data: statsPromedio, isLoading } = useQuery({
-        queryKey: ['jugadorStats', jugador.jugadorRealId],
-        queryFn: () => getJugadorStats(jugador.jugadorRealId),
-        enabled: !!mostrarPromedios
+        queryKey: ['jugadorStats', jugador.jugadorRealId || jugador.id],
+        queryFn: () => getJugadorStats(jugador.jugadorRealId || jugador.id),
+        enabled: !!mostrarPromedios && !isDT
     })
 
     const renderPromedios = () => {
+        if (isDT) return null;
+        
         if (isLoading) {
             return (
                 <div className="py-6 flex justify-center">
@@ -63,17 +66,17 @@ export default function JugadorStatsModal({ jugador, stats, onCerrar, esDraft, m
                 {/* Cabecera */}
                 <div className="flex items-center gap-4 md:gap-6">
                     <div className="md:scale-125 md:origin-left transition-transform">
-                        <CamisetaSVG colorPrincipal={jugador.colorPrincipal} colorSecundario={jugador.colorSecundario} numero={jugador.numeroCamiseta} estado={jugador.estado} modelo={jugador.modeloCamiseta} size={64} />
+                        <CamisetaSVG colorPrincipal={jugador.colorPrincipal} colorSecundario={jugador.colorSecundario} numero={jugador.posicion ? jugador.numeroCamiseta : 'DT'} estado={jugador.estado} modelo={jugador.modeloCamiseta} size={64} />
                     </div>
                     <div className="flex-1">
                         <h3 className="text-textMain font-bold text-lg md:text-xl leading-tight">{jugador.nombreCompleto}</h3>
-                        <p className="text-textMuted text-sm md:text-base">{jugador.equipoSigla} · {jugador.posicion}</p>
-                        {!esDraft && <p className="text-textMuted text-xs md:text-sm mt-0.5">{jugador.valorMercadoActual?.toFixed(1)} cr</p>}
+                        <p className="text-textMuted text-sm md:text-base">{jugador.equipoSigla} • {jugador.posicion || 'DT'}</p>
+                        {!esDraft && !isDT && <p className="text-textMuted text-xs md:text-sm mt-0.5">{jugador.valorMercadoActual?.toFixed(1)} cr</p>}
                     </div>
                     {/* Puntaje Principal */}
                     <div className="text-right">
-                        <p className={clsx("font-black text-3xl md:text-4xl", (jugoHoy || (mostrarPromedios && statsPromedio)) ? "text-accent" : "text-textMuted")}>
-                            {mostrarPromedios ? (statsPromedio?.promedioFantasy?.toFixed(1) ?? '--') : (jugoHoy ? stats.puntajeFantasy?.toFixed(1) : '--')}
+                        <p className={clsx("font-black text-3xl md:text-4xl", (jugoHoy || (mostrarPromedios && (statsPromedio || isDT))) ? "text-accent" : "text-textMuted")}>
+                            {mostrarPromedios ? (isDT ? (jugador.promedioFantasy?.toFixed(1) ?? '--') : (statsPromedio?.promedioFantasy?.toFixed(1) ?? '--')) : (jugoHoy ? stats.puntajeFantasy?.toFixed(1) : '--')}
                         </p>
                         <p className="text-textMuted text-[10px] uppercase font-bold tracking-wider">
                             Puntos Fantasy
@@ -88,8 +91,9 @@ export default function JugadorStatsModal({ jugador, stats, onCerrar, esDraft, m
                 </div>
 
                 {/* Estadísticas Detalladas */}
-                <div className="bg-surface rounded-2xl p-4 md:p-6 border border-border">
-                    {mostrarPromedios ? renderPromedios() : (
+                {!isDT && (
+                    <div className="bg-surface rounded-2xl p-4 md:p-6 border border-border">
+                        {mostrarPromedios ? renderPromedios() : (
                         jugoHoy ? (
                             <div className="grid grid-cols-2 gap-y-3 gap-x-6 text-sm md:text-base pr-1">
                                 <StatRow label="Titular" value={stats.fueTitular ? 'Sí' : 'No'} />
@@ -114,7 +118,8 @@ export default function JugadorStatsModal({ jugador, stats, onCerrar, esDraft, m
                             </div>
                         )
                     )}
-                </div>
+                    </div>
+                )}
 
                 <div className="space-y-3 pt-2">
                     <button onClick={onCerrar} className="w-full py-3 bg-surface border border-border text-textMain rounded-xl font-bold active:scale-95 transition-transform">

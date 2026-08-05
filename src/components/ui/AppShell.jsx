@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Outlet, useNavigate } from 'react-router-dom'
+import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import BottomNav from './BottomNav'
 import { useAuthStore } from '../../store/authStore'
 import { getMe, logout } from '../../api/authApi'
@@ -12,6 +12,7 @@ import Footer from './Footer'
 
 import { getMisTorneos } from '../../api/torneoApi'
 import { useGameStore } from '../../store/gameStore'
+import { useTransferenciaStore } from '../../store/transferenciaStore'
 
 export default function AppShell() {
     const { token, setAuth, logout: logoutStore } = useAuthStore()
@@ -19,6 +20,15 @@ export default function AppShell() {
     const showToast = useUiStore(state => state.showToast)
     const [modalLogout, setModalLogout] = useState(false)
     const navigate = useNavigate()
+    const location = useLocation()
+    const { cancelarEntrada } = useTransferenciaStore()
+
+    // Cancelar transferencia si salimos de la canchita
+    useEffect(() => {
+        if (!location.pathname.includes('/canchita')) {
+            cancelarEntrada()
+        }
+    }, [location.pathname, cancelarEntrada])
 
     useEffect(() => {
         const channel = new BroadcastChannel('lnb-notifications')

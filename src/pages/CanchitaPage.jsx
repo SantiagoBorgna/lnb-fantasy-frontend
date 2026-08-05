@@ -24,6 +24,7 @@ import ModalAyuda from '../components/ui/ModalAyuda'
 import BotonAyuda from '../components/ui/BotonAyuda'
 import { AYUDA } from '../components/ui/ayudaContenido'
 import MercadoPanel from '../components/mercado/MercadoPanel'
+import ConfirmarTransferenciaModal from '../components/mercado/ConfirmarTransferenciaModal'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 export default function CanchitaPage() {
@@ -50,6 +51,8 @@ export default function CanchitaPage() {
     const [dtModal, setDtModal] = useState(false)
     const [selectorDtAberto, setSelectorDtAberto] = useState(false)
     const [dtStatsAbierto, setDtStatsAbierto] = useState(false)
+    const [dtAConfirmar, setDtAConfirmar] = useState(null)
+    const [ejecutandoCambioDt, setEjecutandoCambioDt] = useState(false)
 
     // ── Switch de jornada (Última Fecha) ─────────────────────────────────────
     const [jornadaAnterior, setJornadaAnterior] = useState(null)
@@ -63,12 +66,6 @@ export default function CanchitaPage() {
 
     const { pendienteEntrada, cancelarEntrada } = useTransferenciaStore()
     const { abierto, abrir, cerrar } = useAyuda('canchita')
-
-    useEffect(() => {
-        return () => {
-            cancelarEntrada();
-        }
-    }, [cancelarEntrada]);
 
     const [partidosFixture, setPartidosFixture] = useState([])
     const [esFaseRestringida, setEsFaseRestringida] = useState(false)
@@ -318,7 +315,14 @@ export default function CanchitaPage() {
         autoGuardar(nuevoPlantel, nuevaForm);
     }
 
-    const handleCambiarDt = async (nuevoDt) => {
+    const handleCambiarDt = (nuevoDt) => {
+        setDtAConfirmar(nuevoDt);
+        setSelectorDtAberto(false);
+    }
+
+    const ejecutarCambioDt = async () => {
+        if (!dtAConfirmar) return;
+        setEjecutandoCambioDt(true);
         try {
             if (contextoActual) {
                 const torneoId = typeof contextoActual === 'object' ? contextoActual?.torneoDraft?.id : contextoActual;
@@ -326,23 +330,25 @@ export default function CanchitaPage() {
                     const { waiverApi } = await import('../api/waiverApi');
                     await waiverApi.registrarReclamo({
                         torneoId,
-                        dtEntranteId: nuevoDt.id,
+                        dtEntranteId: dtAConfirmar.id || dtAConfirmar.jugadorRealId,
                         dtSalienteId: plantel?.dt?.dtId || null
                     });
                     showToast("Se creó tu reclamo de DT exitosamente.");
                 } else {
-                    await cambiarDt(nuevoDt.id, torneoId);
+                    await cambiarDt(dtAConfirmar.id || dtAConfirmar.jugadorRealId, torneoId);
                     showToast("Fichaje de DT exitoso.");
                 }
             } else {
-                await cambiarDt(nuevoDt.id);
+                await cambiarDt(dtAConfirmar.id || dtAConfirmar.jugadorRealId);
+                showToast("Fichaje de DT exitoso.");
             }
             queryClient.invalidateQueries({ queryKey: ['plantel', contextoActual, usuario?.id] })
         } catch (e) {
             setError(e.response?.data?.mensaje ?? 'Error al cambiar de DT.')
             setTimeout(() => setError(''), 3000)
         } finally {
-            setSelectorDtAberto(false)
+            setEjecutandoCambioDt(false);
+            setDtAConfirmar(null);
         }
     }
 
@@ -920,6 +926,33 @@ export default function CanchitaPage() {
                     puntaje={plantelActual.puntajeDt}
                     partidos={partidosFixture}
                     onCerrar={() => setDtStatsAbierto(false)}
+                />
+            )}
+
+            {dtAConfirmar && (
+                <ConfirmarTransferenciaModal
+                    torneoId={contextoActual}
+                    jugadorSaliente={{
+                        id: plantel.dt.dtId,
+                        jugadorRealId: plantel.dt.dtId,
+                        precioDeCompra: 0,
+                        valorMercadoActual: 0,
+                        nombreCompleto: plantel.dt.nombreCompleto,
+                        posicion: 'DT',
+                        equipoSigla: plantel.dt.equipoSigla,
+                        colorPrincipal: plantel.dt.colorPrincipal,
+                        colorSecundario: plantel.dt.colorSecundario,
+                        numeroCamiseta: 'DT',
+                        modeloCamiseta: null,
+                        estado: plantel.dt.estado || 'DISPONIBLE'
+                    }}
+                    jugadorEntrante={dtAConfirmar}
+                    plantelActivo={plantel}
+                    poderDeCompraActual={plantel?.presupuestoRestante || 0}
+                    esFaseRestringida={esFaseRestringida}
+                    loading={ejecutandoCambioDt}
+                    onConfirmar={ejecutarCambioDt}
+                    onCancelar={() => setDtAConfirmar(null)}
                 />
             )}
 
