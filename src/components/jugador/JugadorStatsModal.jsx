@@ -1,11 +1,58 @@
 import { createPortal } from 'react-dom'
 import CamisetaSVG from './CamisetaSVG'
 import clsx from 'clsx'
+import { useQuery } from '@tanstack/react-query'
+import { getJugadorStats } from '../../api/mercadoApi'
 
-export default function JugadorStatsModal({ jugador, stats, onCerrar, esDraft }) {
+export default function JugadorStatsModal({ jugador, stats, onCerrar, esDraft, mostrarPromedios }) {
     if (!jugador) return null
 
-    const jugoHoy = stats?.jugó
+    const jugoHoy = !mostrarPromedios && stats?.jugó
+
+    const { data: statsPromedio, isLoading } = useQuery({
+        queryKey: ['jugadorStats', jugador.jugadorRealId],
+        queryFn: () => getJugadorStats(jugador.jugadorRealId),
+        enabled: !!mostrarPromedios
+    })
+
+    const renderPromedios = () => {
+        if (isLoading) {
+            return (
+                <div className="py-6 flex justify-center">
+                    <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                </div>
+            )
+        }
+        if (!statsPromedio || statsPromedio.partidosJugados === 0) {
+            return (
+                <div className="py-6 text-center text-textMuted flex flex-col items-center gap-2">
+                    <span className="text-3xl">🏜️</span>
+                    <p className="font-medium text-sm">Todavía no tiene estadísticas.</p>
+                </div>
+            )
+        }
+        return (
+            <div className="grid grid-cols-2 gap-y-3 gap-x-6 text-sm md:text-base max-h-64 overflow-y-auto pr-1">
+                <div className="col-span-2 text-center pb-2 border-b border-border mb-2">
+                    <p className="text-textMuted text-[10px] uppercase font-bold tracking-wider">
+                        Promedios ({statsPromedio.partidosJugados} {statsPromedio.partidosJugados === 1 ? 'partido' : 'partidos'})
+                    </p>
+                </div>
+                <StatRow label="Puntos" value={statsPromedio.promedioPuntos?.toFixed(1)} />
+                <StatRow label="Asistencias" value={statsPromedio.promedioAsistencias?.toFixed(1)} />
+                <StatRow label="Reb. Def." value={statsPromedio.promedioRebotesDefensivos?.toFixed(1)} />
+                <StatRow label="Reb. Of." value={statsPromedio.promedioRebotesOfensivos?.toFixed(1)} />
+                <StatRow label="Recuperos" value={statsPromedio.promedioRobos?.toFixed(1)} />
+                <StatRow label="Tapones" value={statsPromedio.promedioTaponesRealizados?.toFixed(1)} />
+                <StatRow label="Faltas Recibidas" value={statsPromedio.promedioFaltasRecibidas?.toFixed(1)} />
+                <StatRow label="Pérdidas" value={statsPromedio.promedioPerdidas?.toFixed(1)} warning />
+                <StatRow label="Tap. Recibidos" value={statsPromedio.promedioTaponesRecibidos?.toFixed(1)} warning />
+                <StatRow label="Faltas Cometidas" value={statsPromedio.promedioFaltasCometidas?.toFixed(1)} warning />
+                <StatRow label="TC Fallados" value={statsPromedio.promedioTirosCampoFallados?.toFixed(1)} warning />
+                <StatRow label="TL Fallados" value={statsPromedio.promedioTirosLibresFallados?.toFixed(1)} warning />
+            </div>
+        )
+    }
 
     return createPortal(
         <>
@@ -25,8 +72,8 @@ export default function JugadorStatsModal({ jugador, stats, onCerrar, esDraft })
                     </div>
                     {/* Puntaje Principal */}
                     <div className="text-right">
-                        <p className={clsx("font-black text-3xl md:text-4xl", jugoHoy ? "text-accent" : "text-textMuted")}>
-                            {jugoHoy ? stats.puntajeFantasy?.toFixed(1) : '--'}
+                        <p className={clsx("font-black text-3xl md:text-4xl", (jugoHoy || (mostrarPromedios && statsPromedio)) ? "text-accent" : "text-textMuted")}>
+                            {mostrarPromedios ? (statsPromedio?.promedioFantasy?.toFixed(1) ?? '--') : (jugoHoy ? stats.puntajeFantasy?.toFixed(1) : '--')}
                         </p>
                         <p className="text-textMuted text-[10px] uppercase font-bold tracking-wider">
                             Puntos Fantasy
@@ -42,28 +89,30 @@ export default function JugadorStatsModal({ jugador, stats, onCerrar, esDraft })
 
                 {/* Estadísticas Detalladas */}
                 <div className="bg-surface rounded-2xl p-4 md:p-6 border border-border">
-                    {jugoHoy ? (
-                        <div className="grid grid-cols-2 gap-y-3 gap-x-6 text-sm md:text-base max-h-64 overflow-y-auto pr-1">
-                            <StatRow label="Titular" value={stats.fueTitular ? 'Sí' : 'No'} />
-                            <StatRow label="Victoria" value={stats.gano ? 'Sí' : 'No'} />
-                            <StatRow label="Puntos" value={stats.puntos} />
-                            <StatRow label="Asistencias" value={stats.asistencias} />
-                            <StatRow label="Reb. Def." value={stats.rebotesDefensivos} />
-                            <StatRow label="Reb. Of." value={stats.rebotesOfensivos} />
-                            <StatRow label="Recuperos" value={stats.recuperaciones} />
-                            <StatRow label="Tapones" value={stats.taponesRealizados} />
-                            <StatRow label="Faltas Recibidas" value={stats.faltasRecibidas} />
-                            <StatRow label="Pérdidas" value={stats.perdidas} warning />
-                            <StatRow label="Tap. Recibidos" value={stats.taponesRecibidos} warning />
-                            <StatRow label="Faltas Cometidas" value={stats.faltasCometidas} warning />
-                            <StatRow label="TC Fallados" value={stats.tirosDeCampoFallados} warning />
-                            <StatRow label="TL Fallados" value={stats.tirosLibresFallados} warning />
-                        </div>
-                    ) : (
-                        <div className="py-6 text-center text-textMuted flex flex-col items-center gap-2">
-                            <span className="text-3xl">⏳</span>
-                            <p className="font-medium text-sm">Todavía no jugó en esta jornada.</p>
-                        </div>
+                    {mostrarPromedios ? renderPromedios() : (
+                        jugoHoy ? (
+                            <div className="grid grid-cols-2 gap-y-3 gap-x-6 text-sm md:text-base max-h-64 overflow-y-auto pr-1">
+                                <StatRow label="Titular" value={stats.fueTitular ? 'Sí' : 'No'} />
+                                <StatRow label="Victoria" value={stats.gano ? 'Sí' : 'No'} />
+                                <StatRow label="Puntos" value={stats.puntos} />
+                                <StatRow label="Asistencias" value={stats.asistencias} />
+                                <StatRow label="Reb. Def." value={stats.rebotesDefensivos} />
+                                <StatRow label="Reb. Of." value={stats.rebotesOfensivos} />
+                                <StatRow label="Recuperos" value={stats.recuperaciones} />
+                                <StatRow label="Tapones" value={stats.taponesRealizados} />
+                                <StatRow label="Faltas Recibidas" value={stats.faltasRecibidas} />
+                                <StatRow label="Pérdidas" value={stats.perdidas} warning />
+                                <StatRow label="Tap. Recibidos" value={stats.taponesRecibidos} warning />
+                                <StatRow label="Faltas Cometidas" value={stats.faltasCometidas} warning />
+                                <StatRow label="TC Fallados" value={stats.tirosDeCampoFallados} warning />
+                                <StatRow label="TL Fallados" value={stats.tirosLibresFallados} warning />
+                            </div>
+                        ) : (
+                            <div className="py-6 text-center text-textMuted flex flex-col items-center gap-2">
+                                <span className="text-3xl">⏳</span>
+                                <p className="font-medium text-sm">Todavía no jugó en esta jornada.</p>
+                            </div>
+                        )
                     )}
                 </div>
 
@@ -80,13 +129,13 @@ export default function JugadorStatsModal({ jugador, stats, onCerrar, esDraft })
 
 function StatRow({ label, value, warning = false }) {
     // Para valores booleanos ("Sí"/"No"), evitamos pintar de rojo los "Sí" por error.
-    const esValorNegativo = warning && typeof value === 'number' && value > 0
+    const esValorNegativo = warning && typeof value !== 'boolean' && value !== 'Sí' && value !== 'No' && Number(value) > 0
 
     return (
         <div className="flex justify-between items-center border-b border-white/5 pb-1">
             <span className="text-textMuted">{label}</span>
             <span className={clsx("font-bold tabular-nums", esValorNegativo ? "text-red-400" : "text-textMain")}>
-                {value}
+                {value ?? '0.0'}
             </span>
         </div>
     )

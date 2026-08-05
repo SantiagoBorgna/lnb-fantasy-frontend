@@ -270,9 +270,10 @@ export default function CanchitaAjenaPage() {
             {jugadorStats && (
                 <JugadorStatsModal 
                     jugador={jugadorStats.jugador} 
-                    stats={jugadorStats.stats} 
+                    stats={null} 
                     onCerrar={() => setJugadorStats(null)} 
                     esDraft={torneo?.modalidad === 'DRAFT'}
+                    mostrarPromedios={true}
                 />
             )}
 
