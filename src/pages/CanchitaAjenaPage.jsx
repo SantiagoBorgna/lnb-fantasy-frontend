@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { getPlantelAjeno, getEstadisticasAjenas, getPlantelActualAjeno, getEstadisticasActualesAjenas } from '../api/plantelApi'
+import { getTorneo } from '../api/torneoApi'
 import { encodeId, decodeMultiple } from '../utils/urlParams'
 import SlotJugador from '../components/plantel/SlotJugador'
 import JugadorStatsModal from '../components/jugador/JugadorStatsModal'
@@ -18,6 +19,7 @@ export default function CanchitaAjenaPage() {
     const navigate = useNavigate()
 
     const [plantel, setPlantel] = useState(null)
+    const [torneo, setTorneo] = useState(null)
     const [estadisticas, setEstadisticas] = useState({})
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
@@ -38,13 +40,15 @@ export default function CanchitaAjenaPage() {
 
         Promise.all([
             fetchPlantel,
-            fetchEstadisticas
+            fetchEstadisticas,
+            torneoId ? getTorneo(torneoId) : Promise.resolve(null)
         ])
-        .then(([plantelData, statsData]) => {
+        .then(([plantelData, statsData, torneoData]) => {
             setPlantel(plantelData)
             const mapStats = {}
             statsData.forEach(s => mapStats[s.jugadorRealId] = s)
             setEstadisticas(mapStats)
+            setTorneo(torneoData)
             setLoading(false)
         })
         .catch(err => {
@@ -135,7 +139,9 @@ export default function CanchitaAjenaPage() {
                             </div>
                         </div>
                         <div className="text-right">
-                            <p className="text-accent font-bold text-base md:text-lg">{puntajeEnVivo.toFixed(1)} pts</p>
+                            {torneo?.modalidad !== 'DRAFT' && (
+                                <p className="text-accent font-bold text-base md:text-lg">{puntajeEnVivo.toFixed(1)} pts</p>
+                            )}
                         </div>
                     </div>
 
@@ -266,6 +272,7 @@ export default function CanchitaAjenaPage() {
                     jugador={jugadorStats.jugador} 
                     stats={jugadorStats.stats} 
                     onCerrar={() => setJugadorStats(null)} 
+                    esDraft={torneo?.modalidad === 'DRAFT'}
                 />
             )}
 
