@@ -95,12 +95,10 @@ export default function SeleccionarSalienteModal({
                                         <p className="text-textMain font-bold text-sm truncate">{j.nombreCompleto || j.nombre}</p>
                                         <p className="text-textMuted text-xs truncate">{j.posicion} · {j.equipoSigla}</p>
                                     </div>
-                                    {!isDT && (
-                                        <div className="flex flex-col items-end shrink-0 md:mr-2">
-                                            <span className="text-[10px] text-textMuted uppercase font-bold tracking-wider">Prom</span>
-                                            <span className="font-bold text-sm text-textMain">{(j.promedioPuntosUltimas3 || 0).toFixed(1)}</span>
-                                        </div>
-                                    )}
+                                    <div className="flex flex-col items-end shrink-0 md:mr-2">
+                                        <span className="text-[10px] text-textMuted uppercase font-bold tracking-wider">Prom</span>
+                                        <span className="font-bold text-sm text-textMain">{isDT ? (j.promedioFantasy || 0).toFixed(1) : (j.promedioPuntosUltimas3 || 0).toFixed(1)}</span>
+                                    </div>
                                 </div>
                                 <button 
                                     onClick={() => handleConfirmar(j)}

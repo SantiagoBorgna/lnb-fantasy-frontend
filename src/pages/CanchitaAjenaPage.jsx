@@ -216,13 +216,12 @@ export default function CanchitaAjenaPage() {
                                 <p className="text-textMain font-semibold text-sm truncate">{plantel.dt.nombreCompleto}</p>
                                 <p className="text-textMuted text-xs">{plantel.dt.equipoSigla}</p>
                             </div>
-                            {plantel.puntajeDt != null && (
+                            {plantel.dt.promedioFantasy != null && (
                                 <div className="flex flex-col items-end shrink-0">
-                                    <span className={`font-black text-lg tabular-nums ${plantel.puntajeDt >= 0 ? 'text-accent' : 'text-red-400'}`}>
-                                        {plantel.puntajeDt > 0 ? '+' : ''}
-                                        {plantel.puntajeDt?.toFixed(1)}
+                                    <span className={`font-black text-lg tabular-nums ${plantel.dt.promedioFantasy >= 0 ? 'text-accent' : 'text-red-400'}`}>
+                                        {plantel.dt.promedioFantasy?.toFixed(1)}
                                     </span>
-                                    <span className="text-textMuted text-xs">pts DT</span>
+                                    <span className="text-textMuted text-[10px] uppercase font-bold tracking-wider">Promedio</span>
                                 </div>
                             )}
                         </div>

@@ -64,6 +64,12 @@ export default function CanchitaPage() {
     const { pendienteEntrada, cancelarEntrada } = useTransferenciaStore()
     const { abierto, abrir, cerrar } = useAyuda('canchita')
 
+    useEffect(() => {
+        return () => {
+            cancelarEntrada();
+        }
+    }, [cancelarEntrada]);
+
     const [partidosFixture, setPartidosFixture] = useState([])
     const [esFaseRestringida, setEsFaseRestringida] = useState(false)
 

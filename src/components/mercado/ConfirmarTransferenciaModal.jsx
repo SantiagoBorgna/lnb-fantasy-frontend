@@ -42,6 +42,9 @@ export default function ConfirmarTransferenciaModal({
             />
             <p className="font-bold text-sm text-textMain mt-3 text-center line-clamp-1">{isDT && isSaliente ? plantelActivo?.dt?.nombreCompleto : (j.nombreCompleto || j.nombre)}</p>
             <p className="text-xs text-textMuted text-center">{isDT ? 'DT' : j.posicion} · {j.equipoSigla}</p>
+            <p className="text-xs text-textMuted font-bold mt-1 text-center">
+                Prom: {isDT ? (j.promedioFantasy || 0).toFixed(1) : (j.promedioPuntosUltimas3 || 0).toFixed(1)} pts
+            </p>
             
             {!esModoDraft && !isDT && (
                 <p className={clsx(

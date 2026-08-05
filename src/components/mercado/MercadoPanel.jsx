@@ -1498,9 +1498,9 @@ function TarjetaJugador({ jugador, onElegir, onVerDetalles, presupuestoMaximo, m
                         {estado.label}
                     </span>
                 </div>
-                {jugador.promedioPuntosUltimas3 > 0 && (
+                {(jugador.promedioPuntosUltimas3 > 0 || jugador.promedioFantasy > 0) && (
                     <p className="text-textMuted text-xs mt-0.5">
-                        Prom. Fantasy: <span className="text-accent font-semibold">{jugador.promedioPuntosUltimas3.toFixed(1)}</span> pts
+                        Prom. Fantasy: <span className="text-accent font-semibold">{jugador.posicion ? (jugador.promedioPuntosUltimas3 || 0).toFixed(1) : (jugador.promedioFantasy || 0).toFixed(1)}</span> pts
                     </p>
                 )}
             </div>
