@@ -32,7 +32,7 @@ export default function JugadorStatsModal({ jugador, stats, onCerrar, esDraft, m
             )
         }
         return (
-            <div className="grid grid-cols-2 gap-y-3 gap-x-6 text-sm md:text-base max-h-64 overflow-y-auto pr-1">
+            <div className="grid grid-cols-2 gap-y-3 gap-x-6 text-sm md:text-base pr-1">
                 <div className="col-span-2 text-center pb-2 border-b border-border mb-2">
                     <p className="text-textMuted text-[10px] uppercase font-bold tracking-wider">
                         Promedios ({statsPromedio.partidosJugados} {statsPromedio.partidosJugados === 1 ? 'partido' : 'partidos'})
@@ -57,7 +57,7 @@ export default function JugadorStatsModal({ jugador, stats, onCerrar, esDraft, m
     return createPortal(
         <>
             <div className="fixed inset-0 bg-black/60 z-40" onClick={onCerrar} />
-            <div className="fixed bottom-0 md:top-1/2 md:-translate-y-1/2 md:bottom-auto left-0 right-0 max-w-md md:max-w-lg mx-auto bg-card border-t border-border rounded-t-3xl md:rounded-3xl z-50 p-6 md:p-8 space-y-5 md:space-y-6 animate-slide-up md:animate-none" onClick={e => e.stopPropagation()} onPointerDown={e => e.stopPropagation()}>
+            <div className="fixed bottom-0 md:top-1/2 md:-translate-y-1/2 md:bottom-auto left-0 right-0 max-w-md md:max-w-lg mx-auto bg-card border-t border-border rounded-t-3xl md:rounded-3xl z-50 p-6 md:p-8 space-y-5 md:space-y-6 animate-slide-up md:animate-none max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()} onPointerDown={e => e.stopPropagation()}>
                 <div className="w-10 h-1 bg-border rounded-full mx-auto md:hidden" />
 
                 {/* Cabecera */}
@@ -91,7 +91,7 @@ export default function JugadorStatsModal({ jugador, stats, onCerrar, esDraft, m
                 <div className="bg-surface rounded-2xl p-4 md:p-6 border border-border">
                     {mostrarPromedios ? renderPromedios() : (
                         jugoHoy ? (
-                            <div className="grid grid-cols-2 gap-y-3 gap-x-6 text-sm md:text-base max-h-64 overflow-y-auto pr-1">
+                            <div className="grid grid-cols-2 gap-y-3 gap-x-6 text-sm md:text-base pr-1">
                                 <StatRow label="Titular" value={stats.fueTitular ? 'Sí' : 'No'} />
                                 <StatRow label="Victoria" value={stats.gano ? 'Sí' : 'No'} />
                                 <StatRow label="Puntos" value={stats.puntos} />
