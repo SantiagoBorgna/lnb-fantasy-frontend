@@ -31,9 +31,8 @@ export default function AuthCallbackPage() {
             .then(usuario => {
                 setAuth(token, usuario)
                 
-                const redirectTarget = localStorage.getItem('redirectUrl') || '/';
-                localStorage.removeItem('redirectUrl'); // Limpiamos la memoria
-                navigate(redirectTarget, { replace: true });
+                localStorage.removeItem('redirectUrl'); // Limpiamos la memoria por si quedó algo guardado
+                navigate('/', { replace: true });
             })
             .catch(() => {
                 // Token inválido o expirado

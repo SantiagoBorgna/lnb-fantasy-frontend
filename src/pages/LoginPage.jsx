@@ -17,7 +17,7 @@ export default function LoginPage() {
 
             {/* Logo / Título */}
             <div className="mb-12 text-center">
-                <img src="/icons/logo-cuadrado.jpg" alt="Sexto Hombre Fantasy" className="w-28 h-28 mx-auto mb-6 object-cover rounded-[22px] drop-shadow-xl" />
+                <img src="/icons/logo-cuadrado.jpg" alt="Sexto Hombre Fantasy" className="w-40 h-40 md:w-56 md:h-56 mx-auto mb-6 object-cover rounded-[22px] drop-shadow-xl" />
                 <h1 className="text-3xl font-bold text-white tracking-tight">Sexto Hombre Fantasy</h1>
                 <p className="text-textMuted mt-3 text-sm font-medium">
                     La Liga Nacional de Básquet, a tu manera
