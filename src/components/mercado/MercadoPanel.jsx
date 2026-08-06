@@ -60,6 +60,7 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
     const [ejecutandoTransferencia, setEjecutandoTransferencia] = useState(false)
     const [errorTransferencia, setErrorTransferencia] = useState('')
     const [jugadorAConfirmar, setJugadorAConfirmar] = useState(null)
+    const [startedDtTransferFromMarket, setStartedDtTransferFromMarket] = useState(false)
 
     const [listaPrioridad, setListaPrioridad] = useState([])
 
@@ -83,6 +84,7 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
         if (contextoActual) {
             const isDT = !jugador.posicion || jugador.posicion === 'DT';
             if (isDT && plantelActivo?.dt) {
+                if (!transferenciaPendiente) setStartedDtTransferFromMarket(true);
                 iniciarTransferencia({
                     jugadorSaleId: plantelActivo.dt.dtId || plantelActivo.dt.id,
                     rolSaliente: 'TITULAR',
@@ -612,7 +614,7 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
             )}
 
             {/* BANNER TRANSFERENCIA */}
-            {modoTransferencia && !modoAsignacion && (
+            {modoTransferencia && !modoAsignacion && !startedDtTransferFromMarket && (
                 <div className="bg-accent/15 border border-accent rounded-2xl px-4 py-3 flex items-center gap-3">
                     <div className="flex-1 min-w-0">
                         <p className="text-accent font-semibold text-sm">{contextoActual ? "Proponer traspaso" : "Elegí el reemplazo"}</p>
@@ -1484,7 +1486,13 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
                     esFaseRestringida={esFaseRestringida}
                     loading={ejecutandoTransferencia}
                     onConfirmar={ejecutarTransferencia}
-                    onCancelar={() => setJugadorAConfirmar(null)}
+                    onCancelar={() => {
+                        setJugadorAConfirmar(null);
+                        if (startedDtTransferFromMarket) {
+                            cancelarTransferencia();
+                            setStartedDtTransferFromMarket(false);
+                        }
+                    }}
                 />
             )}
         </div>
