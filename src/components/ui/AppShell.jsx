@@ -21,14 +21,23 @@ export default function AppShell() {
     const [modalLogout, setModalLogout] = useState(false)
     const navigate = useNavigate()
     const location = useLocation()
-    const { cancelarEntrada } = useTransferenciaStore()
+    const { cancelarEntrada, cancelarTransferencia } = useTransferenciaStore()
+    const contextoActual = useGameStore(state => state.contextoActual)
 
-    // Cancelar transferencia si salimos de la canchita
+    // Cancelar transferencias si salimos de su ǭmbito o cambiamos de contexto
     useEffect(() => {
         if (!location.pathname.includes('/canchita')) {
             cancelarEntrada()
         }
-    }, [location.pathname, cancelarEntrada])
+        if (!location.pathname.includes('/mercado')) {
+            cancelarTransferencia()
+        }
+    }, [location.pathname, cancelarEntrada, cancelarTransferencia])
+
+    useEffect(() => {
+        cancelarEntrada()
+        cancelarTransferencia()
+    }, [contextoActual, cancelarEntrada, cancelarTransferencia])
 
     useEffect(() => {
         const channel = new BroadcastChannel('lnb-notifications')

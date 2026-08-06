@@ -13,7 +13,7 @@ export default function ConfirmarTransferenciaModal({
     esFaseRestringida,
     loading
 }) {
-    const isDT = jugadorEntrante.esDT;
+    const isDT = !jugadorEntrante.posicion || jugadorEntrante.posicion === 'DT';
     const esModoDraft = torneoId != null;
 
     // Calculos de transferencias
@@ -27,20 +27,22 @@ export default function ConfirmarTransferenciaModal({
     const diferencia = precioVenta - precioCompra;
     const nuevoPresupuesto = poderDeCompraActual + diferencia;
 
-    const renderJugador = (j, isSaliente) => (
+    const renderJugador = (j, isSaliente) => {
+        const esEstedDT = !j.posicion || j.posicion === 'DT';
+        return (
         <div className="flex flex-col items-center flex-1">
             <p className="text-[10px] font-bold text-textMuted uppercase tracking-wider mb-2">
                 {isSaliente ? 'Sale' : 'Entra'}
             </p>
             <CamisetaSVG 
-                colorPrincipal={isDT && isSaliente ? plantelActivo?.dt?.colorPrincipal : j.colorPrincipal}
-                colorSecundario={isDT && isSaliente ? plantelActivo?.dt?.colorSecundario : j.colorSecundario}
-                numero={isDT ? "DT" : j.numeroCamiseta}
-                estado={isDT ? "ACTIVO" : j.estado}
-                modelo={isDT ? 1 : j.modeloCamiseta}
+                colorPrincipal={esEstedDT && isSaliente ? plantelActivo?.dt?.colorPrincipal : j.colorPrincipal}
+                colorSecundario={esEstedDT && isSaliente ? plantelActivo?.dt?.colorSecundario : j.colorSecundario}
+                numero={esEstedDT ? "DT" : j.numeroCamiseta}
+                estado={esEstedDT ? "ACTIVO" : j.estado}
+                modelo={esEstedDT ? 1 : j.modeloCamiseta}
                 size={56}
             />
-            <p className="font-bold text-sm text-textMain mt-3 text-center line-clamp-1">{isDT && isSaliente ? plantelActivo?.dt?.nombreCompleto : (j.nombreCompleto || j.nombre)}</p>
+            <p className="font-bold text-sm text-textMain mt-3 text-center line-clamp-1">{esEstedDT && isSaliente ? plantelActivo?.dt?.nombreCompleto : (j.nombreCompleto || j.nombre)}</p>
             <p className="text-xs text-textMuted text-center">{isDT ? 'DT' : j.posicion} · {j.equipoSigla}</p>
             <p className="text-xs text-textMuted font-bold mt-1 text-center">
                 Prom: {isDT ? (j.promedioFantasy || 0).toFixed(1) : (j.promedioPuntosUltimas3 || 0).toFixed(1)} pts
@@ -55,7 +57,8 @@ export default function ConfirmarTransferenciaModal({
                 </p>
             )}
         </div>
-    );
+        );
+    };
 
     return createPortal(
         <>

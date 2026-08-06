@@ -554,10 +554,9 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
     }, [jugadoresVisiblesBase, limiteVisible])
 
     const abrirModalJugador = async (jugador) => {
-        // En modo asignación o transferencia, el tap ya tiene otra función
-        // Solo abrir el modal en modo browsing normal
         if (modoAsignacion || modoTransferencia) return
-
+        const isDT = !jugador.posicion || jugador.posicion === 'DT';
+        if (isDT) return;
         setModalJugador(jugador)
         setLoadingStatsModal(true)
         try {
@@ -1490,7 +1489,8 @@ function TarjetaJugador({ jugador, onElegir, onVerDetalles, presupuestoMaximo, m
     // Bloqueamos si supera el presupuesto tanto armando el equipo como haciendo un cambio
     const superaPresupuesto = (modoTransferencia || modoAsignacion) && (!contextoActual && jugador.valorMercadoActual > presupuestoMaximo);
     
-    const superaLimiteEquipo = (modoTransferencia || modoAsignacion) && (limitesEquipo?.[jugador.equipoSigla] >= 2);
+    const isDT = !jugador.posicion || jugador.posicion === 'DT';
+    const superaLimiteEquipo = !isDT && (modoTransferencia || modoAsignacion) && (limitesEquipo?.[jugador.equipoSigla] >= 2);
     const estaBloqueado = superaPresupuesto || superaLimiteEquipo;
 
     return (
