@@ -556,7 +556,10 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
     const abrirModalJugador = async (jugador) => {
         if (modoAsignacion || modoTransferencia) return
         const isDT = !jugador.posicion || jugador.posicion === 'DT';
-        if (isDT) return;
+        if (isDT) {
+            iniciarTransferenciaDesdeEntrada(jugador);
+            return;
+        }
         setModalJugador(jugador)
         setLoadingStatsModal(true)
         try {

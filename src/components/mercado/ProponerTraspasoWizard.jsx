@@ -236,7 +236,7 @@ export default function ProponerTraspasoWizard({ torneoId, equipoVirtualId, jorn
                                         </div>
                                         <div className="flex flex-col items-end">
                                             <span className="text-[10px] text-textMuted uppercase font-bold tracking-wider">Prom</span>
-                                            <span className="font-bold text-sm text-textMain">-</span>
+                                            <span className="font-bold text-sm text-textMain">{(plantelAjeno.dt.promedioFantasy || 0).toFixed(1)}</span>
                                         </div>
                                     </div>
                                 )}
@@ -312,7 +312,7 @@ export default function ProponerTraspasoWizard({ torneoId, equipoVirtualId, jorn
                                         </div>
                                         <div className="flex flex-col items-end">
                                             <span className="text-[10px] text-textMuted uppercase font-bold tracking-wider">Prom</span>
-                                            <span className="font-bold text-sm text-textMain">-</span>
+                                            <span className="font-bold text-sm text-textMain">{(plantelPropio.dt.promedioFantasy || 0).toFixed(1)}</span>
                                         </div>
                                     </div>
                                 )}
