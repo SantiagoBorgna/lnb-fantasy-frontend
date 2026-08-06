@@ -555,12 +555,10 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
 
     const abrirModalJugador = async (jugador) => {
         if (modoAsignacion || modoTransferencia) return
-        const isDT = !jugador.posicion || jugador.posicion === 'DT';
-        if (isDT) {
-            iniciarTransferenciaDesdeEntrada(jugador);
-            return;
-        }
         setModalJugador(jugador)
+        const isDT = !jugador.posicion || jugador.posicion === 'DT';
+        if (isDT) return; // DTs don't have detailed stats in getJugadorStats
+        
         setLoadingStatsModal(true)
         try {
             const stats = await getJugadorStats(jugador.id)
@@ -571,6 +569,7 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
             setLoadingStatsModal(false)
         }
     }
+
 
     return (
         <div className={clsx("w-full relative", layout === 'full' ? "space-y-4 min-h-screen pb-12 pt-4 px-4" : "h-full flex flex-col space-y-4")}>
@@ -1335,7 +1334,12 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
                         </div>
 
                         {/* Stats - Diseño estilo Canchita */}
-                        {loadingStatsModal ? (
+                        {(!modalJugador.posicion || modalJugador.posicion === 'DT') ? (
+                            <div className="bg-surface/50 rounded-2xl p-4 md:p-6 mt-2 border border-white/5 flex flex-col items-center justify-center">
+                                <p className="text-textMuted text-[10px] md:text-xs font-bold uppercase tracking-wider mb-2">Promedio Fantasy</p>
+                                <p className="text-accent font-black text-3xl">{(modalJugador.promedioFantasy || 0).toFixed(1)}</p>
+                            </div>
+                        ) : loadingStatsModal ? (
                             <div className="flex justify-center py-4">
                                 <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                             </div>
@@ -1378,7 +1382,8 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
 
                         {/* Botón transferir */}
                         {(() => {
-                            const superaLimiteModal = limitesEquipo[modalJugador?.equipoSigla] >= 2;
+                            const isDTModal = !modalJugador?.posicion || modalJugador?.posicion === 'DT';
+                            const superaLimiteModal = !isDTModal && limitesEquipo[modalJugador?.equipoSigla] >= 2;
                             const botonBloqueado = superaLimiteModal || mercadoCerrado;
                             return (
                                 <button
@@ -1396,7 +1401,7 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
                                             : "border-primary text-primary active:scale-95"
                                     )}
                                 >
-                                    {mercadoCerrado ? "Mercado cerrado" : superaLimiteModal ? "Límite de equipo alcanzado" : (contextoActual && esFaseRestringida ? "Intentar fichar" : "Transferir al equipo")}
+                                    {mercadoCerrado ? "Mercado cerrado" : superaLimiteModal ? "Límite de equipo alcanzado" : (contextoActual ? (esFaseRestringida ? "Intentar fichar" : "Fichar") : "Transferir al equipo")}
                                 </button>
                             );
                         })()}
