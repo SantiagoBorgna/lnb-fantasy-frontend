@@ -374,7 +374,7 @@ export default function SalaDraftPage() {
                             
                             {/* Resumen del Plantel del Usuario */}
                             <div className="bg-surface rounded-xl p-3 border border-border">
-                                <h4 className="text-xs font-bold text-textMain mb-2 uppercase tracking-wider">Tu Plantel (Mín 2, Máx 4 por grupo)</h4>
+                                <h4 className="text-xs font-bold text-textMain mb-2 uppercase tracking-wider">Tu Plantel (Mín 2 por grupo)</h4>
                                 <div className="grid grid-cols-3 gap-2 text-center text-xs">
                                     <div className="bg-card border border-border rounded p-1.5">
                                         <div className="text-textMuted font-medium text-[10px]">BASE/ESC</div>
