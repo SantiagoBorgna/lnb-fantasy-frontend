@@ -23,3 +23,6 @@ export const activarUsuario = () =>
 
 export const getEquiposParaOnboarding = () =>
     axiosClient.get('/onboarding/equipos').then(r => r.data)
+
+export const marcarAyudaVistaApi = (pagina) =>
+    axiosClient.post(`/onboarding/ayuda/${pagina}`).then(r => r.data)
