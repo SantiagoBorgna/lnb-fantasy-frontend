@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
 import { getShowdownMercado, participarShowdown } from '../../api/showdownApi'
 import { Loader2, X, Plus, Users } from 'lucide-react'
-import toast from 'react-hot-toast'
+import { useUiStore } from '../../store/uiStore'
 
 const POSICIONES = ['Base', 'Escolta', 'Alero', 'AlaPivot', 'Pivot']
 
 export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParticiparSuccess }) {
+    const showToast = useUiStore(state => state.showToast)
     const [nombre, setNombre] = useState('')
     const [apellido, setApellido] = useState('')
     const [step, setStep] = useState(1) // 1: Datos, 2: Draft
@@ -46,14 +47,14 @@ export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParti
 
     const seleccionarJugador = (jugador) => {
         if (presupuestoDisponible < jugador.valorMercadoActual && !plantel[posicionSeleccionando]) {
-            toast.error("Presupuesto insuficiente")
+            showToast("Presupuesto insuficiente", "error")
             return
         }
         
         // Si ya hay alguien en esa posicion, se suma el presupuesto del que sale
         const presupuestoRestanteConReemplazo = presupuestoDisponible + (plantel[posicionSeleccionando]?.valorMercadoActual || 0)
         if (presupuestoRestanteConReemplazo < jugador.valorMercadoActual) {
-            toast.error("Presupuesto insuficiente")
+            showToast("Presupuesto insuficiente", "error")
             return
         }
 
@@ -73,7 +74,7 @@ export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParti
 
     const guardarEquipo = async () => {
         if (Object.values(plantel).some(j => !j)) {
-            toast.error("Faltan jugadores en tu alineación")
+            showToast("Faltan jugadores en tu alineación", "error")
             return
         }
 
@@ -89,10 +90,10 @@ export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParti
                 alapivotId: plantel.AlaPivot.id,
                 pivotId: plantel.Pivot.id
             })
-            toast.success("¡Alineación guardada!")
+            showToast("¡Alineación guardada!", "success")
             onParticiparSuccess()
         } catch (error) {
-            toast.error(error.response?.data?.message || "Error al guardar la alineación")
+            showToast(error.response?.data?.message || "Error al guardar la alineación", "error")
         } finally {
             setIsSubmitting(false)
         }

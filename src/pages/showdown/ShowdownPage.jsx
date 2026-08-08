@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getShowdownEvento, getShowdownRanking } from '../../api/showdownApi'
-import { v4 as uuidv4 } from 'uuid'
 import ShowdownDraft from './ShowdownDraft'
 import ShowdownRanking from './ShowdownRanking'
 import { Loader2 } from 'lucide-react'
@@ -17,7 +16,7 @@ export default function ShowdownPage() {
     useEffect(() => {
         let uuid = localStorage.getItem('showdown_uuid')
         if (!uuid) {
-            uuid = uuidv4()
+            uuid = crypto.randomUUID ? crypto.randomUUID() : (Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15))
             localStorage.setItem('showdown_uuid', uuid)
         }
         setUuidDispositivo(uuid)

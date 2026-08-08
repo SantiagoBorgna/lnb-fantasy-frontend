@@ -46,6 +46,19 @@ export default function TestAdminPanel() {
         }
     }
 
+    const handleSeedIndependiente = async () => {
+        setLoading(true)
+        try {
+            const res = await axiosClient.post('/admin/test/seed-independiente')
+            showToast(res.data.message || 'Partidos generados', 'success')
+        } catch (error) {
+            showToast(error.response?.data?.message || 'Error al generar', 'error')
+            console.error(error)
+        } finally {
+            setLoading(false)
+        }
+    }
+
     return (
         <div className="min-h-screen bg-background text-white p-4">
             <div className="max-w-lg mx-auto mt-4">
@@ -81,6 +94,19 @@ export default function TestAdminPanel() {
                             className="w-full bg-primary text-white py-2 rounded-lg font-bold hover:bg-primary-hover transition"
                         >
                             {loading ? <LoadingSpinner size="sm" /> : 'CREAR EVENTO SHOWDOWN'}
+                        </button>
+                    </div>
+
+                    {/* Tarjeta Seed Independiente */}
+                    <div className="bg-darkCard p-4 rounded-xl border border-white/10">
+                        <h2 className="text-white font-bold mb-2">3. Sembrar Partidos de Independiente</h2>
+                        <p className="text-xs text-gray-400 mb-4">Llena las jornadas 5 a 8 asegurando que Independiente de Oliva juegue de Local en la 5 y 7, y Visitante en la 6 y 8.</p>
+                        <button 
+                            onClick={handleSeedIndependiente} 
+                            disabled={loading}
+                            className="w-full bg-blue-600/20 text-blue-400 border border-blue-600/50 py-2 rounded-lg font-bold hover:bg-blue-600/30 transition"
+                        >
+                            {loading ? <LoadingSpinner size="sm" /> : 'GENERAR PARTIDOS'}
                         </button>
                     </div>
                 </div>
