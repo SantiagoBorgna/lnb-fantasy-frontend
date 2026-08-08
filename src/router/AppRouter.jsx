@@ -20,7 +20,7 @@ import SalaDraftPage from '../pages/SalaDraftPage'
 import TerminosPage from '../pages/TerminosPage'
 import RedirectTorneo from '../components/ui/RedirectTorneo'
 import TestAdminPanel from '../pages/admin/TestAdminPanel'
-
+import ShowdownPage from '../pages/showdown/ShowdownPage'
 
 function PrivateRoute({ children }) {
     const token = useAuthStore(state => state.token)
@@ -84,6 +84,10 @@ export default function AppRouter() {
                 <Route path="/admin-test" element={
                     <PrivateRoute><TestAdminPanel /></PrivateRoute>
                 } />
+
+                {/* ── Showdown (Modo Estadio) ────────────────────────────── */}
+                <Route path="/showdown/:codigo" element={<ShowdownPage />} />
+
 
                 {/* ── App principal — solo usuarios ACTIVOS ──────────────── */}
                 <Route path="/" element={

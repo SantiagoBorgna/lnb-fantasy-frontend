@@ -30,30 +30,16 @@ export default function TestAdminPanel() {
         }
     }
 
-    const handleSeedJornadas = async () => {
+    const handleCrearShowdown = async () => {
         setLoading(true)
         try {
-            const res = await axiosClient.post('/admin/test/seed-jornadas')
-            showToast(res.data.message || 'Jornadas generadas', 'success')
+            const res = await axiosClient.post('/showdown/crear-test')
+            const codigo = res.data
+            showToast(`Evento Showdown creado: ${codigo}`, 'success')
+            // Abrir en nueva pestana
+            window.open(`/showdown/${codigo}`, '_blank')
         } catch (error) {
-            showToast(error.response?.data?.message || 'Error al generar jornadas', 'error')
-            console.error(error)
-        } finally {
-            setLoading(false)
-        }
-    }
-
-    const handleSimularJornada = async () => {
-        if (!jornadaId) {
-            showToast('Ingresa el ID de la jornada', 'error')
-            return
-        }
-        setLoading(true)
-        try {
-            const res = await axiosClient.post(`/admin/test/simular-jornada/${jornadaId}`)
-            showToast(res.data.message || 'Jornada simulada', 'success')
-        } catch (error) {
-            showToast(error.response?.data?.message || 'Error al simular jornada', 'error')
+            showToast(error.response?.data?.message || 'Error al crear evento', 'error')
             console.error(error)
         } finally {
             setLoading(false)
@@ -85,39 +71,17 @@ export default function TestAdminPanel() {
                         </button>
                     </div>
 
-                    {/* Tarjeta Seed */}
+                    {/* Tarjeta Crear Showdown */}
                     <div className="bg-darkCard p-4 rounded-xl border border-white/10">
-                        <h2 className="text-white font-bold mb-2">2. Generar Fixture Falso</h2>
-                        <p className="text-xs text-gray-400 mb-4">Crea 3 jornadas consecutivas y empareja a los 20 equipos reales al azar.</p>
+                        <h2 className="text-white font-bold mb-2">2. Crear Evento Showdown (Test)</h2>
+                        <p className="text-xs text-gray-400 mb-4">Crea un evento rápido utilizando el primer partido disponible en la base de datos para simular la experiencia en el estadio.</p>
                         <button 
-                            onClick={handleSeedJornadas} 
+                            onClick={handleCrearShowdown} 
                             disabled={loading}
                             className="w-full bg-primary text-white py-2 rounded-lg font-bold hover:bg-primary-hover transition"
                         >
-                            {loading ? <LoadingSpinner size="sm" /> : 'GENERAR 3 JORNADAS'}
+                            {loading ? <LoadingSpinner size="sm" /> : 'CREAR EVENTO SHOWDOWN'}
                         </button>
-                    </div>
-
-                    {/* Tarjeta Simular */}
-                    <div className="bg-darkCard p-4 rounded-xl border border-white/10">
-                        <h2 className="text-white font-bold mb-2">3. Simular Resultados</h2>
-                        <p className="text-xs text-gray-400 mb-4">Genera estadísticas aleatorias para los jugadores y cierra la jornada indicada.</p>
-                        <div className="flex gap-2">
-                            <input 
-                                type="number" 
-                                placeholder="ID Jornada (Ej: 1)" 
-                                value={jornadaId}
-                                onChange={(e) => setJornadaId(e.target.value)}
-                                className="bg-darkBg border border-white/10 rounded-lg px-3 py-2 text-white w-1/3 outline-none focus:border-primary"
-                            />
-                            <button 
-                                onClick={handleSimularJornada} 
-                                disabled={loading}
-                                className="w-2/3 bg-green-600 text-white py-2 rounded-lg font-bold hover:bg-green-500 transition"
-                            >
-                                {loading ? <LoadingSpinner size="sm" /> : 'SIMULAR JORNADA'}
-                            </button>
-                        </div>
                     </div>
                 </div>
             </div>
