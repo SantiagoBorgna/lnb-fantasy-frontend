@@ -305,9 +305,16 @@ export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParti
             <div className="w-full max-w-2xl bg-surface md:bg-card border-none md:border md:border-border rounded-none md:rounded-3xl flex flex-col shadow-none md:shadow-xl min-h-screen md:min-h-0 md:h-[90vh] overflow-y-auto custom-scrollbar relative pb-6 md:pb-10">
                 {/* Progress Bar simulada del onboarding o header space */}
                 <div className="flex justify-between items-center px-6 pt-6 md:pt-10 max-w-md mx-auto w-full shrink-0">
-                    <h1 className="text-textMain font-black text-lg flex-1 text-center">
-                        {evento?.localNombre?.replace(' (O)', '') || 'Independiente'} vs {evento?.visitanteNombre?.replace(' (O)', '') || 'Visitante'}
-                    </h1>
+                    <div className="flex-1 text-center">
+                        <h1 className="text-textMain font-black text-lg">
+                            {evento?.localNombre?.replace(' (O)', '') || 'Independiente'} vs {evento?.visitanteNombre?.replace(' (O)', '') || 'Visitante'}
+                        </h1>
+                        {evento?.fecha && (
+                            <p className="text-textMuted text-xs font-medium mt-0.5">
+                                {new Date(evento.fecha).toLocaleString('es-AR', { dateStyle: 'long', timeStyle: 'short' }).replace(' de 2026', '').replace(' de 2027', '')}
+                            </p>
+                        )}
+                    </div>
                     <button 
                         onClick={() => setModalReglasOpen(true)}
                         className="w-8 h-8 rounded-full bg-border flex items-center justify-center text-textMain font-bold hover:bg-border/80 transition-colors shrink-0"

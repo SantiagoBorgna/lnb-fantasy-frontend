@@ -37,9 +37,16 @@ export default function ShowdownRanking({ evento, ranking, miEquipo, uuidDisposi
                 
                 {/* Header */}
                 <div className="text-center space-y-4">
-                    <h1 className="text-xl font-black text-textMain tracking-tight">
-                        {evento.localNombre?.replace(' (O)', '') || evento.localSigla} vs {evento.visitanteNombre?.replace(' (O)', '') || evento.visitanteSigla}
-                    </h1>
+                    <div>
+                        <h1 className="text-xl font-black text-textMain tracking-tight">
+                            {evento.localNombre?.replace(' (O)', '') || evento.localSigla} vs {evento.visitanteNombre?.replace(' (O)', '') || evento.visitanteSigla}
+                        </h1>
+                        {evento.fecha && (
+                            <p className="text-textMuted text-sm font-medium mt-1">
+                                {new Date(evento.fecha).toLocaleString('es-AR', { dateStyle: 'long', timeStyle: 'short' }).replace(' de 2026', '').replace(' de 2027', '')}
+                            </p>
+                        )}
+                    </div>
                     <div className="flex justify-center">
                         {renderEstado()}
                     </div>
