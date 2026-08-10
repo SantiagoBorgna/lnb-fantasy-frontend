@@ -5,7 +5,7 @@ const ZONA_LABEL = {
     'Base': 'Base',
     'Escolta': 'Escolta',
     'Alero': 'Alero',
-    'AlaPivot': 'AlaPivot',
+    'AlaPivot': 'Ala Pivot',
     'Pivot': 'Pivot',
 }
 

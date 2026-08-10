@@ -39,7 +39,7 @@ export default function ShowdownRanking({ evento, ranking, uuidDispositivo }) {
                 {/* Header */}
                 <div className="text-center space-y-4">
                     <h1 className="text-2xl font-black text-textMain tracking-tight">
-                        {evento.localSigla} vs {evento.visitanteSigla}
+                        {evento.localNombre?.replace(' (O)', '') || evento.localSigla} vs {evento.visitanteNombre?.replace(' (O)', '') || evento.visitanteSigla}
                     </h1>
                     <div className="flex justify-center">
                         {renderEstado()}
@@ -52,7 +52,7 @@ export default function ShowdownRanking({ evento, ranking, uuidDispositivo }) {
                         <div className="flex items-center gap-4">
                             <div className="flex flex-col items-center">
                                 <div className="text-textMuted font-medium text-[11px] mb-1.5 uppercase tracking-widest">Tu Posición</div>
-                                <span className={`w-10 h-10 rounded-full flex items-center justify-center text-lg font-black shrink-0 ${myRank === 1 ? 'bg-yellow-500 text-white shadow-[0_0_12px_rgba(234,179,8,0.5)]' : myRank === 2 ? 'bg-gray-400 text-white shadow-[0_0_12px_rgba(156,163,175,0.5)]' : myRank === 3 ? 'bg-amber-700 text-white shadow-[0_0_12px_rgba(180,83,9,0.5)]' : 'bg-border text-textMuted'}`}>
+                                <span className={`w-10 h-10 rounded-full flex items-center justify-center text-lg font-black shrink-0 ${myRank === 1 ? 'bg-yellow-500 text-white' : myRank === 2 ? 'bg-gray-400 text-white' : myRank === 3 ? 'bg-amber-700 text-white' : 'bg-border text-textMuted'}`}>
                                     {myRank}
                                 </span>
                             </div>
@@ -72,7 +72,7 @@ export default function ShowdownRanking({ evento, ranking, uuidDispositivo }) {
                     </h2>
                     
                     <div className="space-y-3 mt-4">
-                        {ranking.map((p, index) => {
+                        {ranking.slice(0, 10).map((p, index) => {
                             const posicion = index + 1
                             const isMe = p.esMio
                             return (

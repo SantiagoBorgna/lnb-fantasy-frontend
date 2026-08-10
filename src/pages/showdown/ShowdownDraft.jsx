@@ -130,7 +130,7 @@ export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParti
                     <div className="p-5 border-b border-white/5 flex items-center justify-between bg-surface">
                         <div>
                             <h3 className="font-bold text-white text-xl">Elegir jugador</h3>
-                            <p className="text-sm text-textMuted uppercase tracking-wider font-semibold">{posicionSeleccionando}</p>
+                            <p className="text-sm text-textMuted uppercase tracking-wider font-semibold">{posicionSeleccionando.replace('AlaPivot', 'Ala Pivot')}</p>
                         </div>
                         <button onClick={() => setPosicionSeleccionando(null)} className="text-textMuted hover:text-white bg-white/5 hover:bg-white/10 p-2 rounded-full transition-colors">
                             <X className="w-5 h-5" />
@@ -172,7 +172,7 @@ export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParti
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <p className="text-textMain font-bold text-sm truncate">{jugador.nombreCompleto}</p>
-                                                <p className="text-textMuted text-xs truncate">{jugador.posicion} · {jugador.equipoReal?.sigla || jugador.equipoSigla}</p>
+                                                <p className="text-textMuted text-xs truncate">{jugador.posicion.replace('_', ' ')} · {jugador.equipoReal?.sigla || jugador.equipoSigla}</p>
                                             </div>
                                             <div className="flex flex-col items-end shrink-0 md:mr-2">
                                                 <span className="text-[10px] text-textMuted uppercase font-bold tracking-wider">Valor</span>

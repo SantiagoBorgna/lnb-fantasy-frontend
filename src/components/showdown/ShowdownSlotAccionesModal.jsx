@@ -21,7 +21,7 @@ export default function ShowdownSlotAccionesModal({ isOpen, onClose, posicion, j
                     />
                     <div>
                         <p className="text-textMain font-bold">{jugador.nombreCompleto}</p>
-                        <p className="text-textMuted text-sm">{jugador.equipoReal?.sigla || jugador.equipoSigla} · {jugador.posicion}</p>
+                        <p className="text-textMuted text-sm">{jugador.equipoReal?.sigla || jugador.equipoSigla} · {jugador.posicion.replace('_', ' ')}</p>
                     </div>
                 </div>
                 
