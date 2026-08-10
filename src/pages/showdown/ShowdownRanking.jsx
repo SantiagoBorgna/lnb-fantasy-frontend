@@ -43,7 +43,7 @@ export default function ShowdownRanking({ evento, ranking, miEquipo, uuidDisposi
                         </h1>
                         {evento.fecha && (
                             <p className="text-textMuted text-sm font-medium mt-1">
-                                {new Date(evento.fecha).toLocaleString('es-AR', { dateStyle: 'long', timeStyle: 'short' }).replace(' de 2026', '').replace(' de 2027', '')}
+                                {new Date(evento.fecha).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' })}
                             </p>
                         )}
                     </div>

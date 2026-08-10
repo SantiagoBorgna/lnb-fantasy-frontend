@@ -311,7 +311,7 @@ export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParti
                         </h1>
                         {evento?.fecha && (
                             <p className="text-textMuted text-xs font-medium mt-0.5">
-                                {new Date(evento.fecha).toLocaleString('es-AR', { dateStyle: 'long', timeStyle: 'short' }).replace(' de 2026', '').replace(' de 2027', '')}
+                                {new Date(evento.fecha).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric' })}
                             </p>
                         )}
                     </div>
