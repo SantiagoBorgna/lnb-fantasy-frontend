@@ -98,9 +98,9 @@ function SlotLleno({ slot, esCapitan, onTap }) {
             )}
             
             <CamisetaSVG
-                colorPrincipal={j.colorPrincipal}
-                colorSecundario={j.colorSecundario}
-                modelo={j.modeloCamiseta}
+                colorPrincipal={j.equipoReal?.colorPrincipal}
+                colorSecundario={j.equipoReal?.colorSecundario}
+                modelo={j.equipoReal?.modeloCamiseta}
                 numero={j.numeroCamiseta}
                 estado={j.estado}
                 size={56}

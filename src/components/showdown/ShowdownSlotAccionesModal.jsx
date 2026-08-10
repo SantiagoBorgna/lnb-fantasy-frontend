@@ -12,16 +12,16 @@ export default function ShowdownSlotAccionesModal({ isOpen, onClose, posicion, j
                 
                 <div className="flex items-center gap-4">
                     <CamisetaSVG
-                        colorPrincipal={jugador.colorPrincipal}
-                        colorSecundario={jugador.colorSecundario}
-                        modelo={jugador.modeloCamiseta}
+                        colorPrincipal={jugador.equipoReal?.colorPrincipal}
+                        colorSecundario={jugador.equipoReal?.colorSecundario}
+                        modelo={jugador.equipoReal?.modeloCamiseta}
                         numero={jugador.numeroCamiseta}
                         estado={jugador.estado}
                         size={56}
                     />
                     <div>
                         <p className="text-textMain font-bold">{jugador.nombreCompleto}</p>
-                        <p className="text-textMuted text-sm">{jugador.equipoSigla} · {jugador.posicion}</p>
+                        <p className="text-textMuted text-sm">{jugador.equipoReal?.sigla || jugador.equipoSigla} · {jugador.posicion}</p>
                     </div>
                 </div>
                 

@@ -122,7 +122,7 @@ export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParti
     const renderModalMercado = () => {
         if (!posicionSeleccionando) return null
 
-        const jugadoresFiltrados = mercado.filter(j => j.posicion.toUpperCase() === posicionSeleccionando.toUpperCase())
+        const jugadoresFiltrados = mercado.filter(j => j.posicion.toUpperCase().replace('_', '') === posicionSeleccionando.toUpperCase())
 
         return (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
@@ -306,7 +306,7 @@ export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParti
                 {/* Progress Bar simulada del onboarding o header space */}
                 <div className="flex justify-between items-center px-6 pt-6 md:pt-10 max-w-md mx-auto w-full shrink-0">
                     <h1 className="text-sm font-black text-textMain uppercase tracking-widest text-center flex-1">
-                        Sexto Hombre Fantasy
+                        {evento?.partido?.equipoLocal?.nombre?.replace(' (O)', '') || 'Independiente'} vs {evento?.partido?.equipoVisitante?.nombre?.replace(' (O)', '') || 'Visitante'}
                     </h1>
                     <button 
                         onClick={() => setModalReglasOpen(true)}
