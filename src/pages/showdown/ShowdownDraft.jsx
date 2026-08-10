@@ -158,8 +158,8 @@ export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParti
 
     if (step === 1) {
         return (
-            <div className="min-h-screen bg-bg dark flex flex-col items-center justify-start pt-12 pb-4">
-                <div className="w-full max-w-sm px-6">
+            <div className="min-h-[100dvh] bg-bg dark flex flex-col items-center justify-start pt-12">
+                <div className="w-full max-w-sm px-6 pb-8">
                     <div className="flex justify-center mb-6">
                         <img src="/icons/logo-cuadrado.jpg" alt="Sexto Hombre Fantasy" className="w-40 h-40 object-cover rounded-3xl drop-shadow-xl" />
                     </div>
