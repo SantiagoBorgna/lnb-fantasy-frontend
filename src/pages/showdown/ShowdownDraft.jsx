@@ -244,9 +244,13 @@ export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParti
 
     // Step 2: Draft
     const isCompleto = Object.values(plantel).every(j => j !== null)
+    const excedePresupuesto = presupuestoDisponible < 0
+    const faltanJugadoresCount = Object.values(plantel).filter(j => j === null).length
+    const faltanJugadoresText = faltanJugadoresCount > 0 ? `Faltan ${faltanJugadoresCount} jugador${faltanJugadoresCount !== 1 ? 'es' : ''}` : null
+    const motivos = [faltanJugadoresText, !capitanId && 'Falta elegir capitán', excedePresupuesto && `Te excediste del presupuesto por ${Math.abs(presupuestoDisponible).toFixed(1)} cr.`].filter(Boolean)
 
     return (
-        <div className="min-h-screen bg-bg dark flex flex-col items-center p-4">
+        <div className="min-h-screen bg-surface flex items-center justify-center p-0 md:p-8">
             {renderModalMercado()}
             
             <ShowdownReglasModal 
@@ -266,27 +270,32 @@ export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParti
                 }}
             />
 
-            <div className="w-full max-w-md flex flex-col min-h-full pb-20">
-                {/* Header */}
-                <div className="flex items-center justify-between mb-2 mt-2 px-1">
-                    <h2 className="text-white font-bold text-xl tracking-tight">Armá tu quinteto</h2>
+            <div className="w-full max-w-2xl bg-surface md:bg-card border-none md:border md:border-border rounded-none md:rounded-3xl flex flex-col shadow-none md:shadow-xl min-h-screen md:min-h-0 md:h-[90vh] overflow-y-auto custom-scrollbar relative pb-6 md:pb-10">
+                {/* Progress Bar simulada del onboarding o header space */}
+                <div className="flex justify-end px-6 pt-6 md:pt-10 max-w-md mx-auto w-full shrink-0">
                     <button 
                         onClick={() => setModalReglasOpen(true)}
-                        className="flex items-center justify-center gap-1.5 bg-surface text-textMuted px-3 py-1.5 rounded-full border border-border text-sm font-semibold hover:text-white transition-colors"
+                        className="w-8 h-8 rounded-full bg-border flex items-center justify-center text-textMain font-bold hover:bg-border/80 transition-colors"
                     >
-                        <HelpCircle className="w-4 h-4" />
-                        Reglas
+                        ?
                     </button>
                 </div>
 
-                <div className="bg-surface rounded-2xl p-4 border border-border mb-2 flex items-center justify-between shadow-lg">
-                    <div>
-                        <div className="text-xs text-textMuted uppercase tracking-wider font-bold mb-1">Presupuesto</div>
-                        <div className="text-2xl font-mono font-bold text-textMain">${presupuestoDisponible.toFixed(1)}m</div>
-                    </div>
-                    <div className="text-right">
-                        <div className="text-xs text-textMuted uppercase tracking-wider font-bold mb-1">Alineación</div>
-                        <div className="text-sm font-medium text-textMain">{Object.values(plantel).filter(j=>j).length}/5</div>
+                <div className="px-4 pt-4 pb-2 max-w-md mx-auto w-full space-y-3">
+                    {/* Header estilo Onboarding */}
+                    <div className="flex items-start justify-between">
+                        <div>
+                            <h2 className="text-textMain font-black text-xl">Armá tu equipo</h2>
+                            <p className="text-textMuted text-xs mt-0.5">
+                                Tocá los espacios vacíos para agregar jugadores.
+                            </p>
+                        </div>
+                        <div className="text-right">
+                            <p className={`font-bold text-lg ${excedePresupuesto ? "text-red-400" : "text-accent"}`}>
+                                {presupuestoDisponible.toFixed(1)} cr
+                            </p>
+                            <p className="text-textMuted text-xs">disponibles</p>
+                        </div>
                     </div>
                 </div>
 
@@ -300,18 +309,27 @@ export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParti
                     />
                 </div>
 
-                {/* Footer Action */}
-                <div className="fixed bottom-0 left-0 right-0 p-4 bg-bg/80 backdrop-blur-md border-t border-border flex justify-center">
+                {/* Footer Action (Validaciones + Guardar) */}
+                <div className="px-4 pb-8 pt-6 max-w-md mx-auto w-full space-y-3">
+                    {motivos.length > 0 && (
+                        <div className="space-y-1 mb-2">
+                            {motivos.map(m => (
+                                <div key={m} className="flex items-center gap-2">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-accent shrink-0" />
+                                    <p className={`text-xs font-medium ${m.includes('presupuesto') ? "text-red-400" : "text-textMuted"}`}>
+                                        {m}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
                     <button 
-                        disabled={!isCompleto || isSubmitting}
+                        disabled={!isCompleto || !capitanId || excedePresupuesto || isSubmitting}
                         onClick={guardarEquipo}
-                        className={`w-full max-w-md py-4 rounded-2xl font-bold text-lg flex items-center justify-center transition-all ${
-                            isCompleto 
-                                ? 'bg-primary text-bg shadow-lg shadow-primary/20 hover:bg-primary/90' 
-                                : 'bg-surface text-textMuted border border-border'
-                        }`}
+                        className="btn-accent w-full disabled:opacity-40 disabled:cursor-not-allowed h-12 text-base font-bold shadow-lg flex items-center justify-center"
                     >
-                        {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin" /> : "Guardar Equipo"}
+                        {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin" /> : "Comenzar a jugar"}
                     </button>
                 </div>
             </div>
