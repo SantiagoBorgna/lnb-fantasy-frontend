@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
 import { getShowdownMercado, participarShowdown } from '../../api/showdownApi'
-import { Loader2, X, Plus, HelpCircle } from 'lucide-react'
+import { HelpCircle, X, Loader2, Star, Trash2 } from 'lucide-react'
 import { useUiStore } from '../../store/uiStore'
 import ShowdownCanchita from '../../components/showdown/ShowdownCanchita'
 import ShowdownSlotAccionesModal from '../../components/showdown/ShowdownSlotAccionesModal'
 import ShowdownReglasModal from '../../components/showdown/ShowdownReglasModal'
+import CamisetaSVG from '../../components/jugador/CamisetaSVG'
 
 const POSICIONES = ['Base', 'Escolta', 'Alero', 'AlaPivot', 'Pivot']
 
@@ -150,32 +151,40 @@ export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParti
                                 const yaElegido = Object.values(plantel).some(j => j?.id === jugador.id)
 
                                 return (
-                                    <div key={jugador.id} className={`flex items-center bg-surface rounded-2xl p-4 border transition-colors ${alcanza && !yaElegido ? 'border-white/10 hover:bg-white/5' : 'border-red-500/10 opacity-60'}`}>
-                                        <div className="w-12 h-12 bg-bg rounded-full flex items-center justify-center mr-4 shrink-0 overflow-hidden border border-white/10 shadow-inner">
-                                            <span className="font-bold text-textMuted text-xs">{jugador.equipoReal.sigla}</span>
-                                        </div>
-                                        <div className="flex-1">
-                                            <div className="font-bold text-white text-lg leading-tight">{jugador.nombreCompleto}</div>
-                                            <div className="flex items-center gap-2 mt-1">
-                                                <span className="text-xs bg-bg px-2 py-0.5 rounded text-textMuted font-bold uppercase">{jugador.posicion}</span>
-                                                <span className="text-sm font-mono text-white font-medium">${jugador.valorMercadoActual}m</span>
+                                    <div key={jugador.id} className={`p-3 bg-card rounded-xl border flex items-center justify-between gap-3 shadow-sm transition-colors ${alcanza && !yaElegido ? 'border-border hover:border-white/20' : 'border-red-500/10 opacity-60'}`}>
+                                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                                            <div className="shrink-0">
+                                                <CamisetaSVG 
+                                                    colorPrincipal={jugador.colorPrincipal}
+                                                    colorSecundario={jugador.colorSecundario}
+                                                    numero={jugador.numeroCamiseta}
+                                                    estado={jugador.estado}
+                                                    modelo={jugador.modeloCamiseta}
+                                                    size={36}
+                                                />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-textMain font-bold text-sm truncate">{jugador.nombreCompleto}</p>
+                                                <p className="text-textMuted text-xs truncate">{jugador.posicion} · {jugador.equipoReal?.sigla || jugador.equipoSigla}</p>
+                                            </div>
+                                            <div className="flex flex-col items-end shrink-0 md:mr-2">
+                                                <span className="text-[10px] text-textMuted uppercase font-bold tracking-wider">Valor</span>
+                                                <span className="font-bold text-sm text-textMain">${jugador.valorMercadoActual}m</span>
                                             </div>
                                         </div>
-                                        <div className="ml-3">
-                                            <button 
-                                                disabled={!alcanza || yaElegido}
-                                                onClick={() => seleccionarJugador(jugador)}
-                                                className={`px-5 py-2.5 rounded-xl font-bold text-sm transition-colors shadow-sm ${
-                                                    yaElegido 
-                                                    ? 'bg-white/5 text-textMuted cursor-not-allowed'
-                                                    : alcanza 
-                                                        ? 'bg-primary text-bg hover:bg-primary/90 hover:scale-105 transform duration-200' 
-                                                        : 'bg-danger/10 text-danger cursor-not-allowed'
-                                                }`}
-                                            >
-                                                {yaElegido ? 'EN EQUIPO' : 'FICHAR'}
-                                            </button>
-                                        </div>
+                                        <button 
+                                            disabled={!alcanza || yaElegido}
+                                            onClick={() => seleccionarJugador(jugador)}
+                                            className={`px-3 py-1.5 rounded-lg text-sm font-semibold active:scale-95 transition-transform whitespace-nowrap shrink-0 ${
+                                                yaElegido 
+                                                ? 'bg-white/5 text-textMuted border border-white/5 cursor-not-allowed'
+                                                : alcanza 
+                                                    ? 'bg-primary/20 text-primary border border-primary/50' 
+                                                    : 'bg-danger/10 text-danger border border-danger/20 cursor-not-allowed'
+                                            }`}
+                                        >
+                                            {yaElegido ? 'En Equipo' : 'Fichar'}
+                                        </button>
                                     </div>
                                 )
                             })
@@ -272,10 +281,13 @@ export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParti
 
             <div className="w-full max-w-2xl bg-surface md:bg-card border-none md:border md:border-border rounded-none md:rounded-3xl flex flex-col shadow-none md:shadow-xl min-h-screen md:min-h-0 md:h-[90vh] overflow-y-auto custom-scrollbar relative pb-6 md:pb-10">
                 {/* Progress Bar simulada del onboarding o header space */}
-                <div className="flex justify-end px-6 pt-6 md:pt-10 max-w-md mx-auto w-full shrink-0">
+                <div className="flex justify-between items-center px-6 pt-6 md:pt-10 max-w-md mx-auto w-full shrink-0">
+                    <h1 className="text-sm font-black text-textMain uppercase tracking-widest text-center flex-1">
+                        Sexto Hombre Fantasy
+                    </h1>
                     <button 
                         onClick={() => setModalReglasOpen(true)}
-                        className="w-8 h-8 rounded-full bg-border flex items-center justify-center text-textMain font-bold hover:bg-border/80 transition-colors"
+                        className="w-8 h-8 rounded-full bg-border flex items-center justify-center text-textMain font-bold hover:bg-border/80 transition-colors shrink-0"
                     >
                         ?
                     </button>
@@ -329,7 +341,7 @@ export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParti
                         onClick={guardarEquipo}
                         className="btn-accent w-full disabled:opacity-40 disabled:cursor-not-allowed h-12 text-base font-bold shadow-lg flex items-center justify-center"
                     >
-                        {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin" /> : "Comenzar a jugar"}
+                        {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin" /> : "Guardar equipo"}
                     </button>
                 </div>
             </div>

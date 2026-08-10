@@ -1,4 +1,5 @@
 import clsx from 'clsx'
+import CamisetaSVG from '../jugador/CamisetaSVG'
 
 const ZONA_LABEL = {
     'Base': 'Base',
@@ -83,33 +84,29 @@ function SlotVacio({ slot, onTap }) {
 
 function SlotLleno({ slot, esCapitan, onTap }) {
     const j = slot.jugador
+    const partes = j.nombreCompleto?.split(',') ?? ['?']
+    const apellido = partes[0].trim()
+    const inicial = partes[1]?.trim().charAt(0) ?? ''
+    const etiqueta = inicial ? `${apellido}, ${inicial}.` : apellido
+
     return (
-        <button onClick={onTap} className="relative w-[85px] group z-20">
+        <div onClick={onTap} className="relative w-[90px] h-[105px] rounded-2xl flex flex-col items-center justify-between p-2 cursor-pointer bg-white/15 transition-transform hover:scale-105 z-20">
             {esCapitan && (
-                <div className="absolute -top-3 -right-2 bg-yellow-400 text-black w-6 h-6 rounded-full flex items-center justify-center font-extrabold text-xs shadow-lg z-30 ring-2 ring-white">
-                    C
+                <div className="absolute -top-1.5 -right-1.5 z-10 w-6 h-6 rounded-full bg-yellow-500 flex items-center justify-center ring-2 ring-surface shadow-md">
+                    <span className="text-surface text-xs font-black">C</span>
                 </div>
             )}
-            <div className="w-[85px] h-[85px] rounded-2xl bg-surface border-2 border-white shadow-xl flex items-end justify-center overflow-hidden transition-transform group-hover:scale-105">
-                {/* Imagen placeholder */}
-                <div className="w-full h-full bg-surface-lighter flex items-center justify-center relative">
-                    {/* Silueta genérica */}
-                    <svg className="w-[80%] h-[80%] text-white/5 absolute bottom-0" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                    </svg>
-                </div>
-            </div>
             
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-full flex justify-center">
-                <span className="bg-bg/90 text-textMain text-[10px] font-bold px-1.5 py-0.5 rounded backdrop-blur-sm whitespace-nowrap shadow-sm border border-border/50">
-                    ${j.valorMercadoActual}m
-                </span>
-            </div>
-
-            <div className="mt-2 text-center">
-                <p className="text-white text-[11px] font-bold leading-tight drop-shadow-md truncate max-w-[85px]">{j.nombreCompleto}</p>
-                <p className="text-white/80 text-[9px] font-semibold uppercase drop-shadow-sm">{ZONA_LABEL[slot.zona]}</p>
-            </div>
-        </button>
+            <CamisetaSVG
+                colorPrincipal={j.colorPrincipal}
+                colorSecundario={j.colorSecundario}
+                modelo={j.modeloCamiseta}
+                numero={j.numeroCamiseta}
+                estado={j.estado}
+                size={56}
+            />
+            <span className="text-white text-[11px] font-bold text-center w-full truncate leading-tight drop-shadow-md">{etiqueta}</span>
+            <span className="text-white/70 text-[10px] font-medium">{j.valorMercadoActual?.toFixed(1)} cr</span>
+        </div>
     )
 }
