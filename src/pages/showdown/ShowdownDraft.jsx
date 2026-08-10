@@ -305,8 +305,8 @@ export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParti
             <div className="w-full max-w-2xl bg-surface md:bg-card border-none md:border md:border-border rounded-none md:rounded-3xl flex flex-col shadow-none md:shadow-xl min-h-screen md:min-h-0 md:h-[90vh] overflow-y-auto custom-scrollbar relative pb-6 md:pb-10">
                 {/* Progress Bar simulada del onboarding o header space */}
                 <div className="flex justify-between items-center px-6 pt-6 md:pt-10 max-w-md mx-auto w-full shrink-0">
-                    <h1 className="text-sm font-black text-textMain uppercase tracking-widest text-center flex-1">
-                        {evento?.partido?.equipoLocal?.nombre?.replace(' (O)', '') || 'Independiente'} vs {evento?.partido?.equipoVisitante?.nombre?.replace(' (O)', '') || 'Visitante'}
+                    <h1 className="text-textMain font-black text-xl flex-1 text-center">
+                        {evento?.localNombre?.replace(' (O)', '') || 'Independiente'} vs {evento?.visitanteNombre?.replace(' (O)', '') || 'Visitante'}
                     </h1>
                     <button 
                         onClick={() => setModalReglasOpen(true)}
@@ -345,19 +345,27 @@ export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParti
                 </div>
 
                 {/* Footer Action (Validaciones + Guardar) */}
-                <div className="px-4 pb-8 pt-6 max-w-md mx-auto w-full space-y-3">
-                    {motivos.length > 0 && (
-                        <div className="space-y-1 mb-2">
-                            {motivos.map(m => (
-                                <div key={m} className="flex items-center gap-2">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-accent shrink-0" />
-                                    <p className={`text-xs font-medium ${m.includes('presupuesto') ? "text-red-400" : "text-textMuted"}`}>
-                                        {m}
-                                    </p>
-                                </div>
-                            ))}
+                <div className="px-4 pb-8 pt-6 max-w-md mx-auto w-full space-y-4">
+                    <div className="space-y-2 bg-surface border border-border p-4 rounded-2xl">
+                        <div className="flex items-center gap-2">
+                            <span className={`w-2 h-2 rounded-full shrink-0 transition-colors ${isCompleto ? "bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.5)]" : "bg-white/20"}`} />
+                            <p className={`text-xs font-medium transition-colors ${isCompleto ? "text-green-400" : "text-textMuted"}`}>
+                                5 jugadores seleccionados
+                            </p>
                         </div>
-                    )}
+                        <div className="flex items-center gap-2">
+                            <span className={`w-2 h-2 rounded-full shrink-0 transition-colors ${!!capitanId ? "bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.5)]" : "bg-white/20"}`} />
+                            <p className={`text-xs font-medium transition-colors ${!!capitanId ? "text-green-400" : "text-textMuted"}`}>
+                                Capitán designado
+                            </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className={`w-2 h-2 rounded-full shrink-0 transition-colors ${!excedePresupuesto ? "bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.5)]" : "bg-red-400 shadow-[0_0_8px_rgba(248,113,113,0.5)]"}`} />
+                            <p className={`text-xs font-medium transition-colors ${!excedePresupuesto ? "text-green-400" : "text-red-400"}`}>
+                                Presupuesto dentro del límite {excedePresupuesto && `(excedido por ${Math.abs(presupuestoDisponible).toFixed(1)} cr)`}
+                            </p>
+                        </div>
+                    </div>
 
                     <button 
                         disabled={!isCompleto || !capitanId || excedePresupuesto || isSubmitting}
