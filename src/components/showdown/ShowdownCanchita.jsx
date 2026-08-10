@@ -76,7 +76,7 @@ export default function ShowdownCanchita({ plantel, capitanId, onSlotVacioTap, o
 
 function SlotVacio({ slot, onTap }) {
     return (
-        <button onClick={onTap} className="w-[85px] h-[100px] rounded-2xl bg-white/10 border-2 border-white/30 border-dashed flex flex-col items-center justify-center gap-1 transition-colors hover:bg-white/20 shadow-sm backdrop-blur-sm relative z-20">
+        <button onClick={onTap} className="w-[85px] h-[100px] rounded-2xl bg-white/10 border-2 border-white/30 border-dashed flex flex-col items-center justify-center gap-1 shadow-sm backdrop-blur-sm relative z-20">
             <span className="text-white/70 text-2xl drop-shadow">+</span>
             <span className="text-white/70 text-[10px] text-center leading-tight px-1 font-bold uppercase tracking-wider drop-shadow">{ZONA_LABEL[slot.zona]}</span>
         </button>
@@ -95,7 +95,7 @@ function SlotLleno({ slot, esCapitan, modo, onTap }) {
     const modelo = j.equipoModeloCamiseta || j.equipoReal?.modeloCamiseta
 
     return (
-        <div onClick={onTap} className="relative w-[90px] h-[105px] rounded-2xl flex flex-col items-center justify-between p-2 cursor-pointer bg-white/15 transition-transform hover:scale-105 z-20">
+        <div onClick={onTap} className="relative w-[90px] h-[105px] rounded-2xl flex flex-col items-center justify-between p-2 cursor-pointer bg-white/15 z-20">
             {esCapitan && (
                 <div className="absolute -top-1.5 -right-1.5 z-10 w-6 h-6 rounded-full bg-yellow-500 flex items-center justify-center ring-2 ring-surface shadow-md">
                     <span className="text-surface text-xs font-black">C</span>
@@ -112,7 +112,7 @@ function SlotLleno({ slot, esCapitan, modo, onTap }) {
             />
             <span className="text-white text-[11px] font-bold text-center w-full truncate leading-tight drop-shadow-md">{etiqueta}</span>
             {modo === 'ranking' ? (
-                <span className="text-green-300 text-[11px] font-bold drop-shadow-md">{j.puntosAportados?.toFixed(1) ?? '0.0'} pts</span>
+                <span className="text-accent text-[11px] font-bold drop-shadow-md">{j.puntosAportados?.toFixed(1) ?? '0.0'} pts</span>
             ) : (
                 <span className="text-white/70 text-[10px] font-medium">{j.valorMercadoActual?.toFixed(1)} cr</span>
             )}
