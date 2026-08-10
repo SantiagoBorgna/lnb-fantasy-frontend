@@ -158,41 +158,41 @@ export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParti
 
     if (step === 1) {
         return (
-            <div className="min-h-screen bg-bg dark flex flex-col items-center justify-center p-4">
-                <div className="w-full max-w-sm bg-surface rounded-3xl p-8 border border-border shadow-2xl">
+            <div className="min-h-screen bg-bg dark flex flex-col items-center justify-start pt-12 pb-4">
+                <div className="w-full max-w-sm px-6">
                     <div className="flex justify-center mb-6">
-                        <img src="/icons/logo-cuadrado.jpg" alt="Sexto Hombre Fantasy" className="w-24 h-24 object-cover rounded-2xl drop-shadow-xl" />
+                        <img src="/icons/logo-cuadrado.jpg" alt="Sexto Hombre Fantasy" className="w-40 h-40 object-cover rounded-3xl drop-shadow-xl" />
                     </div>
                     
-                    <h1 className="text-2xl font-bold text-textMain text-center mb-2">
-                        {evento.localNombre.replace(' (O)', '')} vs {evento.visitanteNombre.replace(' (O)', '')}
+                    <h1 className="text-3xl font-bold text-textMain text-center mb-2 tracking-tight">
+                        Sexto Hombre Fantasy
                     </h1>
-                    <p className="text-textMuted text-center mb-8 text-sm">
+                    <p className="text-textMuted text-center mb-10 text-sm">
                         Ingresá tus datos para participar. ¡El mejor equipo de la noche tiene premio!
                     </p>
 
-                    <form onSubmit={handleContinuar} className="space-y-4">
+                    <form onSubmit={handleContinuar} className="space-y-5">
                         <div>
-                            <label className="block text-sm font-medium text-textMain mb-1">Nombre</label>
+                            <label className="block text-sm font-medium text-textMain mb-1.5 ml-1">Nombre</label>
                             <input 
                                 required
                                 value={nombre}
                                 onChange={e => setNombre(e.target.value)}
-                                className="w-full bg-bg border border-border rounded-xl px-4 py-3 text-textMain focus:outline-none focus:border-primary transition-colors"
+                                className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-textMain focus:outline-none focus:border-primary transition-colors shadow-sm"
                                 placeholder="Tu nombre"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-textMain mb-1">Apellido</label>
+                            <label className="block text-sm font-medium text-textMain mb-1.5 ml-1">Apellido</label>
                             <input 
                                 required
                                 value={apellido}
                                 onChange={e => setApellido(e.target.value)}
-                                className="w-full bg-bg border border-border rounded-xl px-4 py-3 text-textMain focus:outline-none focus:border-primary transition-colors"
+                                className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-textMain focus:outline-none focus:border-primary transition-colors shadow-sm"
                                 placeholder="Tu apellido"
                             />
                         </div>
-                        <button type="submit" className="w-full bg-primary text-bg font-bold rounded-xl py-3 mt-4 hover:bg-primary/90 transition-colors">
+                        <button type="submit" className="w-full bg-primary text-bg font-bold rounded-xl py-3.5 mt-6 hover:bg-primary/90 transition-colors shadow-md">
                             Continuar
                         </button>
                     </form>
