@@ -38,7 +38,7 @@ export default function ShowdownRanking({ evento, ranking, uuidDispositivo }) {
                 
                 {/* Header */}
                 <div className="text-center space-y-4">
-                    <h1 className="text-2xl font-black text-textMain tracking-tight">
+                    <h1 className="text-xl font-black text-textMain tracking-tight">
                         {evento.localNombre?.replace(' (O)', '') || evento.localSigla} vs {evento.visitanteNombre?.replace(' (O)', '') || evento.visitanteSigla}
                     </h1>
                     <div className="flex justify-center">
