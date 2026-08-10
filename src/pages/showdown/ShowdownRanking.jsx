@@ -115,7 +115,7 @@ export default function ShowdownRanking({ evento, ranking, miEquipo, uuidDisposi
                                         {posicion}
                                     </span>
                                     <p className={`flex-1 text-[15px] truncate ${isMe ? 'text-white font-bold' : 'text-textMain font-medium'}`}>
-                                        {p.nombre} {p.apellido} {isMe && "(Vos)"}
+                                        {p.nombre} {p.apellido}
                                     </p>
                                     <span className="text-accent font-bold text-[15px] tabular-nums shrink-0">
                                         {p.puntosTotales.toFixed(1)}
