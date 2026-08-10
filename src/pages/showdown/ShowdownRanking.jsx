@@ -1,7 +1,7 @@
 import { Trophy, Clock, CheckCircle } from 'lucide-react'
 import { useState } from 'react'
-import ShowdownCanchita from './ShowdownCanchita'
-import ShowdownStatsModal from './ShowdownStatsModal'
+import ShowdownCanchita from '../../components/showdown/ShowdownCanchita'
+import ShowdownStatsModal from '../../components/showdown/ShowdownStatsModal'
 
 export default function ShowdownRanking({ evento, ranking, miEquipo, uuidDispositivo }) {
     const [activeTab, setActiveTab] = useState('ranking')
@@ -123,10 +123,9 @@ export default function ShowdownRanking({ evento, ranking, miEquipo, uuidDisposi
                         )}
                     </div>
                 </div>
-                        </div>
-                    </>
-                ) : (
-                    <div className="animate-fade-in space-y-4">
+            </>
+        ) : (
+            <div className="animate-fade-in space-y-4">
                         {/* Mi Equipo Tab */}
                         {miEquipo && (() => {
                             const plantel = {};
