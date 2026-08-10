@@ -19,12 +19,7 @@ export default function ShowdownRanking({ evento, ranking, uuidDispositivo }) {
                     </div>
                 )
             case 'FINALIZADO':
-                return (
-                    <div className="flex items-center gap-2 text-success bg-success/10 px-4 py-2 rounded-full text-sm font-medium">
-                        <CheckCircle className="w-4 h-4" />
-                        <span>Resultados Finales</span>
-                    </div>
-                )
+                return null;
             default: return null
         }
     }
