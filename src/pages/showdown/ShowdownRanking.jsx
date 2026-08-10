@@ -1,7 +1,11 @@
 import { Trophy, Clock, CheckCircle } from 'lucide-react'
+import { useState } from 'react'
+import ShowdownCanchita from './ShowdownCanchita'
+import ShowdownStatsModal from './ShowdownStatsModal'
 
-export default function ShowdownRanking({ evento, ranking, uuidDispositivo }) {
-
+export default function ShowdownRanking({ evento, ranking, miEquipo, uuidDispositivo }) {
+    const [activeTab, setActiveTab] = useState('ranking')
+    const [selectedJugador, setSelectedJugador] = useState(null)
     const renderEstado = () => {
         switch (evento.estado) {
             case 'ABIERTO':
@@ -41,8 +45,36 @@ export default function ShowdownRanking({ evento, ranking, uuidDispositivo }) {
                     </div>
                 </div>
 
-                {/* Resumen Usuario */}
-                {myRankIndex !== -1 && (
+                {/* Winner Banner */}
+                {evento.estado === 'FINALIZADO' && myRank === 1 && (
+                    <div className="bg-green-500/10 border border-green-500/20 text-green-500 rounded-xl p-4 text-center mb-[-1rem]">
+                        <p className="font-bold text-lg">¡Ganaste!</p>
+                        <p className="text-sm mt-1">Nos vamos a comunicar con vos muy pronto.</p>
+                    </div>
+                )}
+
+                {/* Tabs */}
+                {miEquipo && (
+                    <div className="flex bg-surface border border-border rounded-lg p-1">
+                        {[
+                            { key: 'ranking', label: 'Ranking' },
+                            { key: 'equipo', label: 'Mi Equipo' },
+                        ].map(({ key, label }) => (
+                            <button
+                                key={key}
+                                onClick={() => setActiveTab(key)}
+                                className={`flex-1 py-1.5 text-sm font-bold rounded-md transition-colors ${activeTab === key ? 'bg-card shadow text-textMain' : 'text-textMuted hover:text-textMain'}`}
+                            >
+                                {label}
+                            </button>
+                        ))}
+                    </div>
+                )}
+
+                {activeTab === 'ranking' ? (
+                    <>
+                        {/* Resumen Usuario */}
+                        {myRankIndex !== -1 && (
                     <div className="bg-surface text-textMain rounded-2xl p-6 shadow-xl flex items-center justify-between border border-border">
                         <div className="flex items-center gap-4">
                             <div className="flex flex-col items-center">
@@ -91,7 +123,46 @@ export default function ShowdownRanking({ evento, ranking, uuidDispositivo }) {
                         )}
                     </div>
                 </div>
+                        </div>
+                    </>
+                ) : (
+                    <div className="animate-fade-in space-y-4">
+                        {/* Mi Equipo Tab */}
+                        {miEquipo && (() => {
+                            const plantel = {};
+                            miEquipo.jugadores.forEach(j => {
+                                // Match position name correctly, assuming exact match or mapping if needed
+                                // The backend returns Base, Escolta, Alero, AlaPivot, Pivot
+                                let posKey = j.posicion;
+                                if (posKey === 'ALA_PIVOT') posKey = 'AlaPivot';
+                                else if (posKey === 'BASE') posKey = 'Base';
+                                else if (posKey === 'ESCOLTA') posKey = 'Escolta';
+                                else if (posKey === 'ALERO') posKey = 'Alero';
+                                else if (posKey === 'PIVOT') posKey = 'Pivot';
+                                
+                                plantel[posKey] = j;
+                            });
+                            
+                            const capitan = miEquipo.jugadores.find(j => j.esCapitan);
+                            
+                            return (
+                                <ShowdownCanchita
+                                    plantel={plantel}
+                                    capitanId={capitan?.id}
+                                    modo="ranking"
+                                    onSlotLlenoTap={(slot) => setSelectedJugador(slot.jugador)}
+                                />
+                            );
+                        })()}
+                    </div>
+                )}
             </div>
+
+            <ShowdownStatsModal
+                isOpen={!!selectedJugador}
+                onClose={() => setSelectedJugador(null)}
+                jugador={selectedJugador}
+            />
         </div>
     )
 }

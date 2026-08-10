@@ -11,3 +11,6 @@ export const participarShowdown = (codigo, payload) =>
 
 export const getShowdownRanking = (codigo, uuidDispositivo) => 
     axiosClient.get(`/showdown/${codigo}/ranking`, { params: { uuidDispositivo } }).then(r => r.data);
+
+export const getShowdownMiEquipo = (codigo, uuidDispositivo) => 
+    axiosClient.get(`/showdown/${codigo}/mi-equipo`, { params: { uuidDispositivo } }).then(r => r.data);

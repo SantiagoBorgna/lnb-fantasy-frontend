@@ -9,7 +9,7 @@ const ZONA_LABEL = {
     'Pivot': 'Pivot',
 }
 
-export default function ShowdownCanchita({ plantel, capitanId, onSlotVacioTap, onSlotLlenoTap }) {
+export default function ShowdownCanchita({ plantel, capitanId, onSlotVacioTap, onSlotLlenoTap, modo = 'draft' }) {
     // Formación fija: 2-2-1
     // Fila 1: Base, Escolta
     // Fila 2: Alero, AlaPivot
@@ -56,13 +56,14 @@ export default function ShowdownCanchita({ plantel, capitanId, onSlotVacioTap, o
                                     ? <SlotLleno 
                                         key={slot.zona} 
                                         slot={slot} 
-                                        esCapitan={capitanId === slot.jugador.id}
-                                        onTap={() => onSlotLlenoTap(slot)} 
+                                        esCapitan={modo === 'ranking' ? slot.jugador.esCapitan : capitanId === slot.jugador.id}
+                                        modo={modo}
+                                        onTap={() => onSlotLlenoTap && onSlotLlenoTap(slot)} 
                                       />
                                     : <SlotVacio 
                                         key={slot.zona} 
                                         slot={slot} 
-                                        onTap={() => onSlotVacioTap(slot)} 
+                                        onTap={() => onSlotVacioTap && onSlotVacioTap(slot)} 
                                       />
                             ))}
                         </div>
@@ -82,12 +83,16 @@ function SlotVacio({ slot, onTap }) {
     )
 }
 
-function SlotLleno({ slot, esCapitan, onTap }) {
+function SlotLleno({ slot, esCapitan, modo, onTap }) {
     const j = slot.jugador
-    const partes = j.nombreCompleto?.split(',') ?? ['?']
+    const partes = j.nombreCompleto ? j.nombreCompleto.split(',') : (j.apellido ? [j.apellido, j.nombre] : ['?'])
     const apellido = partes[0].trim()
     const inicial = partes[1]?.trim().charAt(0) ?? ''
     const etiqueta = inicial ? `${apellido}, ${inicial}.` : apellido
+    
+    const colorPrincipal = j.equipoColorPrincipal || j.equipoReal?.colorPrincipal
+    const colorSecundario = j.equipoColorSecundario || j.equipoReal?.colorSecundario
+    const modelo = j.equipoModeloCamiseta || j.equipoReal?.modeloCamiseta
 
     return (
         <div onClick={onTap} className="relative w-[90px] h-[105px] rounded-2xl flex flex-col items-center justify-between p-2 cursor-pointer bg-white/15 transition-transform hover:scale-105 z-20">
@@ -98,15 +103,19 @@ function SlotLleno({ slot, esCapitan, onTap }) {
             )}
             
             <CamisetaSVG
-                colorPrincipal={j.equipoReal?.colorPrincipal}
-                colorSecundario={j.equipoReal?.colorSecundario}
-                modelo={j.equipoReal?.modeloCamiseta}
+                colorPrincipal={colorPrincipal}
+                colorSecundario={colorSecundario}
+                modelo={modelo}
                 numero={j.numeroCamiseta}
                 estado={j.estado}
                 size={56}
             />
             <span className="text-white text-[11px] font-bold text-center w-full truncate leading-tight drop-shadow-md">{etiqueta}</span>
-            <span className="text-white/70 text-[10px] font-medium">{j.valorMercadoActual?.toFixed(1)} cr</span>
+            {modo === 'ranking' ? (
+                <span className="text-green-300 text-[11px] font-bold drop-shadow-md">{j.puntosAportados?.toFixed(1) ?? '0.0'} pts</span>
+            ) : (
+                <span className="text-white/70 text-[10px] font-medium">{j.valorMercadoActual?.toFixed(1)} cr</span>
+            )}
         </div>
     )
 }

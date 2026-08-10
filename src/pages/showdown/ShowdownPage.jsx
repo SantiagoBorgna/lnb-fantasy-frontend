@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { getShowdownEvento, getShowdownRanking } from '../../api/showdownApi'
+import { getShowdownEvento, getShowdownRanking, getShowdownMiEquipo } from '../../api/showdownApi'
 import ShowdownDraft from './ShowdownDraft'
 import ShowdownRanking from './ShowdownRanking'
 import { Loader2 } from 'lucide-react'
@@ -12,6 +12,7 @@ export default function ShowdownPage() {
     const [uuidDispositivo, setUuidDispositivo] = useState('')
     const [yaParticipo, setYaParticipo] = useState(false)
     const [ranking, setRanking] = useState([])
+    const [miEquipo, setMiEquipo] = useState(null)
 
     useEffect(() => {
         let uuid = localStorage.getItem('showdown_uuid')
@@ -35,6 +36,12 @@ export default function ShowdownPage() {
             
             if (rk.some(p => p.esMio)) {
                 setYaParticipo(true)
+                try {
+                    const equipo = await getShowdownMiEquipo(codigo, uuid)
+                    setMiEquipo(equipo)
+                } catch (e) {
+                    console.error("Error cargando equipo", e)
+                }
             }
         } catch (error) {
             console.error(error)
@@ -67,6 +74,7 @@ export default function ShowdownPage() {
         return <ShowdownRanking 
                     evento={evento} 
                     ranking={ranking} 
+                    miEquipo={miEquipo}
                     codigo={codigo} 
                     uuidDispositivo={uuidDispositivo} 
                 />
