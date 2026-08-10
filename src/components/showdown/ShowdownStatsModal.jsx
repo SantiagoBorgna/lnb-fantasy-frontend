@@ -12,7 +12,7 @@ export default function ShowdownStatsModal({ isOpen, onClose, jugador }) {
     return createPortal(
         <>
             <div className="fixed inset-0 bg-black/60 z-40" onClick={onClose} />
-            <div className="fixed bottom-0 md:top-1/2 md:-translate-y-1/2 md:bottom-auto left-0 right-0 max-w-md md:max-w-lg mx-auto bg-card border-t border-border rounded-t-3xl md:rounded-3xl z-50 p-6 md:p-8 space-y-5 md:space-y-6 animate-slide-up md:animate-none max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="fixed bottom-0 md:top-1/2 md:-translate-y-1/2 md:bottom-auto left-0 right-0 max-w-md mx-auto bg-card border-t border-border rounded-t-3xl md:rounded-3xl z-50 p-6 md:p-8 space-y-5 md:space-y-6 animate-slide-up md:animate-none max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
                 <div className="w-10 h-1 bg-border rounded-full mx-auto md:hidden" />
                 
                 {/* Cabecera */}
@@ -56,12 +56,20 @@ export default function ShowdownStatsModal({ isOpen, onClose, jugador }) {
                 {/* Estadísticas Detalladas */}
                 <div className="bg-surface rounded-2xl p-4 md:p-6 border border-border">
                     <div className="grid grid-cols-2 gap-y-3 gap-x-6 text-sm md:text-base pr-1">
-                        <StatRow label="Puntos" value={jugador.pts} />
-                        <StatRow label="Asistencias" value={jugador.ast} />
-                        <StatRow label="Rebotes Totales" value={jugador.reb} />
-                        <StatRow label="Recuperos" value={jugador.stl} />
-                        <StatRow label="Tapones" value={jugador.blk} />
-                        <StatRow label="Pérdidas" value={jugador.tov} warning />
+                        <StatRow label="Titular" value={jugador.fueTitular ? 'Sí' : 'No'} />
+                        <StatRow label="Victoria" value={jugador.gano ? 'Sí' : 'No'} />
+                        <StatRow label="Puntos" value={jugador.puntos} />
+                        <StatRow label="Asistencias" value={jugador.asistencias} />
+                        <StatRow label="Reb. Def." value={jugador.rebotesDefensivos} />
+                        <StatRow label="Reb. Of." value={jugador.rebotesOfensivos} />
+                        <StatRow label="Recuperos" value={jugador.recuperaciones} />
+                        <StatRow label="Tapones" value={jugador.taponesRealizados} />
+                        <StatRow label="Faltas Recibidas" value={jugador.faltasRecibidas} />
+                        <StatRow label="Pérdidas" value={jugador.perdidas} warning />
+                        <StatRow label="Tap. Recibidos" value={jugador.taponesRecibidos} warning />
+                        <StatRow label="Faltas Cometidas" value={jugador.faltasCometidas} warning />
+                        <StatRow label="TC Fallados" value={jugador.tirosDeCampoFallados} warning />
+                        <StatRow label="TL Fallados" value={jugador.tirosLibresFallados} warning />
                     </div>
                 </div>
                 
