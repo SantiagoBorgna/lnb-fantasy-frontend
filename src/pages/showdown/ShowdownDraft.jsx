@@ -161,16 +161,14 @@ export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParti
             <div className="min-h-screen bg-bg dark flex flex-col items-center justify-center p-4">
                 <div className="w-full max-w-sm bg-surface rounded-3xl p-8 border border-border shadow-2xl">
                     <div className="flex justify-center mb-6">
-                        <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center">
-                            <Users className="w-10 h-10 text-primary" />
-                        </div>
+                        <img src="/icons/logo-cuadrado.jpg" alt="Sexto Hombre Fantasy" className="w-24 h-24 object-cover rounded-2xl drop-shadow-xl" />
                     </div>
                     
                     <h1 className="text-2xl font-bold text-textMain text-center mb-2">
-                        {evento.localNombre} vs {evento.visitanteNombre}
+                        {evento.localNombre.replace(' (O)', '')} vs {evento.visitanteNombre.replace(' (O)', '')}
                     </h1>
                     <p className="text-textMuted text-center mb-8 text-sm">
-                        Ingresá tus datos para participar del Fantasy en vivo. ¡El mejor quinteto de la noche tiene premio!
+                        Ingresá tus datos para participar. ¡El mejor equipo de la noche tiene premio!
                     </p>
 
                     <form onSubmit={handleContinuar} className="space-y-4">
