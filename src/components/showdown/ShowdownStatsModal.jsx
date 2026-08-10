@@ -24,7 +24,12 @@ export default function ShowdownStatsModal({ isOpen, onClose, jugador }) {
                         size={56}
                     />
                     <div>
-                        <p className="text-textMain font-bold">{jugador.nombre} {jugador.apellido}</p>
+                        {(() => {
+                            const partes = jugador.nombreCompleto ? jugador.nombreCompleto.split(',') : (jugador.apellido ? [jugador.apellido, jugador.nombre] : ['']);
+                            const apellido = partes[0]?.trim();
+                            const nombre = partes[1]?.trim();
+                            return <p className="text-textMain font-bold">{nombre ? `${nombre} ${apellido}` : apellido}</p>;
+                        })()}
                         <p className="text-textMuted text-sm">{jugador.equipoSigla} · {jugador.posicion.replace('_', ' ')}</p>
                     </div>
                 </div>
