@@ -29,6 +29,7 @@ export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParti
     const [posicionSeleccionando, setPosicionSeleccionando] = useState(null) // 'Base', 'Escolta', etc
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [capitanId, setCapitanId] = useState(null)
+    const [jugadorAFichar, setJugadorAFichar] = useState(null)
     const [slotSeleccionado, setSlotSeleccionado] = useState(null)
     const [modalReglasOpen, setModalReglasOpen] = useState(false)
 
@@ -125,10 +126,10 @@ export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParti
 
         return (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-                <div className="bg-bg border border-border w-full max-w-md rounded-[32px] flex flex-col max-h-[80vh] shadow-2xl overflow-hidden">
+                <div className="bg-bg border border-border w-full max-w-md rounded-[32px] flex flex-col max-h-[80vh] shadow-2xl overflow-hidden relative">
                     <div className="p-5 border-b border-white/5 flex items-center justify-between bg-surface">
                         <div>
-                            <h3 className="font-bold text-white text-xl">Fichar Jugador</h3>
+                            <h3 className="font-bold text-white text-xl">Elegir jugador</h3>
                             <p className="text-sm text-textMuted uppercase tracking-wider font-semibold">{posicionSeleccionando}</p>
                         </div>
                         <button onClick={() => setPosicionSeleccionando(null)} className="text-textMuted hover:text-white bg-white/5 hover:bg-white/10 p-2 rounded-full transition-colors">
@@ -136,9 +137,9 @@ export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParti
                         </button>
                     </div>
                     
-                    <div className="p-4 bg-surface-lighter flex justify-between items-center text-sm">
-                        <span className="text-textMuted font-medium">Presupuesto</span>
-                        <span className="font-bold text-accent">${(presupuestoDisponible + (plantel[posicionSeleccionando]?.valorMercadoActual || 0)).toFixed(1)}m</span>
+                    <div className="p-4 bg-surface-lighter flex justify-between items-center text-base">
+                        <span className="text-textMuted font-bold">Presupuesto</span>
+                        <span className="font-bold text-accent text-lg">${(presupuestoDisponible + (plantel[posicionSeleccionando]?.valorMercadoActual || 0)).toFixed(1)}m</span>
                     </div>
 
                     <div className="overflow-y-auto p-4 flex-1 space-y-3 custom-scrollbar bg-bg">
@@ -151,15 +152,21 @@ export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParti
                                 const yaElegido = Object.values(plantel).some(j => j?.id === jugador.id)
 
                                 return (
-                                    <div key={jugador.id} className={`p-3 bg-card rounded-xl border flex items-center justify-between gap-3 shadow-sm transition-colors ${alcanza && !yaElegido ? 'border-border hover:border-white/20' : 'border-red-500/10 opacity-60'}`}>
+                                    <div 
+                                        key={jugador.id} 
+                                        onClick={() => {
+                                            if (alcanza && !yaElegido) setJugadorAFichar(jugador);
+                                        }}
+                                        className={`p-3 bg-card rounded-xl border flex items-center justify-between gap-3 shadow-sm transition-colors ${alcanza && !yaElegido ? 'border-border hover:border-white/20 cursor-pointer' : 'border-red-500/10 opacity-60 cursor-not-allowed'}`}
+                                    >
                                         <div className="flex items-center gap-3 flex-1 min-w-0">
                                             <div className="shrink-0">
                                                 <CamisetaSVG 
-                                                    colorPrincipal={jugador.colorPrincipal}
-                                                    colorSecundario={jugador.colorSecundario}
+                                                    colorPrincipal={jugador.equipoReal?.colorPrincipal}
+                                                    colorSecundario={jugador.equipoReal?.colorSecundario}
                                                     numero={jugador.numeroCamiseta}
                                                     estado={jugador.estado}
-                                                    modelo={jugador.modeloCamiseta}
+                                                    modelo={jugador.equipoReal?.modeloCamiseta}
                                                     size={36}
                                                 />
                                             </div>
@@ -172,24 +179,40 @@ export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParti
                                                 <span className="font-bold text-sm text-textMain">${jugador.valorMercadoActual}m</span>
                                             </div>
                                         </div>
-                                        <button 
-                                            disabled={!alcanza || yaElegido}
-                                            onClick={() => seleccionarJugador(jugador)}
-                                            className={`px-3 py-1.5 rounded-lg text-sm font-semibold active:scale-95 transition-transform whitespace-nowrap shrink-0 ${
-                                                yaElegido 
-                                                ? 'bg-white/5 text-textMuted border border-white/5 cursor-not-allowed'
-                                                : alcanza 
-                                                    ? 'bg-primary/20 text-primary border border-primary/50' 
-                                                    : 'bg-danger/10 text-danger border border-danger/20 cursor-not-allowed'
-                                            }`}
-                                        >
-                                            {yaElegido ? 'En Equipo' : 'Fichar'}
-                                        </button>
+                                        {yaElegido && <span className="text-[10px] font-bold text-textMuted bg-white/5 px-2 py-1 rounded shrink-0 uppercase tracking-wider">En Equipo</span>}
                                     </div>
                                 )
                             })
                         )}
                     </div>
+
+                    {jugadorAFichar && (
+                        <div className="absolute inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in zoom-in-95 duration-200" onClick={() => setJugadorAFichar(null)}>
+                            <div className="bg-card border border-border w-full max-w-[280px] rounded-3xl p-6 shadow-2xl flex flex-col gap-5" onClick={e => e.stopPropagation()}>
+                                <div className="text-center">
+                                    <h3 className="font-bold text-white text-lg">¿Fichar a {jugadorAFichar.nombreCompleto}?</h3>
+                                    <p className="text-textMuted text-sm mt-1">Se descontarán ${jugadorAFichar.valorMercadoActual}m</p>
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <button 
+                                        onClick={() => {
+                                            seleccionarJugador(jugadorAFichar);
+                                            setJugadorAFichar(null);
+                                        }}
+                                        className="w-full py-3 font-semibold text-bg bg-primary rounded-xl hover:bg-primary/90 transition-colors"
+                                    >
+                                        Fichar
+                                    </button>
+                                    <button 
+                                        onClick={() => setJugadorAFichar(null)}
+                                        className="w-full py-3 font-semibold text-textMuted bg-transparent hover:bg-surface border border-border rounded-xl transition-colors"
+                                    >
+                                        Cancelar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         )
