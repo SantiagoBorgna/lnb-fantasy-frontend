@@ -139,7 +139,7 @@ export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParti
                     
                     <div className="p-4 bg-surface-lighter flex justify-between items-center text-base">
                         <span className="text-textMuted font-bold">Presupuesto</span>
-                        <span className="font-bold text-accent text-lg">${(presupuestoDisponible + (plantel[posicionSeleccionando]?.valorMercadoActual || 0)).toFixed(1)}m</span>
+                        <span className="font-bold text-accent text-lg">{(presupuestoDisponible + (plantel[posicionSeleccionando]?.valorMercadoActual || 0)).toFixed(1)}cr</span>
                     </div>
 
                     <div className="overflow-y-auto p-4 flex-1 space-y-3 custom-scrollbar bg-bg">
@@ -176,7 +176,7 @@ export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParti
                                             </div>
                                             <div className="flex flex-col items-end shrink-0 md:mr-2">
                                                 <span className="text-[10px] text-textMuted uppercase font-bold tracking-wider">Valor</span>
-                                                <span className="font-bold text-sm text-textMain">${jugador.valorMercadoActual}m</span>
+                                                <span className="font-bold text-sm text-textMain">{jugador.valorMercadoActual}cr</span>
                                             </div>
                                         </div>
                                         {yaElegido && <span className="text-[10px] font-bold text-textMuted bg-white/5 px-2 py-1 rounded shrink-0 uppercase tracking-wider">En Equipo</span>}
@@ -304,8 +304,14 @@ export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParti
 
             <div className="w-full max-w-2xl bg-surface md:bg-card border-none md:border md:border-border rounded-none md:rounded-3xl flex flex-col shadow-none md:shadow-xl min-h-screen md:min-h-0 md:h-[90vh] overflow-y-auto custom-scrollbar relative pb-6 md:pb-10">
                 {/* Progress Bar simulada del onboarding o header space */}
-                <div className="flex justify-between items-center px-6 pt-6 md:pt-10 max-w-md mx-auto w-full shrink-0">
-                    <div className="flex-1 text-center">
+                <div className="relative flex justify-center items-center px-6 pt-6 md:pt-10 max-w-md mx-auto w-full shrink-0">
+                    <button 
+                        onClick={() => setModalReglasOpen(true)}
+                        className="absolute left-6 top-6 md:top-10 w-8 h-8 rounded-full bg-border flex items-center justify-center text-textMain font-bold hover:bg-border/80 transition-colors shrink-0"
+                    >
+                        ?
+                    </button>
+                    <div className="text-center">
                         <h1 className="text-textMain font-black text-lg">
                             {evento?.localNombre?.replace(' (O)', '') || 'Independiente'} vs {evento?.visitanteNombre?.replace(' (O)', '') || 'Visitante'}
                         </h1>
@@ -315,12 +321,6 @@ export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParti
                             </p>
                         )}
                     </div>
-                    <button 
-                        onClick={() => setModalReglasOpen(true)}
-                        className="w-8 h-8 rounded-full bg-border flex items-center justify-center text-textMain font-bold hover:bg-border/80 transition-colors shrink-0"
-                    >
-                        ?
-                    </button>
                 </div>
 
                 <div className="px-4 pt-4 pb-2 max-w-md mx-auto w-full space-y-3">
