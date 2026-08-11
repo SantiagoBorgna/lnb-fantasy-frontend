@@ -3,10 +3,11 @@ import { getTodosLosShowdowns, getPartidosDisponiblesParaShowdown, crearShowdown
 import { Loader2, Copy, CheckCircle, Trash2, ShieldAlert } from 'lucide-react'
 import { useAuthStore } from '../../store/authStore'
 import { Navigate, useNavigate } from 'react-router-dom'
-import { showToast } from '../../components/ui/Toast'
+import { useUiStore } from '../../store/uiStore'
 
 export default function AdminShowdownPanel() {
     const usuario = useAuthStore(state => state.usuario)
+    const showToast = useUiStore(state => state.showToast)
     const navigate = useNavigate()
 
     const [partidos, setPartidos] = useState([])
