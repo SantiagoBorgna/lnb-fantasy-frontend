@@ -334,7 +334,7 @@ export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParti
                         </div>
                         <div className="text-right">
                             <p className={`font-bold text-lg ${excedePresupuesto ? "text-red-400" : "text-accent"}`}>
-                                {presupuestoDisponible.toFixed(1)} cr
+                                {presupuestoDisponible.toFixed(1)}cr
                             </p>
                             <p className="text-textMuted text-xs">disponibles</p>
                         </div>
