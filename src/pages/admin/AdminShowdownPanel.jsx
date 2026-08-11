@@ -82,11 +82,24 @@ export default function AdminShowdownPanel() {
         )
     }
 
+    const partidosAgrupados = partidos.reduce((acc, p) => {
+        const j = p.jornada || 'Sin Jornada';
+        if (!acc[j]) acc[j] = [];
+        acc[j].push(p);
+        return acc;
+    }, {});
+
     return (
         <div className="min-h-screen bg-bg dark flex flex-col p-4 md:p-8">
-            <div className="max-w-5xl mx-auto w-full space-y-8">
+            <div className="max-w-5xl mx-auto w-full space-y-6">
                 
-                <div className="flex items-center gap-3 border-b border-white/10 pb-4">
+                <div className="flex items-center justify-between pb-4">
+                    <button onClick={() => navigate('/')} className="text-sm font-medium text-textMuted hover:text-white transition-colors">
+                        &larr; Volver
+                    </button>
+                </div>
+
+                <div className="flex items-center gap-3">
                     <ShieldAlert className="w-8 h-8 text-primary" />
                     <div>
                         <h1 className="text-2xl font-black text-textMain tracking-tight">Panel de Administrador</h1>
@@ -94,34 +107,54 @@ export default function AdminShowdownPanel() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Sub-navbar / Tabs */}
+                <div className="flex items-center gap-4 border-b border-white/10 pb-2">
+                    <button className="px-4 py-2 border-b-2 border-primary text-textMain font-bold">
+                        Showdowns
+                    </button>
+                    <button className="px-4 py-2 text-textMuted font-medium cursor-not-allowed opacity-50" title="Próximamente">
+                        Usuarios
+                    </button>
+                    <button className="px-4 py-2 text-textMuted font-medium cursor-not-allowed opacity-50" title="Próximamente">
+                        Scraper
+                    </button>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-4">
                     {/* Columna Izquierda: Partidos Disponibles */}
                     <div className="space-y-4">
                         <h2 className="text-lg font-bold text-textMain">Próximos Partidos (Sin Showdown)</h2>
                         
-                        <div className="space-y-3">
+                        <div className="space-y-6">
                             {partidos.length === 0 ? (
                                 <div className="bg-surface rounded-xl p-6 text-center text-textMuted text-sm border border-border">
                                     No hay partidos PROGRAMADOS sin Showdown en este momento.
                                 </div>
                             ) : (
-                                partidos.map(p => (
-                                    <div key={p.id} className="bg-surface border border-border rounded-xl p-4 flex items-center justify-between shadow-sm">
-                                        <div>
-                                            <p className="font-bold text-textMain">
-                                                {p.equipoLocal} vs {p.equipoVisitante}
-                                            </p>
-                                            <p className="text-xs text-textMuted mt-1">
-                                                {new Date(p.fechaHora).toLocaleString('es-AR', { dateStyle: 'long', timeStyle: 'short' })}
-                                            </p>
-                                        </div>
-                                        <button
-                                            onClick={() => handleCrear(p.id)}
-                                            disabled={creandoId === p.id}
-                                            className="px-4 py-2 bg-primary text-bg font-bold rounded-lg text-sm hover:bg-primary/90 transition-colors disabled:opacity-50"
-                                        >
-                                            {creandoId === p.id ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Crear Link'}
-                                        </button>
+                                Object.entries(partidosAgrupados).map(([jornada, lista]) => (
+                                    <div key={jornada} className="space-y-3">
+                                        <h3 className="text-sm font-black text-textMuted uppercase tracking-wider pl-1">
+                                            Jornada {jornada}
+                                        </h3>
+                                        {lista.map(p => (
+                                            <div key={p.id} className="bg-surface border border-border rounded-xl p-4 flex items-center justify-between shadow-sm">
+                                                <div>
+                                                    <p className="font-bold text-textMain">
+                                                        {p.equipoLocal} vs {p.equipoVisitante}
+                                                    </p>
+                                                    <p className="text-xs text-textMuted mt-1">
+                                                        {new Date(p.fechaHora).toLocaleString('es-AR', { dateStyle: 'long', timeStyle: 'short' })}
+                                                    </p>
+                                                </div>
+                                                <button
+                                                    onClick={() => handleCrear(p.id)}
+                                                    disabled={creandoId === p.id}
+                                                    className="px-4 py-2 bg-primary text-bg font-bold rounded-lg text-sm hover:bg-primary/90 transition-colors disabled:opacity-50"
+                                                >
+                                                    {creandoId === p.id ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Crear Link'}
+                                                </button>
+                                            </div>
+                                        ))}
                                     </div>
                                 ))
                             )}
@@ -186,12 +219,6 @@ export default function AdminShowdownPanel() {
                             )}
                         </div>
                     </div>
-                </div>
-
-                <div className="pt-8">
-                    <button onClick={() => navigate('/')} className="text-sm font-medium text-textMuted hover:text-white transition-colors">
-                        &larr; Volver a la App
-                    </button>
                 </div>
             </div>
         </div>
