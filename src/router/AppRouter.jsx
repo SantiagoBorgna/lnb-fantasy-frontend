@@ -21,6 +21,7 @@ import TerminosPage from '../pages/TerminosPage'
 import RedirectTorneo from '../components/ui/RedirectTorneo'
 import AdminShowdownPanel from '../pages/admin/AdminShowdownPanel'
 import ShowdownPage from '../pages/showdown/ShowdownPage'
+import MaintenancePage from '../pages/MaintenancePage'
 
 function PrivateRoute({ children }) {
     const token = useAuthStore(state => state.token)
@@ -53,6 +54,18 @@ function OnboardingGuard({ children }) {
 }
 
 export default function AppRouter() {
+    const isMaintenance = import.meta.env.VITE_MAINTENANCE_MODE === 'true'
+
+    if (isMaintenance) {
+        return (
+            <BrowserRouter>
+                <Routes>
+                    <Route path="*" element={<MaintenancePage />} />
+                </Routes>
+            </BrowserRouter>
+        )
+    }
+
     return (
         <BrowserRouter>
             <Toast />
