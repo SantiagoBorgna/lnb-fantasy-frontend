@@ -52,7 +52,7 @@ export default function BottomNav({ onLogout, className }) {
     }
 
     return (
-        <nav className={clsx("fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-card border-t border-border flex items-center justify-around h-16 px-2 z-50", className)}>
+        <nav className={clsx("fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-card border-t border-border flex items-center justify-around h-16 px-2 z-40", className)}>
             {renderNavItems().map(({ to, label, icon: Icon, exact }) => (
                 <NavLink
                     key={to}
