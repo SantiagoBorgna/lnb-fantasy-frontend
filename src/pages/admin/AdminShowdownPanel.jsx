@@ -4,6 +4,7 @@ import { Loader2, Copy, CheckCircle, Trash2, ShieldAlert } from 'lucide-react'
 import { useAuthStore } from '../../store/authStore'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { useUiStore } from '../../store/uiStore'
+import ConfirmModal from '../../components/ui/ConfirmModal'
 
 export default function AdminShowdownPanel() {
     const usuario = useAuthStore(state => state.usuario)
@@ -15,6 +16,7 @@ export default function AdminShowdownPanel() {
     const [loading, setLoading] = useState(true)
     const [copiadoId, setCopiadoId] = useState(null)
     const [creandoId, setCreandoId] = useState(null)
+    const [confirmModal, setConfirmModal] = useState({ isOpen: false, id: null })
 
     useEffect(() => {
         if (usuario?.rol !== 'ADMIN') return;
@@ -58,9 +60,13 @@ export default function AdminShowdownPanel() {
         setTimeout(() => setCopiadoId(null), 2000)
     }
 
-    const handleEliminar = async (id) => {
-        if (!window.confirm("¿Estás seguro de eliminar este Showdown? Esto borrará también a todos los participantes inscriptos.")) return;
-        
+    const handleEliminar = (id) => {
+        setConfirmModal({ isOpen: true, id })
+    }
+
+    const confirmarEliminacion = async () => {
+        const id = confirmModal.id;
+        setConfirmModal({ isOpen: false, id: null })
         try {
             await eliminarShowdown(id)
             showToast("Showdown eliminado", "success")
@@ -91,6 +97,13 @@ export default function AdminShowdownPanel() {
 
     return (
         <div className="min-h-screen bg-bg dark flex flex-col p-4 md:p-8">
+            <ConfirmModal
+                isOpen={confirmModal.isOpen}
+                onClose={() => setConfirmModal({ isOpen: false, id: null })}
+                onConfirm={confirmarEliminacion}
+                titulo="Eliminar Showdown"
+                mensaje="¿Estás seguro de eliminar este Showdown? Esto borrará también a todos los participantes inscriptos. Esta acción no se puede deshacer."
+            />
             <div className="max-w-5xl mx-auto w-full space-y-6">
                 
                 <div className="flex items-center justify-between pb-4">
