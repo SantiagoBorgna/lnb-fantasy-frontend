@@ -19,7 +19,7 @@ import CanchitaAjenaPage from '../pages/CanchitaAjenaPage'
 import SalaDraftPage from '../pages/SalaDraftPage'
 import TerminosPage from '../pages/TerminosPage'
 import RedirectTorneo from '../components/ui/RedirectTorneo'
-import TestAdminPanel from '../pages/admin/TestAdminPanel'
+import AdminShowdownPanel from '../pages/admin/AdminShowdownPanel'
 import ShowdownPage from '../pages/showdown/ShowdownPage'
 
 function PrivateRoute({ children }) {
@@ -80,9 +80,12 @@ export default function AppRouter() {
                     <PrivateRoute><MercadoPage modoOnboarding={true} /></PrivateRoute>
                 } />
 
-                {/* 🛠️ Admin Test */}
-                <Route path="/admin-test" element={
-                    <PrivateRoute><TestAdminPanel /></PrivateRoute>
+                {/* 🛠️ Admin Panel */}
+                <Route path="/admin" element={
+                    <PrivateRoute>
+                        {/* We will enforce admin check here or inside the component */}
+                        <AdminShowdownPanel />
+                    </PrivateRoute>
                 } />
 
                 {/* ── Showdown (Modo Estadio) ────────────────────────────── */}

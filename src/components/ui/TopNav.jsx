@@ -6,10 +6,12 @@ import {
     MarketIcon, 
     TrophyIcon, 
     StatsIcon, 
-    LogoutIcon 
+    LogoutIcon,
+    ShieldIcon
 } from './BottomNav'
 
 import ContextSwitcher from './ContextSwitcher'
+import { useAuthStore } from '../../store/authStore'
 
 const NAV_ITEMS = [
     { to: '/', label: 'Inicio', icon: HomeIcon, exact: true },
@@ -20,6 +22,22 @@ const NAV_ITEMS = [
 ]
 
 export default function TopNav({ onLogout, className }) {
+    const { usuario } = useAuthStore()
+    const isAdmin = usuario?.rol === 'ADMIN'
+
+    const renderNavItems = () => {
+        let items = [...NAV_ITEMS]
+        if (isAdmin) {
+            items.push({
+                to: '/admin',
+                label: 'Admin',
+                icon: ShieldIcon,
+                exact: false
+            })
+        }
+        return items
+    }
+
     return (
         <nav className={clsx("relative bg-card border-b border-border h-16 flex items-center justify-between px-6 shrink-0", className)}>
             <div className="flex items-center gap-4 z-10">
@@ -30,7 +48,7 @@ export default function TopNav({ onLogout, className }) {
             </div>
 
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-2">
-                {NAV_ITEMS.map(({ to, label, icon: Icon, exact }) => (
+                {renderNavItems().map(({ to, label, icon: Icon, exact }) => (
                     <NavLink
                         key={to}
                         to={to}

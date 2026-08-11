@@ -34,11 +34,26 @@ const NAV_ITEMS = [
 
 export default function BottomNav({ onLogout, className }) {
     const navigate = useNavigate()
-    const { setAuth } = useAuthStore()
+    const { setAuth, usuario } = useAuthStore()
+
+    const isAdmin = usuario?.rol === 'ADMIN'
+
+    const renderNavItems = () => {
+        let items = [...NAV_ITEMS]
+        if (isAdmin) {
+            items.push({
+                to: '/admin',
+                label: 'Admin',
+                icon: ShieldIcon,
+                exact: false
+            })
+        }
+        return items
+    }
 
     return (
         <nav className={clsx("fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-card border-t border-border flex items-center justify-around h-16 px-2 z-50", className)}>
-            {NAV_ITEMS.map(({ to, label, icon: Icon, exact }) => (
+            {renderNavItems().map(({ to, label, icon: Icon, exact }) => (
                 <NavLink
                     key={to}
                     to={to}
@@ -119,6 +134,14 @@ export function LogoutIcon({ className }) {
             stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round"
                 d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1" />
+        </svg>
+    )
+}
+
+export function ShieldIcon({ className }) {
+    return (
+        <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
         </svg>
     )
 }
