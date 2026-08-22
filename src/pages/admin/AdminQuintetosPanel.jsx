@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getJornadas } from '../../api/fixtureApi'
+import { getJornadas } from '../../api/jornadaApi'
 import { getQuintetosPorJornada } from '../../api/adminApi'
 import { Loader2, Star, ShieldAlert } from 'lucide-react'
 
