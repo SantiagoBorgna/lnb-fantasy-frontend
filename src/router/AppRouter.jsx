@@ -19,7 +19,7 @@ import CanchitaAjenaPage from '../pages/CanchitaAjenaPage'
 import SalaDraftPage from '../pages/SalaDraftPage'
 import TerminosPage from '../pages/TerminosPage'
 import RedirectTorneo from '../components/ui/RedirectTorneo'
-import AdminShowdownPanel from '../pages/admin/AdminShowdownPanel'
+import AdminPage from '../pages/admin/AdminPage'
 import ShowdownPage from '../pages/showdown/ShowdownPage'
 import MaintenancePage from '../pages/MaintenancePage'
 
@@ -96,8 +96,7 @@ export default function AppRouter() {
                 {/* 🛠️ Admin Panel */}
                 <Route path="/admin" element={
                     <PrivateRoute>
-                        {/* We will enforce admin check here or inside the component */}
-                        <AdminShowdownPanel />
+                        <AdminPage />
                     </PrivateRoute>
                 } />
 

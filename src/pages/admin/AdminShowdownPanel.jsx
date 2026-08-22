@@ -79,14 +79,19 @@ export default function AdminShowdownPanel() {
     if (usuario?.rol !== 'ADMIN') {
         return <Navigate to="/" replace />
     }
-
     if (loading) {
         return (
-            <div className="min-h-screen bg-bg dark flex items-center justify-center">
+            <div className="flex items-center justify-center py-20">
                 <Loader2 className="w-10 h-10 animate-spin text-primary" />
             </div>
         )
     }
+
+    const showdownsPorPartido = showdowns.reduce((acc, sh) => {
+        if (!acc[sh.partidoId]) acc[sh.partidoId] = [];
+        acc[sh.partidoId].push(sh);
+        return acc;
+    }, {});
 
     const partidosAgrupados = partidos.reduce((acc, p) => {
         const j = p.jornada || 'Sin Jornada';
@@ -96,7 +101,7 @@ export default function AdminShowdownPanel() {
     }, {});
 
     return (
-        <div className="min-h-screen bg-bg dark flex flex-col p-4 md:p-8">
+        <div className="flex flex-col animate-fade-in">
             <ConfirmModal
                 isOpen={confirmModal.isOpen}
                 onClose={() => setConfirmModal({ isOpen: false, id: null })}
@@ -104,36 +109,8 @@ export default function AdminShowdownPanel() {
                 titulo="Eliminar Showdown"
                 mensaje="¿Estás seguro de eliminar este Showdown? Esto borrará también a todos los participantes inscriptos. Esta acción no se puede deshacer."
             />
-            <div className="max-w-5xl mx-auto w-full space-y-6">
-                
-                <div className="flex items-center justify-between pb-4">
-                    <button onClick={() => navigate('/')} className="text-sm font-medium text-textMuted hover:text-white transition-colors">
-                        &larr; Volver
-                    </button>
-                </div>
-
-                <div className="flex items-center gap-3">
-                    <ShieldAlert className="w-8 h-8 text-primary" />
-                    <div>
-                        <h1 className="text-2xl font-black text-textMain tracking-tight">Panel de Administrador</h1>
-                        <p className="text-textMuted text-sm">Gestión de herramientas y Showdowns</p>
-                    </div>
-                </div>
-
-                {/* Sub-navbar / Tabs */}
-                <div className="flex items-center gap-4 border-b border-white/10 pb-2">
-                    <button className="px-4 py-2 border-b-2 border-primary text-textMain font-bold">
-                        Showdowns
-                    </button>
-                    <button className="px-4 py-2 text-textMuted font-medium cursor-not-allowed opacity-50" title="Próximamente">
-                        Usuarios
-                    </button>
-                    <button className="px-4 py-2 text-textMuted font-medium cursor-not-allowed opacity-50" title="Próximamente">
-                        Scraper
-                    </button>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-4">
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-4">
                     {/* Columna Izquierda: Partidos Disponibles */}
                     <div className="space-y-4">
                         <h2 className="text-lg font-bold text-textMain">Próximos Partidos (Sin Showdown)</h2>
@@ -233,7 +210,6 @@ export default function AdminShowdownPanel() {
                         </div>
                     </div>
                 </div>
-            </div>
         </div>
     )
 }

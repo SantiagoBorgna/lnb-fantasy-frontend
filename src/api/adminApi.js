@@ -19,3 +19,8 @@ export const eliminarShowdown = async (id) => {
     const { data } = await api.delete(`/admin/showdown/${id}`);
     return data;
 };
+
+export const getQuintetosPorJornada = async (jornadaId) => {
+    const { data } = await api.get(/admin/quintetos?jornadaId=);
+    return data;
+};
