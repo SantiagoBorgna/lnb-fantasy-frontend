@@ -137,7 +137,7 @@ export default function ShowdownRanking({ evento, ranking, miEquipo, uuidDisposi
                         Registrate en Sexto Hombre Fantasy y competí todas las semanas por grandes premios. ¡Es gratis!
                     </p>
                     <button 
-                        onClick={() => window.location.href = '/'} 
+                        onClick={() => window.open('/', '_blank')} 
                         className="w-full bg-primary text-bg font-bold rounded-xl py-3 hover:bg-primary/90 transition-colors shadow-md"
                     >
                         ¡Registrarme ahora!

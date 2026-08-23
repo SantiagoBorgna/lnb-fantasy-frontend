@@ -26,7 +26,7 @@ export default function AdminPage() {
                             Volver al inicio
                         </Link>
                         <h1 className="text-3xl font-black text-textMain font-display tracking-tight">Panel de Administrador</h1>
-                        <p className="text-textMuted mt-1">GestionÃ¡ los modos de juego y estadÃ­sticas</p>
+                        <p className="text-textMuted mt-1">Gestioná los modos de juego y estadísticas</p>
                     </div>
 
                     {/* Tabs */}
