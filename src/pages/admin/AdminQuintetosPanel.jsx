@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { getJornadas } from '../../api/jornadaApi'
 import { getQuintetosPorJornada } from '../../api/adminApi'
 import { Loader2, Star, ShieldAlert } from 'lucide-react'
+import CamisetaSVG from '../../components/jugador/CamisetaSVG'
 
 export default function AdminQuintetosPanel() {
     const [jornadas, setJornadas] = useState([])
@@ -65,8 +66,14 @@ export default function AdminQuintetosPanel() {
     const renderJugador = (jugador, index) => (
         <div key={`${jugador.id}-${index}`} className="bg-card border border-border rounded-xl p-4 flex items-center justify-between shadow-sm">
             <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center shrink-0">
-                    <span className="text-sm font-bold text-textMuted">{formatearPosicion(jugador.posicion).substring(0, 3)}</span>
+                <div className="w-12 h-12 flex items-center justify-center shrink-0">
+                    <CamisetaSVG 
+                        numero={jugador.numeroCamiseta}
+                        modelo={jugador.modeloCamiseta}
+                        colorPrincipal={jugador.colorPrincipal}
+                        colorSecundario={jugador.colorSecundario}
+                        size={48}
+                    />
                 </div>
                 <div>
                     <div className="flex items-center gap-2">
@@ -105,7 +112,7 @@ export default function AdminQuintetosPanel() {
                 >
                     <option value="" disabled>Elegir jornada...</option>
                     {jornadas.map(j => (
-                        <option key={j.id} value={j.id}>Jornada {j.numero} ({j.estado})</option>
+                        <option key={j.id} value={j.id}>Jornada {j.numero}</option>
                     ))}
                 </select>
             </div>
