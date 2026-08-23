@@ -130,6 +130,19 @@ export default function ShowdownRanking({ evento, ranking, miEquipo, uuidDisposi
                         )}
                     </div>
                 </div>
+
+                <div className="bg-gradient-to-r from-primary/20 to-accent/20 border border-primary/30 rounded-2xl p-6 text-center mt-4">
+                    <h3 className="text-lg font-black text-textMain mb-2">¿Querés seguir jugando?</h3>
+                    <p className="text-sm text-textMuted mb-4">
+                        Registrate en Sexto Hombre Fantasy y competí todas las semanas por grandes premios. ¡Es gratis!
+                    </p>
+                    <button 
+                        onClick={() => window.location.href = '/'} 
+                        className="w-full bg-primary text-bg font-bold rounded-xl py-3 hover:bg-primary/90 transition-colors shadow-md"
+                    >
+                        ¡Registrarme ahora!
+                    </button>
+                </div>
             </>
         ) : (
             <div className="animate-fade-in space-y-4">

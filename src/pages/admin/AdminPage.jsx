@@ -9,7 +9,7 @@ import AdminQuintetosPanel from './AdminQuintetosPanel'
 
 export default function AdminPage() {
     const usuario = useAuthStore(state => state.usuario)
-    const [tab, setTab] = useState('SHOWDOWNS') // 'SHOWDOWNS' o 'QUINTETOS'
+    const [tab, setTab] = useState('RELAMPAGOS') // 'RELAMPAGOS' o 'QUINTETOS'
 
     if (!usuario || usuario.rol !== 'ADMIN') {
         return <Navigate to="/" replace />
@@ -26,19 +26,19 @@ export default function AdminPage() {
                             Volver al inicio
                         </Link>
                         <h1 className="text-3xl font-black text-textMain font-display tracking-tight">Panel de Administrador</h1>
-                        <p className="text-textMuted mt-1">Gestioná los modos de juego y estadísticas</p>
+                        <p className="text-textMuted mt-1">GestionÃ¡ los modos de juego y estadÃ­sticas</p>
                     </div>
 
                     {/* Tabs */}
                     <div className="flex p-1 bg-surface rounded-xl border border-border w-full md:w-max mx-auto md:mx-0">
                         <button
-                            onClick={() => setTab('SHOWDOWNS')}
+                            onClick={() => setTab('RELAMPAGOS')}
                             className={clsx(
                                 "flex-1 md:w-48 py-2 text-sm font-bold rounded-lg transition-all",
-                                tab === 'SHOWDOWNS' ? "bg-card text-textMain shadow-sm border border-border" : "text-textMuted hover:text-textMain"
+                                tab === 'RELAMPAGOS' ? "bg-card text-textMain shadow-sm border border-border" : "text-textMuted hover:text-textMain"
                             )}
                         >
-                            Modo Showdown
+                            Modo Relámpago
                         </button>
                         <button
                             onClick={() => setTab('QUINTETOS')}
@@ -53,7 +53,7 @@ export default function AdminPage() {
 
                     {/* Content */}
                     <div className="mt-4">
-                        {tab === 'SHOWDOWNS' && <AdminShowdownPanel />}
+                        {tab === 'RELAMPAGOS' && <AdminShowdownPanel />}
                         {tab === 'QUINTETOS' && <AdminQuintetosPanel />}
                     </div>
                 </div>

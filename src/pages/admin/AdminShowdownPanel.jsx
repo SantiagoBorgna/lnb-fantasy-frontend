@@ -44,10 +44,10 @@ export default function AdminShowdownPanel() {
         try {
             setCreandoId(partidoId)
             await crearShowdownManual(partidoId)
-            showToast("¡Showdown creado exitosamente!", "success")
+            showToast("¡Relámpago creado exitosamente!", "success")
             cargarDatos()
         } catch (error) {
-            showToast("Error al crear showdown", "error")
+            showToast("Error al crear Relámpago", "error")
         } finally {
             setCreandoId(null)
         }
@@ -69,10 +69,10 @@ export default function AdminShowdownPanel() {
         setConfirmModal({ isOpen: false, id: null })
         try {
             await eliminarShowdown(id)
-            showToast("Showdown eliminado", "success")
+            showToast("Relámpago eliminado", "success")
             cargarDatos()
         } catch (error) {
-            showToast("Error al eliminar showdown", "error")
+            showToast("Error al eliminar Relámpago", "error")
         }
     }
 
@@ -106,19 +106,19 @@ export default function AdminShowdownPanel() {
                 isOpen={confirmModal.isOpen}
                 onClose={() => setConfirmModal({ isOpen: false, id: null })}
                 onConfirm={confirmarEliminacion}
-                titulo="Eliminar Showdown"
-                mensaje="¿Estás seguro de eliminar este Showdown? Esto borrará también a todos los participantes inscriptos. Esta acción no se puede deshacer."
+                titulo="Eliminar Relámpago"
+                mensaje="¿Estás seguro de eliminar este Relámpago? Esto borrará también a todos los participantes inscriptos. Esta acción no se puede deshacer."
             />
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-4">
                     {/* Columna Izquierda: Partidos Disponibles */}
                     <div className="space-y-4">
-                        <h2 className="text-lg font-bold text-textMain">Próximos Partidos (Sin Showdown)</h2>
+                        <h2 className="text-lg font-bold text-textMain">Próximos Partidos (Sin Relámpago)</h2>
                         
                         <div className="space-y-6">
                             {partidos.length === 0 ? (
                                 <div className="bg-surface rounded-xl p-6 text-center text-textMuted text-sm border border-border">
-                                    No hay partidos PROGRAMADOS sin Showdown en este momento.
+                                    No hay partidos PROGRAMADOS sin Relámpago en este momento.
                                 </div>
                             ) : (
                                 Object.entries(partidosAgrupados).map(([jornada, lista]) => (
@@ -151,14 +151,14 @@ export default function AdminShowdownPanel() {
                         </div>
                     </div>
 
-                    {/* Columna Derecha: Showdowns Creados */}
+                    {/* Columna Derecha: Relámpagos Creados */}
                     <div className="space-y-4">
-                        <h2 className="text-lg font-bold text-textMain">Showdowns Históricos</h2>
+                        <h2 className="text-lg font-bold text-textMain">Relámpagos Históricos</h2>
                         
                         <div className="space-y-3">
                             {showdowns.length === 0 ? (
                                 <div className="bg-surface rounded-xl p-6 text-center text-textMuted text-sm border border-border">
-                                    Aún no creaste ningún Showdown.
+                                    Aún no creaste ningún Relámpago.
                                 </div>
                             ) : (
                                 showdowns.map(s => (
