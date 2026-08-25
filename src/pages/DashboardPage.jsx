@@ -1,7 +1,8 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useAuthStore } from '../store/authStore'
 import { useGameStore } from '../store/gameStore'
+import { useUiStore } from '../store/uiStore'
 import { useCountdown } from '../hooks/useCountdown'
 import { getJornadaProxima, getJornadaActiva, getJornadas } from '../api/jornadaApi'
 import { getPlantel } from '../api/plantelApi'
@@ -56,6 +57,21 @@ export default function DashboardPage() {
         if (!jornadasRes) return [];
         return jornadasRes.filter(j => j.estado === 'FINALIZADA').sort((a, b) => b.numero - a.numero)
     }, [jornadasRes]);
+
+    const showToast = useUiStore(state => state.showToast);
+
+    // Check for BAJA
+    useEffect(() => {
+        if (plantel?.jugadores?.some(j => j.estado === 'BAJA')) {
+            const bajaBanned = sessionStorage.getItem(`baja_alerted_${usuario?.id}`);
+            if (!bajaBanned) {
+                const bjas = plantel.jugadores.filter(j => j.estado === 'BAJA');
+                const textoBajas = bjas.map(j => `${j.nombreCompleto.split(',')[0]} fue cortado por ${j.equipoSigla}`).join(', y ');
+                showToast(`⚠️ ${textoBajas}, acomodá tu equipo ahora!`);
+                sessionStorage.setItem(`baja_alerted_${usuario?.id}`, 'true');
+            }
+        }
+    }, [plantel, usuario, showToast]);
 
     // ── Derivación de Datos ──
     const jornada = useMemo(() => {

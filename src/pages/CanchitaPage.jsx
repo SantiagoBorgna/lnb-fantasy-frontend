@@ -156,6 +156,17 @@ export default function CanchitaPage() {
         if (plantelRes) {
             setPlantel(plantelRes);
             setJugadores(plantelRes.jugadores ?? []);
+            
+            // Check for BAJA players
+            if (plantelRes.jugadores?.some(j => j.estado === 'BAJA')) {
+                const bajaBanned = sessionStorage.getItem(`baja_alerted_${usuario?.id}`);
+                if (!bajaBanned) {
+                    const bjas = plantelRes.jugadores.filter(j => j.estado === 'BAJA');
+                    const textoBajas = bjas.map(j => `${j.nombreCompleto.split(',')[0]} fue cortado por ${j.equipoSigla}`).join(', y ');
+                    showToast(`⚠️ ${textoBajas}, acomodá tu equipo ahora!`);
+                    sessionStorage.setItem(`baja_alerted_${usuario?.id}`, 'true');
+                }
+            }
         } else if (plantelRes === null) {
             setPlantel(null);
             setJugadores([]);

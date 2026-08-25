@@ -15,6 +15,7 @@ export default function SlotJugador({
     esDraft = false,
 }) {
     const esCap = jugador.rol === 'CAPITAN'
+    const esBaja = jugador.estado === 'BAJA'
 
     // El valor mostrado depende del modo:
     // - undefined → modo edición → mostrar créditos (o nada en draft)
@@ -55,14 +56,15 @@ export default function SlotJugador({
                 'relative flex flex-col items-center justify-between',
                 'w-[100px] h-[116px] p-2 rounded-2xl',
                 'cursor-pointer select-none transition-opacity duration-150',
-                esSexto
+                esBaja ? 'bg-red-500/20 ring-2 ring-red-500 opacity-60' :
+                (esSexto
                     ? 'bg-accent/25 ring-1 ring-accent/60'
-                    : 'bg-white/15',
+                    : 'bg-white/15'),
                 opaco && 'opacity-20 pointer-events-none',
             )}
         >
             {/* Badges superpuestos */}
-            {esCap && (
+            {esCap && !esBaja && (
                 <div className="absolute -top-1.5 -right-1.5 z-10
                         w-5 h-5 rounded-full bg-yellow-500
                         flex items-center justify-center
@@ -70,12 +72,20 @@ export default function SlotJugador({
                     <span className="text-white text-xs font-black leading-none">C</span>
                 </div>
             )}
-            {esSexto && (
+            {esSexto && !esBaja && (
                 <div className="absolute -top-1.5 -right-1.5 z-10
                         w-5 h-5 rounded-full bg-accent
                         flex items-center justify-center
                         ring-2 ring-surface">
                     <span className="text-white text-xs font-black leading-none">6</span>
+                </div>
+            )}
+            {esBaja && (
+                <div className="absolute -top-1.5 -right-1.5 z-20
+                        bg-red-600 rounded px-1.5 py-0.5
+                        flex items-center justify-center
+                        ring-2 ring-surface">
+                    <span className="text-white text-[9px] font-black leading-none">BAJA</span>
                 </div>
             )}
             {jugador.rol === 'SUPLENTE' && (
