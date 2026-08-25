@@ -66,8 +66,8 @@ export default function DashboardPage() {
             const bajaBanned = sessionStorage.getItem(`baja_alerted_${usuario?.id}`);
             if (!bajaBanned) {
                 const bjas = plantel.jugadores.filter(j => j.estado === 'BAJA');
-                const textoBajas = bjas.map(j => `${j.nombreCompleto.split(',')[0]} fue cortado por ${j.equipoSigla}`).join(', y ');
-                showToast(`⚠️ ${textoBajas}, acomodá tu equipo ahora!`);
+                const textoBajas = bjas.map(j => `${j.nombreCompleto.split(',')[0]} fue cortado por ${j.equipoNombre}`).join(', y ');
+                showToast(`${textoBajas}, acomodá tu equipo ahora!`);
                 sessionStorage.setItem(`baja_alerted_${usuario?.id}`, 'true');
             }
         }
