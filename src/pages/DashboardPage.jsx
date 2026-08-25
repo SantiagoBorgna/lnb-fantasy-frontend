@@ -64,7 +64,13 @@ export default function DashboardPage() {
     useEffect(() => {
         if (plantel?.jugadores?.some(j => j.estado === 'BAJA')) {
             const alertedIdsStr = sessionStorage.getItem(`baja_alerted_${usuario?.id}`) || '[]';
-            const alertedIds = JSON.parse(alertedIdsStr);
+            let alertedIds = [];
+            try {
+                const parsed = JSON.parse(alertedIdsStr);
+                if (Array.isArray(parsed)) alertedIds = parsed;
+            } catch (e) {
+                // Ignore parse error
+            }
             const bjas = plantel.jugadores.filter(j => j.estado === 'BAJA');
             const nuevasBajas = bjas.filter(j => !alertedIds.includes(j.jugadorRealId));
 
