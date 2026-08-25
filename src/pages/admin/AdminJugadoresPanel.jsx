@@ -83,9 +83,9 @@ export default function AdminJugadoresPanel() {
                         onChange={e => setFiltroEquipo(e.target.value)}
                         className="bg-bg border border-border rounded-lg px-4 py-2.5 text-sm text-textMain focus:outline-none focus:border-primary flex-1 md:w-48 appearance-none"
                     >
-                        <option value="">Todos los Clubes</option>
+                        <option value="" className="bg-card text-textMain">Todos los Clubes</option>
                         {equipos.map(eq => (
-                            <option key={eq.id} value={eq.id}>{eq.sigla}</option>
+                            <option key={eq.id} value={eq.id} className="bg-card text-textMain">{eq.sigla}</option>
                         ))}
                     </select>
                     <select 
@@ -93,12 +93,12 @@ export default function AdminJugadoresPanel() {
                         onChange={e => setFiltroEstado(e.target.value)}
                         className="bg-bg border border-border rounded-lg px-4 py-2.5 text-sm text-textMain focus:outline-none focus:border-primary flex-1 md:w-40 appearance-none"
                     >
-                        <option value="">Todos los Estados</option>
-                        <option value="DISPONIBLE">Disponible</option>
-                        <option value="LESIONADO">Lesionado</option>
-                        <option value="SUSPENDIDO">Suspendido</option>
-                        <option value="DUDA">Duda</option>
-                        <option value="BAJA">Baja</option>
+                        <option value="" className="bg-card text-textMain">Todos los Estados</option>
+                        <option value="DISPONIBLE" className="bg-card text-textMain">Disponible</option>
+                        <option value="LESIONADO" className="bg-card text-textMain">Lesionado</option>
+                        <option value="SUSPENDIDO" className="bg-card text-textMain">Suspendido</option>
+                        <option value="DUDA" className="bg-card text-textMain">Duda</option>
+                        <option value="BAJA" className="bg-card text-textMain">Baja</option>
                     </select>
                 </div>
             </div>
@@ -106,26 +106,26 @@ export default function AdminJugadoresPanel() {
             {/* Tabla */}
             <div className="bg-surface border border-border rounded-2xl overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
+                    <table className="w-full text-left border-collapse table-fixed">
                         <thead>
                             <tr className="bg-card border-b border-border">
-                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider">Nombre</th>
-                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider">Club</th>
-                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider">Posición</th>
-                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider">Precio</th>
-                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider">Estado</th>
-                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider text-right">Acción</th>
+                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-1/3">Nombre</th>
+                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[15%]">Club</th>
+                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[15%]">Posición</th>
+                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[15%]">Precio</th>
+                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[12%]">Estado</th>
+                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider text-right w-[10%]">Acción</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-border">
                             {jugadoresFiltrados.map(j => (
                                 <tr key={j.id} className="hover:bg-white/5 transition-colors group">
-                                    <td className="p-4">
-                                        <div className="font-bold text-textMain text-sm">{j.nombreCompleto}</div>
+                                    <td className="p-4 truncate">
+                                        <div className="font-bold text-textMain text-sm truncate" title={j.nombreCompleto}>{j.nombreCompleto}</div>
                                     </td>
-                                    <td className="p-4 text-sm text-textMuted font-medium">{j.equipoSigla}</td>
-                                    <td className="p-4 text-sm text-textMuted">{j.posicion.replace("_", " ")}</td>
-                                    <td className="p-4 font-bold text-accent">${j.valorMercadoActual.toFixed(1)}m</td>
+                                    <td className="p-4 text-sm text-textMuted font-medium truncate">{j.equipoSigla}</td>
+                                    <td className="p-4 text-sm text-textMuted truncate">{j.posicion.replace("_", " ")}</td>
+                                    <td className="p-4 font-bold text-accent truncate">${j.valorMercadoActual.toFixed(1)}m</td>
                                     <td className="p-4">
                                         <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded ${
                                             j.estado === "DISPONIBLE" ? "bg-green-500/10 text-green-500" :
