@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 
 export default function AdminEditarJugadorModal({ isOpen, onClose, jugador, equipos, onSave }) {
@@ -46,7 +46,7 @@ export default function AdminEditarJugadorModal({ isOpen, onClose, jugador, equi
                 <form onSubmit={handleSubmit} className="p-6 space-y-5">
                     <div>
                         <p className="font-bold text-lg text-textMain">{jugador.nombreCompleto}</p>
-                        <p className="text-sm text-textMuted">{jugador.equipoSigla} Â• {jugador.posicion.replace("_", " ")}</p>
+                        <p className="text-sm text-textMuted">{jugador.equipoSigla}  {jugador.posicion.replace("_", " ")}</p>
                     </div>
 
                     <div className="space-y-4">
@@ -57,26 +57,26 @@ export default function AdminEditarJugadorModal({ isOpen, onClose, jugador, equi
                                 onChange={(e) => setFormData({...formData, estado: e.target.value})}
                                 className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-textMain focus:outline-none focus:border-primary transition-colors appearance-none"
                             >
-                                <option className="bg-card text-textMain" value="DISPONIBLE">DISPONIBLE</option>
-                                <option className="bg-card text-textMain" value="LESIONADO">LESIONADO</option>
-                                <option className="bg-card text-textMain" value="SUSPENDIDO">SUSPENDIDO</option>
-                                <option className="bg-card text-textMain" value="DUDA">DUDA</option>
-                                <option className="bg-card text-textMain" value="BAJA">BAJA (No juega mÃ¡s)</option>
+                                <option value="DISPONIBLE" className="bg-card text-textMain">DISPONIBLE</option>
+                                <option value="LESIONADO" className="bg-card text-textMain">LESIONADO</option>
+                                <option value="SUSPENDIDO" className="bg-card text-textMain">SUSPENDIDO</option>
+                                <option value="DUDA" className="bg-card text-textMain">DUDA</option>
+                                <option value="BAJA" className="bg-card text-textMain">BAJA (No juega más)</option>
                             </select>
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-textMain mb-1.5 ml-1">PosiciÃ³n</label>
+                            <label className="block text-sm font-medium text-textMain mb-1.5 ml-1">Posición</label>
                             <select 
                                 value={formData.posicion}
                                 onChange={(e) => setFormData({...formData, posicion: e.target.value})}
                                 className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-textMain focus:outline-none focus:border-primary transition-colors appearance-none"
                             >
-                                <option className="bg-card text-textMain" value="BASE">BASE</option>
-                                <option className="bg-card text-textMain" value="ESCOLTA">ESCOLTA</option>
-                                <option className="bg-card text-textMain" value="ALERO">ALERO</option>
-                                <option className="bg-card text-textMain" value="ALA_PIVOT">ALA PIVOT</option>
-                                <option className="bg-card text-textMain" value="PIVOT">PIVOT</option>
+                                <option value="BASE" className="bg-card text-textMain">BASE</option>
+                                <option value="ESCOLTA" className="bg-card text-textMain">ESCOLTA</option>
+                                <option value="ALERO" className="bg-card text-textMain">ALERO</option>
+                                <option value="ALA_PIVOT" className="bg-card text-textMain">ALA PIVOT</option>
+                                <option value="PIVOT" className="bg-card text-textMain">PIVOT</option>
                             </select>
                         </div>
 
@@ -87,15 +87,15 @@ export default function AdminEditarJugadorModal({ isOpen, onClose, jugador, equi
                                 onChange={(e) => setFormData({...formData, equipoRealId: e.target.value})}
                                 className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-textMain focus:outline-none focus:border-primary transition-colors appearance-none"
                             >
-                                <option className="bg-card text-textMain" value="">Seleccionar Club...</option>
+                                <option value="" className="bg-card text-textMain">Seleccionar Club...</option>
                                 {equipos.map(eq => (
-                                    <option key={eq.id} value={eq.id}>{eq.nombre} ({eq.sigla})</option>
+                                    <option key={eq.id} value={eq.id} className="bg-card text-textMain">{eq.nombre} ({eq.sigla})</option>
                                 ))}
                             </select>
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-textMain mb-1.5 ml-1">Precio (CrÃ©ditos)</label>
+                            <label className="block text-sm font-medium text-textMain mb-1.5 ml-1">Precio (Créditos)</label>
                             <input 
                                 type="number"
                                 step="0.1"
