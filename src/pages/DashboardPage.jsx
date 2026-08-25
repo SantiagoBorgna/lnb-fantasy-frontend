@@ -63,12 +63,17 @@ export default function DashboardPage() {
     // Check for BAJA
     useEffect(() => {
         if (plantel?.jugadores?.some(j => j.estado === 'BAJA')) {
-            const bajaBanned = sessionStorage.getItem(`baja_alerted_${usuario?.id}`);
-            if (!bajaBanned) {
-                const bjas = plantel.jugadores.filter(j => j.estado === 'BAJA');
-                const textoBajas = bjas.map(j => `${j.nombreCompleto.split(',')[0]} fue cortado por ${j.equipoNombre}`).join(', y ');
+            const alertedIdsStr = sessionStorage.getItem(`baja_alerted_${usuario?.id}`) || '[]';
+            const alertedIds = JSON.parse(alertedIdsStr);
+            const bjas = plantel.jugadores.filter(j => j.estado === 'BAJA');
+            const nuevasBajas = bjas.filter(j => !alertedIds.includes(j.jugadorRealId));
+
+            if (nuevasBajas.length > 0) {
+                const textoBajas = nuevasBajas.map(j => `${j.nombreCompleto.split(',')[0]} fue cortado por ${j.equipoNombre}`).join(', y ');
                 showToast(`⚠️ ${textoBajas}, acomodá tu equipo ahora!`, 'error', { persist: true, centered: true, size: 'lg' });
-                sessionStorage.setItem(`baja_alerted_${usuario?.id}`, 'true');
+                
+                const newAlertedIds = [...alertedIds, ...nuevasBajas.map(j => j.jugadorRealId)];
+                sessionStorage.setItem(`baja_alerted_${usuario?.id}`, JSON.stringify(newAlertedIds));
             }
         }
     }, [plantel, usuario, showToast]);
