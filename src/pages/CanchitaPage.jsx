@@ -171,7 +171,7 @@ export default function CanchitaPage() {
 
                 if (nuevasBajas.length > 0) {
                     const textoBajas = nuevasBajas.map(j => `${j.nombreCompleto.split(',')[0]} fue cortado por ${j.equipoNombre}`).join(', y ');
-                    showToast(`⚠️ ${textoBajas}, acomodá tu equipo ahora!`, 'error', { persist: true, centered: true, size: 'lg' });
+                    showToast(`${textoBajas}, acomodá tu equipo ahora!`, 'error', { persist: true, centered: true, size: 'lg' });
                     
                     const newAlertedIds = [...alertedIds, ...nuevasBajas.map(j => j.jugadorRealId)];
                     sessionStorage.setItem(`baja_alerted_${usuario?.id}`, JSON.stringify(newAlertedIds));
