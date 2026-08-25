@@ -85,7 +85,7 @@ export default function SlotJugador({
                         bg-red-600 rounded px-1.5 py-0.5
                         flex items-center justify-center
                         ring-2 ring-surface">
-                    <span className="text-white text-[9px] font-black leading-none">BAJA</span>
+                    <span className="text-white text-[9px] font-black leading-none">CORTADO</span>
                 </div>
             )}
             {jugador.rol === 'SUPLENTE' && (

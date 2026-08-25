@@ -163,7 +163,7 @@ export default function CanchitaPage() {
                 if (!bajaBanned) {
                     const bjas = plantelRes.jugadores.filter(j => j.estado === 'BAJA');
                     const textoBajas = bjas.map(j => `${j.nombreCompleto.split(',')[0]} fue cortado por ${j.equipoNombre}`).join(', y ');
-                    showToast(`${textoBajas}, acomodá tu equipo ahora!`);
+                    showToast(`⚠️ ${textoBajas}, acomodá tu equipo ahora!`, 'error', { persist: true, centered: true, size: 'lg' });
                     sessionStorage.setItem(`baja_alerted_${usuario?.id}`, 'true');
                 }
             }

@@ -7,7 +7,7 @@ export default function Toast() {
     const { toast, hideToast } = useUiStore()
 
     useEffect(() => {
-        if (toast) {
+        if (toast && !toast.persist) {
             const timer = setTimeout(hideToast, 4000)
             return () => clearTimeout(timer)
         }
@@ -16,14 +16,20 @@ export default function Toast() {
     if (!toast) return null
 
     return createPortal(
-        <div className="fixed top-28 md:top-12 left-1/2 -translate-x-1/2 z-[100] animate-slide-down">
+        <div className={clsx(
+            "fixed z-[100] animate-slide-down",
+            toast.centered 
+                ? "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" 
+                : "top-28 md:top-12 left-1/2 -translate-x-1/2"
+        )}>
             <div className={clsx(
-                "px-5 py-3 rounded-2xl shadow-xl border font-semibold flex items-center gap-3 text-sm backdrop-blur-md",
+                "rounded-2xl shadow-xl border font-semibold flex items-center gap-3 backdrop-blur-md",
+                toast.size === 'lg' ? "px-8 py-5 text-lg" : "px-5 py-3 text-sm",
                 toast.tipo === 'success' 
                     ? "bg-green-950/80 text-green-400 border-green-500/30" 
                     : toast.tipo === 'info'
                         ? "bg-blue-950/80 text-blue-100 border-blue-500/30"
-                        : "bg-red-950/80 text-red-400 border-red-500/30"
+                        : "bg-red-950/90 text-red-400 border-red-500/50"
             )}>
                 {toast.tipo === 'success' ? (
                     <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center shrink-0">
