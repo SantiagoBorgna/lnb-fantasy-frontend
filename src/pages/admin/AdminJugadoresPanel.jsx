@@ -74,14 +74,14 @@ export default function AdminJugadoresPanel() {
                         placeholder="Buscar por nombre..."
                         value={search}
                         onChange={e => setSearch(e.target.value)}
-                        className="w-full bg-bg border border-border rounded-lg pl-9 pr-4 py-2.5 text-sm text-textMain focus:outline-none focus:border-primary transition-colors"
+                        className="w-full bg-bg border border-border rounded-lg pl-9 pr-4 py-2.5 text-sm text-black focus:outline-none focus:border-primary transition-colors"
                     />
                 </div>
                 <div className="flex w-full md:w-auto gap-4">
                     <select 
                         value={filtroEquipo}
                         onChange={e => setFiltroEquipo(e.target.value)}
-                        className="bg-bg border border-border rounded-lg px-4 py-2.5 text-sm text-textMain focus:outline-none focus:border-primary flex-1 md:w-48 appearance-none"
+                        className="bg-bg border border-border rounded-lg px-4 py-2.5 text-sm text-black focus:outline-none focus:border-primary flex-1 md:w-48 appearance-none"
                     >
                         <option value="" className="bg-card text-textMain">Todos los Clubes</option>
                         {equipos.map(eq => (
@@ -91,7 +91,7 @@ export default function AdminJugadoresPanel() {
                     <select 
                         value={filtroEstado}
                         onChange={e => setFiltroEstado(e.target.value)}
-                        className="bg-bg border border-border rounded-lg px-4 py-2.5 text-sm text-textMain focus:outline-none focus:border-primary flex-1 md:w-40 appearance-none"
+                        className="bg-bg border border-border rounded-lg px-4 py-2.5 text-sm text-black focus:outline-none focus:border-primary flex-1 md:w-40 appearance-none"
                     >
                         <option value="" className="bg-card text-textMain">Todos los Estados</option>
                         <option value="DISPONIBLE" className="bg-card text-textMain">Disponible</option>
