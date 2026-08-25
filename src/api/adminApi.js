@@ -24,3 +24,20 @@ export const getQuintetosPorJornada = async (jornadaId) => {
     const { data } = await api.get(`/admin/quintetos?jornadaId=${jornadaId}`);
     return data;
 };
+
+
+export const getTodosLosJugadoresAdmin = async () => {
+    const { data } = await api.get('/admin/jugadores');
+    return data;
+};
+
+export const updateJugadorAdmin = async (id, payload) => {
+    const { data } = await api.put(`/admin/jugadores/${id}`, payload);
+    return data;
+};
+
+export const getTodosLosEquiposAdmin = async () => {
+    const { data } = await api.get('/admin/jugadores/equipos');
+    return data;
+};
+

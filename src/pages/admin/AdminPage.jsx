@@ -6,6 +6,7 @@ import { ChevronLeft } from 'lucide-react'
 
 import AdminShowdownPanel from './AdminShowdownPanel'
 import AdminQuintetosPanel from './AdminQuintetosPanel'
+import AdminJugadoresPanel from './AdminJugadoresPanel'
 
 export default function AdminPage() {
     const usuario = useAuthStore(state => state.usuario)
@@ -43,11 +44,20 @@ export default function AdminPage() {
                         <button
                             onClick={() => setTab('QUINTETOS')}
                             className={clsx(
-                                "flex-1 md:w-48 py-2 text-sm font-bold rounded-lg transition-all",
+                                "flex-1 md:w-32 py-2 text-sm font-bold rounded-lg transition-all",
                                 tab === 'QUINTETOS' ? "bg-card text-textMain shadow-sm border border-border" : "text-textMuted hover:text-textMain"
                             )}
                         >
                             Quintetos
+                        </button>
+                        <button
+                            onClick={() => setTab('JUGADORES')}
+                            className={clsx(
+                                "flex-1 md:w-32 py-2 text-sm font-bold rounded-lg transition-all",
+                                tab === 'JUGADORES' ? "bg-card text-textMain shadow-sm border border-border" : "text-textMuted hover:text-textMain"
+                            )}
+                        >
+                            Jugadores
                         </button>
                     </div>
 
@@ -55,6 +65,7 @@ export default function AdminPage() {
                     <div className="mt-4">
                         {tab === 'RELAMPAGOS' && <AdminShowdownPanel />}
                         {tab === 'QUINTETOS' && <AdminQuintetosPanel />}
+                        {tab === 'JUGADORES' && <AdminJugadoresPanel />}
                     </div>
                 </div>
             </main>
