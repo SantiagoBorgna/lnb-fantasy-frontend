@@ -902,7 +902,7 @@ export default function CanchitaPage() {
 
             <JugadorModal
                 jugador={jugadorModal}
-                esDraft={typeof contextoActual === 'object'}
+                esDraft={!!contextoActual}
                 esTitularActual={jugadorModal ? ['TITULAR', 'CAPITAN'].includes(jugadorModal.rol) : false}
                 onCerrar={() => setJugadorModal(null)}
                 onHacerCapitan={jugadorModal && esTitular(jugadorModal.rol) ? hacerCapitan : null}
@@ -928,7 +928,7 @@ export default function CanchitaPage() {
             {dtModal && (
                 <DtOpcionesModal
                     dt={plantel.dt}
-                    esDraft={typeof contextoActual === 'object'}
+                    esDraft={!!contextoActual}
                     onCerrar={() => setDtModal(false)}
                     onTransferir={() => { setDtModal(false); setSelectorDtAberto(true); }}
                 />
