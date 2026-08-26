@@ -1,11 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Search, Edit2, Loader2 } from 'lucide-react';
 import { getDtsAdmin, updateDtAdmin, getTodosLosEquiposAdmin } from '../../api/adminApi';
-import { useToast } from '../../hooks/useToast';
+import { useUiStore } from '../../store/uiStore';
 import AdminEditarDtModal from './AdminEditarDtModal';
 
 export default function AdminDtsPanel() {
-    const { showToast } = useToast();
+    const showToast = useUiStore(state => state.showToast);
     const [dts, setDts] = useState([]);
     const [equipos, setEquipos] = useState([]);
     const [loading, setLoading] = useState(true);
