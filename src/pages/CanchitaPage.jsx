@@ -1039,7 +1039,7 @@ function DtOpcionesModal({ dt, onCerrar, onTransferir, esDraft }) {
                     <p className="text-textMuted text-sm">{dt?.equipoSigla}</p>
                 </div>
                 
-                {dt?.promedioFantasy > 0 && (
+                {typeof dt?.promedioFantasy === 'number' && (
                     <div className="bg-surface rounded-2xl p-3 text-center border border-border">
                         <p className="text-textMuted text-xs mb-1">Promedio Fantasy (últ. 3 partidos)</p>
                         <p className="text-accent font-bold text-2xl">{dt.promedioFantasy.toFixed(1)}</p>
