@@ -12,6 +12,7 @@ export default function JugadorModal({
     onCambiar,
     onTransferir,
     onHacerSexto,
+    esDraft,
 }) {
     if (!jugador) return null
 
@@ -40,16 +41,18 @@ export default function JugadorModal({
                         <h3 className="text-textMain font-bold text-lg leading-tight">{jugador.nombreCompleto}</h3>
                         <p className="text-textMuted text-sm">{jugador.equipoSigla} {jugador.posicion}</p>
                         <div className="flex items-center gap-2 mt-0.5">
-                            <p className="text-accent font-semibold text-sm">{jugador.valorMercadoActual?.toFixed(1)} cr</p>
+                            {!esDraft && (
+                                <p className="text-accent font-semibold text-sm">{jugador.valorMercadoActual?.toFixed(1)} cr</p>
+                            )}
                             {jugador.estado && (
                                 <span className={clsx(
-                                    "px-1.5 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider",
-                                    jugador.estado === 'DISPONIBLE' ? 'bg-green-500/20 text-green-400' :
-                                    jugador.estado === 'LESIONADO' ? 'bg-red-500/20 text-red-400' :
-                                    jugador.estado === 'BAJA' ? 'bg-gray-500/20 text-gray-400' :
-                                    'bg-yellow-500/20 text-yellow-400'
+                                    "text-sm font-semibold capitalize",
+                                    jugador.estado === 'DISPONIBLE' ? 'text-green-400' :
+                                    jugador.estado === 'LESIONADO' ? 'text-red-400' :
+                                    jugador.estado === 'BAJA' ? 'text-gray-400' :
+                                    'text-yellow-400'
                                 )}>
-                                    {jugador.estado === 'BAJA' ? 'CORTADO' : jugador.estado}
+                                    {jugador.estado === 'BAJA' ? 'Cortado' : jugador.estado.toLowerCase()}
                                 </span>
                             )}
                         </div>
@@ -91,6 +94,8 @@ export default function JugadorModal({
                                 <StatRow label="Pérdidas" value={statsPromedio.promedioPerdidas?.toFixed(1)} warning />
                                 <StatRow label="Tap. Recib." value={statsPromedio.promedioTaponesRecibidos?.toFixed(1)} warning />
                                 <StatRow label="Faltas Com." value={statsPromedio.promedioFaltasCometidas?.toFixed(1)} warning />
+                                <StatRow label="TC Fallados" value={statsPromedio.promedioTirosCampoFallados?.toFixed(1)} warning />
+                                <StatRow label="TL Fallados" value={statsPromedio.promedioTirosLibresFallados?.toFixed(1)} warning />
                             </div>
                         )}
                     </div>

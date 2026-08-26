@@ -902,6 +902,7 @@ export default function CanchitaPage() {
 
             <JugadorModal
                 jugador={jugadorModal}
+                esDraft={typeof contextoActual === 'object'}
                 esTitularActual={jugadorModal ? ['TITULAR', 'CAPITAN'].includes(jugadorModal.rol) : false}
                 onCerrar={() => setJugadorModal(null)}
                 onHacerCapitan={jugadorModal && esTitular(jugadorModal.rol) ? hacerCapitan : null}
@@ -927,6 +928,7 @@ export default function CanchitaPage() {
             {dtModal && (
                 <DtOpcionesModal
                     dt={plantel.dt}
+                    esDraft={typeof contextoActual === 'object'}
                     onCerrar={() => setDtModal(false)}
                     onTransferir={() => { setDtModal(false); setSelectorDtAberto(true); }}
                 />
@@ -1025,8 +1027,7 @@ function CambioModal({ jugadorOrigen, titulares, banco, onElegir, onCerrar }) {
     )
 }
 
-// ... las demás funciones (DtOpcionesModal y ListaDtsModal) quedan exactamente igual
-function DtOpcionesModal({ dt, onCerrar, onTransferir }) { /* ... código intacto ... */
+function DtOpcionesModal({ dt, onCerrar, onTransferir, esDraft }) {
     return (
         <>
             <div className="fixed inset-0 bg-black/60 z-40" onClick={onCerrar} />
