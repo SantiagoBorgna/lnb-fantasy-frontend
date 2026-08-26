@@ -1,0 +1,145 @@
+import { useState, useEffect } from 'react';
+import { X, Sparkles, Loader2, Crown, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { useAuthStore } from '../../store/authStore';
+import { useUiStore } from '../../store/uiStore';
+import { simularCompraPremium, obtenerConsejos } from '../../api/premiumApi';
+
+export default function ConsejeroModal({ isOpen, onClose }) {
+    const { usuario, setUsuario } = useAuthStore();
+    const showToast = useUiStore((state) => state.showToast);
+    const [loading, setLoading] = useState(false);
+    const [comprando, setComprando] = useState(false);
+    const [consejeroData, setConsejeroData] = useState(null);
+
+    useEffect(() => {
+        if (isOpen && usuario?.isPremium) {
+            cargarConsejos();
+        }
+    }, [isOpen, usuario?.isPremium]);
+
+    const cargarConsejos = async () => {
+        try {
+            setLoading(true);
+            const data = await obtenerConsejos();
+            setConsejeroData(data);
+        } catch (error) {
+            showToast("Error al obtener consejos del analista", "error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleComprarPremium = async () => {
+        try {
+            setComprando(true);
+            await simularCompraPremium();
+            // Actualizamos el usuario localmente
+            setUsuario({ ...usuario, isPremium: true });
+            showToast("¡Felicidades! Ahora sos Premium.", "success");
+        } catch (error) {
+            showToast("Error al procesar el pago", "error");
+        } finally {
+            setComprando(false);
+        }
+    };
+
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+
+            <div className="relative w-full max-w-md bg-[#1a1a2e] border border-white/10 rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
+                
+                {/* Header */}
+                <div className="flex items-center justify-between p-4 border-b border-white/10 shrink-0">
+                    <div className="flex items-center gap-2">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-white shadow-lg">
+                            <Sparkles size={20} className="drop-shadow-md" />
+                        </div>
+                        <div>
+                            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                                Analista Consejero
+                                {usuario?.isPremium && <Crown size={16} className="text-amber-400" />}
+                            </h2>
+                            <p className="text-xs text-gray-400">Inteligencia deportiva LNB</p>
+                        </div>
+                    </div>
+                    <button onClick={onClose} className="p-2 text-gray-400 hover:text-white rounded-full hover:bg-white/5 transition-colors">
+                        <X size={20} />
+                    </button>
+                </div>
+
+                {/* Content */}
+                <div className="p-5 overflow-y-auto custom-scrollbar flex-1">
+                    {!usuario?.isPremium ? (
+                        <div className="text-center py-6 flex flex-col items-center">
+                            <div className="w-20 h-20 bg-amber-500/10 rounded-full flex items-center justify-center mb-4">
+                                <Crown size={40} className="text-amber-400" />
+                            </div>
+                            <h3 className="text-xl font-bold text-white mb-2">Desbloqueá el Analista</h3>
+                            <p className="text-gray-400 mb-6 max-w-[250px] mx-auto text-sm leading-relaxed">
+                                Suscribite a Premium para obtener recomendaciones avanzadas sobre a quién elegir como Capitán y 6to Hombre según el rendimiento reciente, además de <b>transferencias ilimitadas</b>.
+                            </p>
+
+                            <button 
+                                onClick={handleComprarPremium}
+                                disabled={comprando}
+                                className="w-full relative group overflow-hidden bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold py-3.5 px-6 rounded-xl transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:hover:scale-100 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(245,158,11,0.3)]"
+                            >
+                                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform" />
+                                {comprando ? (
+                                    <Loader2 size={20} className="animate-spin relative z-10" />
+                                ) : (
+                                    <>
+                                        <span className="relative z-10">Activar Premium ($5.000 / mes)</span>
+                                        <ChevronRight size={18} className="relative z-10" />
+                                    </>
+                                )}
+                            </button>
+                            <p className="text-[10px] text-gray-500 mt-4 uppercase tracking-wider font-semibold">Simulador de pago</p>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col gap-4">
+                            {loading || !consejeroData ? (
+                                <div className="py-12 flex flex-col items-center justify-center text-amber-500 gap-3">
+                                    <Loader2 size={32} className="animate-spin" />
+                                    <span className="text-sm font-medium animate-pulse">Analizando tu plantel...</span>
+                                </div>
+                            ) : (
+                                <>
+                                    {consejeroData.advertencias?.length > 0 && (
+                                        <div className="mb-2">
+                                            <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">⚠️ Puntos de mejora</h4>
+                                            <div className="flex flex-col gap-3">
+                                                {consejeroData.advertencias.map((adv, idx) => (
+                                                    <div key={idx} className="bg-red-500/10 border border-red-500/20 p-4 rounded-xl text-red-200 text-sm leading-relaxed">
+                                                        {adv}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {consejeroData.consejos?.length > 0 && (
+                                        <div>
+                                            <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">💡 Análisis General</h4>
+                                            <div className="flex flex-col gap-3">
+                                                {consejeroData.consejos.map((cons, idx) => (
+                                                    <div key={idx} className="bg-white/5 border border-white/10 p-4 rounded-xl flex items-start gap-3">
+                                                        <CheckCircle2 size={18} className="text-green-400 shrink-0 mt-0.5" />
+                                                        <span className="text-gray-300 text-sm leading-relaxed">{cons}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </>
+                            )}
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+}

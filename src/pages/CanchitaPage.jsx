@@ -25,6 +25,8 @@ import BotonAyuda from '../components/ui/BotonAyuda'
 import { AYUDA } from '../components/ui/ayudaContenido'
 import MercadoPanel from '../components/mercado/MercadoPanel'
 import ConfirmarTransferenciaModal from '../components/mercado/ConfirmarTransferenciaModal'
+import ConsejeroModal from '../components/premium/ConsejeroModal'
+import { Sparkles } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 export default function CanchitaPage() {
@@ -44,10 +46,11 @@ export default function CanchitaPage() {
     const [error, setError] = useState('')
     const [jornadaProxima, setJornadaProxima] = useState(null)
 
-    // ── Modales ──────────────────────────────────────────────────────────────
+    // ── Modales ──────────────────────────────────────────────────────────────    // 👑 Modales
     const [jugadorModal, setJugadorModal] = useState(null)
     const [jugadorParaCambio, setJugadorParaCambio] = useState(null)
     const [jugadorStats, setJugadorStats] = useState(null)
+    const [consejeroOpen, setConsejeroOpen] = useState(false)
     const [dtModal, setDtModal] = useState(false)
     const [selectorDtAberto, setSelectorDtAberto] = useState(false)
     const [dtStatsAbierto, setDtStatsAbierto] = useState(false)
@@ -90,13 +93,13 @@ export default function CanchitaPage() {
             if (contextoActual && esFaseRestringida) {
                 const { waiverApi } = await import('../api/waiverApi')
                 await waiverApi.registrarReclamo({
-                    torneoId: contextoActual.torneoDraft?.id || contextoActual, // Canchita stores torneoId differently? Wait, CanchitaPage uses contextoActual?.torneoDraft?.id!
+                    torneoId: contextoActual.torneoDraft?.id || contextoActual,
                     jugadorEntranteId: pendienteEntrada.id || pendienteEntrada.jugadorRealId,
                     jugadorSalienteId: jugadorSale.jugadorRealId,
                 })
             } else {
                 await realizarTransferencia({
-                    torneoId: contextoActual?.torneoDraft?.id || null, // Fallback if it's an object or just a number? Wait, in CanchitaPage: `contextoActual?.torneoDraft?.id` is used in getPlantel. Let's look closely at CanchitaPage's getPlantel call.
+                    torneoId: contextoActual?.torneoDraft?.id || null,
                     jugadorSaleId: jugadorSale.jugadorRealId,
                     jugadorEntraId: pendienteEntrada.id || pendienteEntrada.jugadorRealId,
                     rolEntrante: jugadorSale.rol,
@@ -263,7 +266,6 @@ export default function CanchitaPage() {
                 torneoId: contextoActual
             })
         } catch (e) {
-            // ¡ACÁ ESTÁ EL FIX! Ahora leemos el error real de tu Spring Boot
             const mensajeBackend = typeof e.response?.data === 'string'
                 ? e.response.data
                 : (e.response?.data?.mensaje || 'Error al guardar la alineación en el servidor.');
@@ -288,21 +290,20 @@ export default function CanchitaPage() {
             const idx = disponibles.findIndex(j => esCompatible(j.posicion, zona));
             if (idx !== -1) {
                 nuevosTitulares.push(disponibles[idx]);
-                disponibles.splice(idx, 1); // Lo sacamos del pool
+                disponibles.splice(idx, 1);
             } else {
                 esPosible = false;
                 break;
             }
         }
 
-        // Si no tenemos jugadores compatibles (ej: pide 3 bases y tenemos 2), tiramos error
         if (!esPosible) {
             setError(`No tenés los jugadores necesarios en tu plantel para formar un ${nuevaForm}.`);
             setTimeout(() => setError(''), 4500);
             return;
         }
 
-        // 2. Éxito: reasignamos los roles (respetando al capitán si quedó titular)
+        // 2. Éxito: reasignamos los roles
         let capitanAsignado = false;
         nuevosTitulares = nuevosTitulares.map(j => {
             if (j.rol === 'CAPITAN') {
@@ -312,7 +313,6 @@ export default function CanchitaPage() {
             return { ...j, rol: 'TITULAR' };
         });
 
-        // Si el capitán anterior se fue al banco, nombramos a uno nuevo al azar
         if (!capitanAsignado && nuevosTitulares.length > 0) {
             nuevosTitulares[0].rol = 'CAPITAN';
         }
@@ -477,7 +477,6 @@ export default function CanchitaPage() {
     }
 
     const handleClickSlot = (jugador) => {
-        // En celulares evitamos que se dispare si venían arrastrando (falso positivo)
         if (isDragging.current) {
             setTimeout(() => { isDragging.current = false }, 100)
             return
@@ -564,10 +563,8 @@ export default function CanchitaPage() {
         }
     }
 
-    // ── Render ───────────────────────────────────────────────────────────────
     if (loadingPlantel && !plantel) return <LoadingSpinner mensaje="Cargando tu plantel..." />
 
-    // 1. Extraemos los Tabs a una constante para que no desaparezcan en los estados vacíos
     const TabsJornada = jornadaAnterior && (
         <div className="flex bg-surface rounded-xl p-1 border border-border mx-auto mb-2">
             <button onClick={() => setJornadaVista(null)} className={clsx("flex-1 py-1.5 text-xs font-bold rounded-lg transition-colors", !jornadaVista ? "bg-card shadow text-textMain" : "text-textMuted")}>
@@ -579,7 +576,6 @@ export default function CanchitaPage() {
         </div>
     );
 
-    // 2. Manejamos los estados vacíos de forma inteligente
     const estaVacio = !plantelActual || (plantelActual.jugadores && plantelActual.jugadores.length === 0)
 
     const titulares = getTitularesOrdenados()
@@ -613,10 +609,8 @@ export default function CanchitaPage() {
     return (
         <div className="max-w-md md:max-w-none mx-auto w-full px-2 lg:px-4 space-y-3 pb-6 min-h-screen pt-4 overflow-x-hidden">
 
-            {/* WRAPPER COLUMNAS DESKTOP */}
             <div className="flex flex-col md:flex-row gap-4 md:gap-4 lg:gap-8">
                 
-                {/* COLUMNA IZQUIERDA */}
                 <div className="flex-1 space-y-4 min-h-[500px] md:min-h-[700px]">
                     {TabsJornada}
                     {loadingVista ? (
@@ -661,11 +655,11 @@ export default function CanchitaPage() {
                             </select>
                         ) : (
                             <span className="text-textMuted text-xs">{plantelActual.formacion}</span>
-                        )}
-                        {!modoLectura && (
-                            <span className="text-textMuted text-xs">· {plantelActual.transferenciasRestantes} transferencias</span>
-                        )}
-                    </div>
+                          )}
+                          {!modoLectura && (
+                              <span className="text-textMuted text-xs">· {usuario?.isPremium || plantelActual.transferenciasRestantes === 99 ? '∞' : plantelActual.transferenciasRestantes} transferencias</span>
+                          )}
+                      </div>
                 </div>
                 <div className="flex items-center justify-end gap-3">
                     <div className="text-right">
@@ -688,10 +682,8 @@ export default function CanchitaPage() {
                 </div>
             </div>
 
-            {/* ── Cartel de Error ── */}
             {error && <div className="bg-red-900/40 border border-red-700 text-red-400 rounded-2xl px-4 py-3 text-sm text-center animate-slide-up">{error}</div>}
 
-            {/* ── Banners de estado de la jornada ── */}
             {modoLectura && jornadaVista === null && (
                 <div className="rounded-2xl px-4 py-2.5 text-sm font-semibold text-center mt-2 bg-red-900/30 border border-red-700/50 text-red-400">
                     🔴 Jornada en juego — no se permiten cambios

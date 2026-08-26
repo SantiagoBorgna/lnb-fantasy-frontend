@@ -13,6 +13,7 @@ import Footer from './Footer'
 import { getMisTorneos } from '../../api/torneoApi'
 import { useGameStore } from '../../store/gameStore'
 import { useTransferenciaStore } from '../../store/transferenciaStore'
+import { dismissVencimientoPremium } from '../../api/premiumApi'
 
 export default function AppShell() {
     const { token, setAuth, logout: logoutStore } = useAuthStore()
@@ -63,6 +64,12 @@ export default function AppShell() {
         getMe()
             .then(usuarioActualizado => {
                 setAuth(token, usuarioActualizado)
+
+                if (usuarioActualizado.notificacionPremiumVencido) {
+                    showToast("Tu suscripción premium venció. Renovala para seguir disfrutando de tus beneficios", "error", { persist: true, centered: true, size: "lg" })
+                    dismissVencimientoPremium().catch(e => console.error("Error al limpiar notificacion premium", e))
+                }
+
                 return getMisTorneos()
             })
             .then(torneos => {
