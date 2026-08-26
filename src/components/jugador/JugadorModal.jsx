@@ -1,4 +1,7 @@
 import { createPortal } from 'react-dom'
+import { useQuery } from '@tanstack/react-query'
+import { getJugadorStats } from '../../api/mercadoApi'
+import clsx from 'clsx'
 import CamisetaSVG from './CamisetaSVG'
 
 export default function JugadorModal({
@@ -11,6 +14,14 @@ export default function JugadorModal({
     onHacerSexto,
 }) {
     if (!jugador) return null
+
+    const isDT = !jugador.posicion || jugador.posicion === 'DT';
+    
+    const { data: statsPromedio, isLoading } = useQuery({
+        queryKey: ['jugadorStats', jugador.jugadorRealId || jugador.id],
+        queryFn: () => getJugadorStats(jugador.jugadorRealId || jugador.id),
+        enabled: !isDT
+    })
 
     const handleAccion = (accion, e) => {
         e.stopPropagation()
@@ -28,15 +39,60 @@ export default function JugadorModal({
                     <div>
                         <h3 className="text-textMain font-bold text-lg leading-tight">{jugador.nombreCompleto}</h3>
                         <p className="text-textMuted text-sm">{jugador.equipoSigla} {jugador.posicion}</p>
-                        <p className="text-accent font-semibold text-sm mt-0.5">{jugador.valorMercadoActual?.toFixed(1)} cr</p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                            <p className="text-accent font-semibold text-sm">{jugador.valorMercadoActual?.toFixed(1)} cr</p>
+                            {jugador.estado && (
+                                <span className={clsx(
+                                    "px-1.5 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider",
+                                    jugador.estado === 'DISPONIBLE' ? 'bg-green-500/20 text-green-400' :
+                                    jugador.estado === 'LESIONADO' ? 'bg-red-500/20 text-red-400' :
+                                    jugador.estado === 'BAJA' ? 'bg-gray-500/20 text-gray-400' :
+                                    'bg-yellow-500/20 text-yellow-400'
+                                )}>
+                                    {jugador.estado === 'BAJA' ? 'CORTADO' : jugador.estado}
+                                </span>
+                            )}
+                        </div>
                     </div>
                 </div>
 
-                {jugador.promedioPuntosUltimas3 > 0 && (
+                {isDT && jugador.promedioPuntosUltimas3 > 0 && (
                     <div className="bg-surface rounded-2xl p-3 text-center border border-border">
                         <p className="text-textMuted text-xs mb-1">Promedio Fantasy (últ. 3 partidos)</p>
                         <p className="text-accent font-bold text-2xl">{jugador.promedioPuntosUltimas3?.toFixed(1)}</p>
                         <p className="text-textMuted text-xs">puntos</p>
+                    </div>
+                )}
+
+                {!isDT && (
+                    <div className="bg-surface rounded-2xl p-4 border border-border">
+                        {isLoading ? (
+                            <div className="py-4 flex justify-center">
+                                <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                            </div>
+                        ) : (!statsPromedio || statsPromedio.partidosJugados === 0) ? (
+                            <div className="text-center text-textMuted flex flex-col items-center gap-1">
+                                <p className="font-medium text-xs">Todavía no tiene estadísticas.</p>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-xs">
+                                <div className="col-span-2 text-center pb-2 border-b border-border mb-1">
+                                    <p className="text-textMuted text-[10px] uppercase font-bold tracking-wider">
+                                        Promedios ({statsPromedio.partidosJugados} {statsPromedio.partidosJugados === 1 ? 'partido' : 'partidos'})
+                                    </p>
+                                </div>
+                                <StatRow label="Puntos" value={statsPromedio.promedioPuntos?.toFixed(1)} />
+                                <StatRow label="Asistencias" value={statsPromedio.promedioAsistencias?.toFixed(1)} />
+                                <StatRow label="Reb. Def." value={statsPromedio.promedioRebotesDefensivos?.toFixed(1)} />
+                                <StatRow label="Reb. Of." value={statsPromedio.promedioRebotesOfensivos?.toFixed(1)} />
+                                <StatRow label="Recuperos" value={statsPromedio.promedioRobos?.toFixed(1)} />
+                                <StatRow label="Tapones" value={statsPromedio.promedioTaponesRealizados?.toFixed(1)} />
+                                <StatRow label="Faltas Recib." value={statsPromedio.promedioFaltasRecibidas?.toFixed(1)} />
+                                <StatRow label="Pérdidas" value={statsPromedio.promedioPerdidas?.toFixed(1)} warning />
+                                <StatRow label="Tap. Recib." value={statsPromedio.promedioTaponesRecibidos?.toFixed(1)} warning />
+                                <StatRow label="Faltas Com." value={statsPromedio.promedioFaltasCometidas?.toFixed(1)} warning />
+                            </div>
+                        )}
                     </div>
                 )}
 
@@ -70,4 +126,16 @@ export default function JugadorModal({
         </>,
         document.body
     )
+}
+
+function StatRow({ label, value, warning = false }) {
+    const esValorNegativo = warning && typeof value !== 'boolean' && value !== 'Sí' && value !== 'No' && Number(value) > 0;
+    return (
+        <div className="flex justify-between items-center border-b border-border/50 pb-1">
+            <span className="text-textMuted">{label}</span>
+            <span className={clsx("font-bold tabular-nums", esValorNegativo ? "text-red-400" : "text-textMain")}>
+                {value ?? '0.0'}
+            </span>
+        </div>
+    );
 }
