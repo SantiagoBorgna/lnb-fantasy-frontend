@@ -1037,6 +1037,15 @@ function DtOpcionesModal({ dt, onCerrar, onTransferir }) { /* ... código intact
                     <h3 className="text-textMain font-bold text-lg">{dt?.nombreCompleto}</h3>
                     <p className="text-textMuted text-sm">{dt?.equipoSigla}</p>
                 </div>
+                
+                {dt?.promedioFantasy > 0 && (
+                    <div className="bg-surface rounded-2xl p-3 text-center border border-border">
+                        <p className="text-textMuted text-xs mb-1">Promedio Fantasy (últ. 3 partidos)</p>
+                        <p className="text-accent font-bold text-2xl">{dt.promedioFantasy.toFixed(1)}</p>
+                        <p className="text-textMuted text-xs">puntos</p>
+                    </div>
+                )}
+                
                 <div className="space-y-3 pt-2">
                     <button onClick={onTransferir} className="w-full py-3 px-4 rounded-xl font-bold bg-transparent border-2 border-accent text-accent active:scale-95 transition-transform flex justify-center items-center gap-2">
                         Transferir DT

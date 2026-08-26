@@ -32,8 +32,8 @@ export default function JugadorModal({
     return createPortal(
         <>
             <div className="fixed inset-0 bg-black/60 z-40" onClick={onCerrar} />
-            <div className="fixed bottom-0 md:top-1/2 md:-translate-y-1/2 md:bottom-auto left-0 right-0 max-w-md mx-auto bg-card border-t border-border rounded-t-3xl md:rounded-3xl z-50 p-6 space-y-5 animate-slide-up md:animate-none" onClick={e => e.stopPropagation()} onPointerDown={e => e.stopPropagation()}>
-                <div className="w-10 h-1 bg-border rounded-full mx-auto md:hidden" />
+            <div className="fixed bottom-0 md:top-1/2 md:-translate-y-1/2 md:bottom-auto left-0 right-0 max-w-md mx-auto bg-card border-t border-border rounded-t-3xl md:rounded-3xl z-50 p-6 space-y-5 animate-slide-up md:animate-none max-h-[95vh] overflow-y-auto" onClick={e => e.stopPropagation()} onPointerDown={e => e.stopPropagation()}>
+                <div className="w-10 h-1 bg-border rounded-full mx-auto md:hidden shrink-0" />
                 <div className="flex items-center gap-4">
                     <CamisetaSVG colorPrincipal={jugador.colorPrincipal} colorSecundario={jugador.colorSecundario} numero={jugador.posicion === 'DT' ? 'DT' : jugador.numeroCamiseta} estado={jugador.estado} modelo={jugador.modeloCamiseta} size={64} />
                     <div>
@@ -75,7 +75,7 @@ export default function JugadorModal({
                                 <p className="font-medium text-xs">Todavía no tiene estadísticas.</p>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-xs">
+                            <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-[13px]">
                                 <div className="col-span-2 text-center pb-2 border-b border-border mb-1">
                                     <p className="text-textMuted text-[10px] uppercase font-bold tracking-wider">
                                         Promedios ({statsPromedio.partidosJugados} {statsPromedio.partidosJugados === 1 ? 'partido' : 'partidos'})
