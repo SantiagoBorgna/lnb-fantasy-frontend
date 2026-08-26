@@ -7,6 +7,7 @@ import { ChevronLeft } from 'lucide-react'
 import AdminShowdownPanel from './AdminShowdownPanel'
 import AdminQuintetosPanel from './AdminQuintetosPanel'
 import AdminJugadoresPanel from './AdminJugadoresPanel'
+import AdminDtsPanel from './AdminDtsPanel'
 
 export default function AdminPage() {
     const usuario = useAuthStore(state => state.usuario)
@@ -59,6 +60,15 @@ export default function AdminPage() {
                         >
                             Jugadores
                         </button>
+                        <button
+                            onClick={() => setTab('DTS')}
+                            className={clsx(
+                                "flex-1 md:w-32 py-2 text-sm font-bold rounded-lg transition-all",
+                                tab === 'DTS' ? "bg-card text-textMain shadow-sm border border-border" : "text-textMuted hover:text-textMain"
+                            )}
+                        >
+                            DTs
+                        </button>
                     </div>
 
                     {/* Content */}
@@ -66,6 +76,7 @@ export default function AdminPage() {
                         {tab === 'RELAMPAGOS' && <AdminShowdownPanel />}
                         {tab === 'QUINTETOS' && <AdminQuintetosPanel />}
                         {tab === 'JUGADORES' && <AdminJugadoresPanel />}
+                        {tab === 'DTS' && <AdminDtsPanel />}
                     </div>
                 </div>
             </main>

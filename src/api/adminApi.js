@@ -41,3 +41,15 @@ export const getTodosLosEquiposAdmin = async () => {
     return data;
 };
 
+
+
+export const getDtsAdmin = async () => {
+    const { data } = await api.get('/admin/dts');
+    return data;
+};
+
+export const updateDtAdmin = async (id, payload) => {
+    const { data } = await api.put(`/admin/dts/${id}`, payload);
+    return data;
+};
+
