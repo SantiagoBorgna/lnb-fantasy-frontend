@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { X, Sparkles, Loader2, Crown, ChevronRight, CheckCircle2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Sparkles, Loader2, Crown, ChevronRight, CheckCircle2, Infinity } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { useUiStore } from '../../store/uiStore';
 import { simularCompraPremium, obtenerConsejos } from '../../api/premiumApi';
@@ -55,14 +55,26 @@ export default function ConsejeroModal({ isOpen, onClose }) {
                 <div className="flex items-center justify-between p-4 border-b border-white/10 shrink-0">
                     <div className="flex items-center gap-2">
                         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-white shadow-lg">
-                            <Sparkles size={20} className="drop-shadow-md" />
+                            {usuario?.isPremium ? (
+                                <Sparkles size={20} className="drop-shadow-md" />
+                            ) : (
+                                <Crown size={20} className="drop-shadow-md" />
+                            )}
                         </div>
                         <div>
-                            <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                                Analista Consejero
-                                {usuario?.isPremium && <Crown size={16} className="text-amber-400" />}
-                            </h2>
-                            <p className="text-xs text-gray-400">Inteligencia deportiva LNB</p>
+                            {usuario?.isPremium ? (
+                                <>
+                                    <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                                        Analista Consejero
+                                        <Crown size={16} className="text-amber-400" />
+                                    </h2>
+                                    <p className="text-xs text-gray-400">Inteligencia deportiva LNB</p>
+                                </>
+                            ) : (
+                                <h2 className="text-lg font-bold text-white">
+                                    Subscribite al plan premium
+                                </h2>
+                            )}
                         </div>
                     </div>
                     <button onClick={onClose} className="p-2 text-gray-400 hover:text-white rounded-full hover:bg-white/5 transition-colors">
@@ -73,31 +85,49 @@ export default function ConsejeroModal({ isOpen, onClose }) {
                 {/* Content */}
                 <div className="p-5 overflow-y-auto custom-scrollbar flex-1">
                     {!usuario?.isPremium ? (
-                        <div className="text-center py-6 flex flex-col items-center">
-                            <div className="w-20 h-20 bg-amber-500/10 rounded-full flex items-center justify-center mb-4">
-                                <Crown size={40} className="text-amber-400" />
+                        <div className="flex flex-col gap-6 py-2">
+                            <div className="flex items-start gap-4">
+                                <div className="w-12 h-12 rounded-full border border-amber-500 flex items-center justify-center shrink-0 bg-amber-500/10">
+                                    <Infinity size={24} className="text-amber-400" />
+                                </div>
+                                <div className="flex-1 mt-1">
+                                    <h3 className="text-white font-bold text-base leading-tight">Transferencias ilimitadas</h3>
+                                    <p className="text-gray-400 text-sm mt-1 leading-relaxed">
+                                        Realizá todos los cambios que necesites sin preocuparte por el límite de 3 por jornada.
+                                    </p>
+                                </div>
                             </div>
-                            <h3 className="text-xl font-bold text-white mb-2">Desbloqueá el Analista</h3>
-                            <p className="text-gray-400 mb-6 max-w-[250px] mx-auto text-sm leading-relaxed">
-                                Suscribite a Premium para obtener recomendaciones avanzadas sobre a quién elegir como Capitán y 6to Hombre según el rendimiento reciente, además de <b>transferencias ilimitadas</b>.
-                            </p>
+                            
+                            <div className="flex items-start gap-4 mb-2">
+                                <div className="w-12 h-12 rounded-full border border-amber-500 flex items-center justify-center shrink-0 bg-amber-500/10">
+                                    <Sparkles size={24} className="text-amber-400" />
+                                </div>
+                                <div className="flex-1 mt-1">
+                                    <h3 className="text-white font-bold text-base leading-tight">Analista Consejero</h3>
+                                    <p className="text-gray-400 text-sm mt-1 leading-relaxed">
+                                        Nuestra Inteligencia Artificial deportiva analizará tu equipo y te dará recomendaciones sobre Capitán y 6to Hombre según el rendimiento reciente.
+                                    </p>
+                                </div>
+                            </div>
 
-                            <button 
-                                onClick={handleComprarPremium}
-                                disabled={comprando}
-                                className="w-full relative group overflow-hidden bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold py-3.5 px-6 rounded-xl transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:hover:scale-100 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(245,158,11,0.3)]"
-                            >
-                                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform" />
-                                {comprando ? (
-                                    <Loader2 size={20} className="animate-spin relative z-10" />
-                                ) : (
-                                    <>
-                                        <span className="relative z-10">Activar Premium ($5.000 / mes)</span>
-                                        <ChevronRight size={18} className="relative z-10" />
-                                    </>
-                                )}
-                            </button>
-                            <p className="text-[10px] text-gray-500 mt-4 uppercase tracking-wider font-semibold">Simulador de pago</p>
+                            <div className="flex flex-col items-center mt-2">
+                                <button 
+                                    onClick={handleComprarPremium}
+                                    disabled={comprando}
+                                    className="w-full relative group overflow-hidden bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold py-3.5 px-6 rounded-xl transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:hover:scale-100 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(245,158,11,0.3)]"
+                                >
+                                    <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform" />
+                                    {comprando ? (
+                                        <Loader2 size={20} className="animate-spin relative z-10" />
+                                    ) : (
+                                        <>
+                                            <span className="relative z-10">Activar Premium ($5.000 / mes)</span>
+                                            <ChevronRight size={18} className="relative z-10" />
+                                        </>
+                                    )}
+                                </button>
+                                <p className="text-[10px] text-gray-500 mt-4 uppercase tracking-wider font-semibold">Simulador de pago</p>
+                            </div>
                         </div>
                     ) : (
                         <div className="flex flex-col gap-4">

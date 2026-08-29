@@ -632,7 +632,7 @@ export default function CanchitaPage() {
                                     </div>
                                     <div className="flex-1">
                                         <h3 className="text-white font-bold text-sm leading-tight">¿Tu equipo no está rindiendo?</h3>
-                                        <p className="text-textMuted text-xs mt-0.5">Analizalo completo con nuestra IA</p>
+                                        <p className="text-textMuted text-xs mt-0.5">Cambia todo lo que quieras uniendote al plan premium</p>
                                     </div>
                                 </div>
                                 <div className="mt-3 pt-3 border-t border-border flex items-center justify-between cursor-pointer hover:opacity-80 transition-opacity">
