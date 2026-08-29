@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Sparkles, Loader2, Crown, ChevronRight, CheckCircle2, Infinity } from 'lucide-react';
+import { X, Loader2, Crown, ChevronRight, CheckCircle2, Infinity } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { useUiStore } from '../../store/uiStore';
 import { simularCompraPremium, obtenerConsejos } from '../../api/premiumApi';
@@ -54,9 +54,9 @@ export default function ConsejeroModal({ isOpen, onClose }) {
                 {/* Header */}
                 <div className="flex items-center justify-between p-4 border-b border-white/10 shrink-0">
                     <div className="flex items-center gap-2">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-white shadow-lg">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center text-white shadow-lg overflow-hidden">
                             {usuario?.isPremium ? (
-                                <Sparkles size={20} className="drop-shadow-md" />
+                                <img src="/consejero.png" alt="Consejero" className="w-7 h-7 object-contain brightness-0 invert" />
                             ) : (
                                 <Crown size={20} className="drop-shadow-md" />
                             )}
@@ -99,13 +99,13 @@ export default function ConsejeroModal({ isOpen, onClose }) {
                             </div>
                             
                             <div className="flex items-start gap-4 mb-2">
-                                <div className="w-12 h-12 rounded-full border border-amber-500 flex items-center justify-center shrink-0 bg-amber-500/10">
-                                    <Sparkles size={24} className="text-amber-400" />
+                                <div className="w-12 h-12 rounded-full border border-amber-500 flex items-center justify-center shrink-0 bg-amber-500/10 overflow-hidden">
+                                    <img src="/consejero.png" alt="Consejero" className="w-8 h-8 object-contain" />
                                 </div>
                                 <div className="flex-1 mt-1">
                                     <h3 className="text-white font-bold text-base leading-tight">Analista Consejero</h3>
                                     <p className="text-gray-400 text-sm mt-1 leading-relaxed">
-                                        Nuestra Inteligencia Artificial deportiva analizará tu equipo y te dará recomendaciones sobre Capitán y 6to Hombre según el rendimiento reciente.
+                                        Nuestra Inteligencia Artificial deportiva analizará tu equipo y te dará recomendaciones para que sumes más puntos.
                                     </p>
                                 </div>
                             </div>
