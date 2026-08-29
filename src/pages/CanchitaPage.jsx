@@ -971,6 +971,21 @@ export default function CanchitaPage() {
                 />
             )}
 
+            {/* FAB Consejero Premium */}
+            {!modoLectura && (
+                <button
+                    onClick={() => setConsejeroOpen(true)}
+                    className="fixed bottom-24 right-4 z-40 bg-gradient-to-br from-amber-500 to-amber-600 p-3 rounded-full shadow-lg shadow-amber-500/20 text-white hover:scale-110 active:scale-95 transition-transform lg:bottom-8 lg:right-8"
+                >
+                    <Sparkles size={24} />
+                </button>
+            )}
+
+            <ConsejeroModal 
+                isOpen={consejeroOpen} 
+                onClose={() => setConsejeroOpen(false)} 
+            />
+
             <ModalAyuda pagina="canchita" contenido={AYUDA.canchita} onCerrar={cerrar} abierto={abierto} />
 
         </div>
