@@ -26,7 +26,7 @@ import { AYUDA } from '../components/ui/ayudaContenido'
 import MercadoPanel from '../components/mercado/MercadoPanel'
 import ConfirmarTransferenciaModal from '../components/mercado/ConfirmarTransferenciaModal'
 import ConsejeroModal from '../components/premium/ConsejeroModal'
-import { Sparkles } from 'lucide-react'
+import { Sparkles, Crown, X, ChevronRight } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 export default function CanchitaPage() {
@@ -51,6 +51,7 @@ export default function CanchitaPage() {
     const [jugadorParaCambio, setJugadorParaCambio] = useState(null)
     const [jugadorStats, setJugadorStats] = useState(null)
     const [consejeroOpen, setConsejeroOpen] = useState(false)
+    const [showPremiumBanner, setShowPremiumBanner] = useState(() => !sessionStorage.getItem('hidePremiumBanner'))
     const [dtModal, setDtModal] = useState(false)
     const [selectorDtAberto, setSelectorDtAberto] = useState(false)
     const [dtStatsAbierto, setDtStatsAbierto] = useState(false)
@@ -612,6 +613,35 @@ export default function CanchitaPage() {
             <div className="flex flex-col md:flex-row gap-4 md:gap-4 lg:gap-8">
                 
                 <div className="flex-1 space-y-4 min-h-[500px] md:min-h-[700px]">
+                    {!usuario?.isPremium && !modoLectura && showPremiumBanner && (
+                        <div className="relative bg-[#1A1A1A] border border-amber-500/50 rounded-xl overflow-hidden mb-4 shadow-lg">
+                            <button
+                                onClick={() => {
+                                    sessionStorage.setItem('hidePremiumBanner', 'true')
+                                    setShowPremiumBanner(false)
+                                }}
+                                className="absolute top-2 right-2 p-1 text-textMuted hover:text-textMain transition-colors z-10"
+                                aria-label="Cerrar"
+                            >
+                                <X size={16} />
+                            </button>
+                            <div className="p-4" onClick={() => setConsejeroOpen(true)}>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-12 h-12 rounded-full border border-amber-500 flex items-center justify-center shrink-0">
+                                        <Crown size={24} className="text-amber-500" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <h3 className="text-white font-bold text-sm leading-tight">¿Tu equipo no está rindiendo?</h3>
+                                        <p className="text-textMuted text-xs mt-0.5">Analizalo completo con nuestra IA</p>
+                                    </div>
+                                </div>
+                                <div className="mt-3 pt-3 border-t border-border flex items-center justify-between cursor-pointer hover:opacity-80 transition-opacity">
+                                    <span className="text-white font-bold text-sm">Convertite en Premium</span>
+                                    <ChevronRight size={18} className="text-white" />
+                                </div>
+                            </div>
+                        </div>
+                    )}
                     {TabsJornada}
                     {loadingVista ? (
                         <div className="pt-16 pb-16">
@@ -972,7 +1002,7 @@ export default function CanchitaPage() {
             )}
 
             {/* FAB Consejero Premium */}
-            {!modoLectura && (
+            {usuario?.isPremium && !modoLectura && (
                 <button
                     onClick={() => setConsejeroOpen(true)}
                     className="fixed bottom-24 right-4 z-40 bg-gradient-to-br from-amber-500 to-amber-600 p-3 rounded-full shadow-lg shadow-amber-500/20 text-white hover:scale-110 active:scale-95 transition-transform lg:bottom-8 lg:right-8"
