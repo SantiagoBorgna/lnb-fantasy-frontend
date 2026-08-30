@@ -17,7 +17,7 @@ export default function Toast() {
 
     return createPortal(
         <div className={clsx(
-            "fixed z-[100] animate-slide-down",
+            "fixed z-[100] animate-slide-down w-fit max-w-[90vw] md:max-w-none md:w-auto",
             toast.centered 
                 ? "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" 
                 : "top-28 md:top-12 left-1/2 -translate-x-1/2"
@@ -50,7 +50,7 @@ export default function Toast() {
                         </svg>
                     </div>
                 )}
-                <span className="whitespace-nowrap">{toast.mensaje}</span>
+                <span className="whitespace-normal md:whitespace-nowrap text-center md:text-left leading-tight">{toast.mensaje}</span>
                 <button 
                     onClick={hideToast}
                     className="ml-2 text-current opacity-50 hover:opacity-100 transition-opacity"
