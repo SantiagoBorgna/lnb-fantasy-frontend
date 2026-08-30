@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../../store/authStore';
+import { useAuthStore } from '../store/authStore';
 import { Crown, CheckCircle2 } from 'lucide-react';
-import api from '../../api/axiosClient';
+import api from '../api/axiosClient';
 
 export default function PremiumSuccess() {
     const navigate = useNavigate();
