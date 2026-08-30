@@ -32,19 +32,19 @@ export default function Toast() {
                         : "bg-red-950/90 text-red-400 border-red-500/50"
             )}>
                 {toast.tipo === 'success' ? (
-                    <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center shrink-0">
+                    <div className="w-6 h-6 rounded-full bg-green-500/20 hidden md:flex items-center justify-center shrink-0">
                         <svg className="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                         </svg>
                     </div>
                 ) : toast.tipo === 'info' ? (
-                    <div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center shrink-0">
+                    <div className="w-6 h-6 rounded-full bg-blue-500/20 hidden md:flex items-center justify-center shrink-0">
                         <svg className="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </div>
                 ) : (
-                    <div className="w-6 h-6 rounded-full bg-red-500/20 flex items-center justify-center shrink-0">
+                    <div className="w-6 h-6 rounded-full bg-red-500/20 hidden md:flex items-center justify-center shrink-0">
                         <svg className="w-4 h-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
                         </svg>
