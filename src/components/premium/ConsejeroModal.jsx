@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Loader2, Crown, ChevronRight, CheckCircle2, Infinity } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { useUiStore } from '../../store/uiStore';
-import { simularCompraPremium, obtenerConsejos } from '../../api/premiumApi';
+import { checkoutPremium, obtenerConsejos } from '../../api/premiumApi';
 
 export default function ConsejeroModal({ isOpen, onClose }) {
     const { usuario, setUsuario } = useAuthStore();
@@ -32,13 +32,10 @@ export default function ConsejeroModal({ isOpen, onClose }) {
     const handleComprarPremium = async () => {
         try {
             setComprando(true);
-            await simularCompraPremium();
-            // Actualizamos el usuario localmente
-            setUsuario({ ...usuario, isPremium: true });
-            showToast("¡Felicidades! Ahora sos Premium.", "success");
+            const { init_point } = await checkoutPremium();
+            window.location.href = init_point; // Redirigir a Mercado Pago
         } catch (error) {
-            showToast("Error al procesar el pago", "error");
-        } finally {
+            showToast("Error al conectar con Mercado Pago", "error");
             setComprando(false);
         }
     };
@@ -114,7 +111,7 @@ export default function ConsejeroModal({ isOpen, onClose }) {
                                 <div className="flex-1 mt-1">
                                     <h3 className="text-white font-bold text-base leading-tight">Analista Consejero</h3>
                                     <p className="text-gray-400 text-sm mt-1 leading-relaxed">
-                                        Nuestra Inteligencia Artificial deportiva analizará tu equipo y te dará recomendaciones para que sumes más puntos.
+                                        Nuestra Inteligencia Artificial analizará tu equipo y te dará recomendaciones para que sumes más puntos.
                                     </p>
                                 </div>
                             </div>

@@ -1,5 +1,10 @@
 import api from './axiosClient';
 
+export const checkoutPremium = async () => {
+    const response = await api.post('/premium/checkout');
+    return response.data;
+};
+
 export const simularCompraPremium = async () => {
     const response = await api.post('/premium/simular-compra');
     return response.data;

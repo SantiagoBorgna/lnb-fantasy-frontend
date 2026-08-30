@@ -10,6 +10,7 @@ import OnboardingDraftPage from '../pages/onboarding/OnboardingDraftPage'
 import DashboardPage from '../pages/DashboardPage'
 import CanchitaPage from '../pages/CanchitaPage'
 import MercadoPage from '../pages/MercadoPage'
+import PremiumSuccess from '../pages/PremiumSuccess'
 import TorneosPage from '../pages/TorneosPage'
 import LideresPage from '../pages/LideresPage'
 import AppShell from '../components/ui/AppShell'
@@ -115,6 +116,7 @@ export default function AppRouter() {
                     <Route index element={<DashboardPage />} />
                     <Route path="canchita" element={<CanchitaPage />} />
                     <Route path="mercado" element={<MercadoPage />} />
+                    <Route path="premium/success" element={<PremiumSuccess />} />
                     <Route path="torneos" element={<TorneosPage />} />
                     <Route path="/t/:hashId" element={<PrivateRoute><TorneoDetallePage /></PrivateRoute>} />
                     <Route path="/t-redir/:id/*" element={<PrivateRoute><RedirectTorneo /></PrivateRoute>} />
