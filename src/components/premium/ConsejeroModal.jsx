@@ -99,8 +99,20 @@ export default function ConsejeroModal({ isOpen, onClose }) {
                             </div>
                             
                             <div className="flex items-start gap-4 mb-2">
-                                <div className="w-12 h-12 rounded-full border border-amber-500 flex items-center justify-center shrink-0 bg-amber-500/10 overflow-hidden">
-                                    <img src="/consejero.png" alt="Consejero" className="w-8 h-8 object-contain" />
+                                <div className="w-12 h-12 rounded-full border border-amber-500 flex items-center justify-center shrink-0 bg-amber-500/10">
+                                    <div 
+                                        className="w-6 h-6 bg-amber-400" 
+                                        style={{ 
+                                            WebkitMaskImage: 'url(/consejero.png)', 
+                                            maskImage: 'url(/consejero.png)', 
+                                            WebkitMaskSize: 'contain', 
+                                            maskSize: 'contain', 
+                                            WebkitMaskRepeat: 'no-repeat', 
+                                            maskRepeat: 'no-repeat',
+                                            WebkitMaskPosition: 'center',
+                                            maskPosition: 'center'
+                                        }} 
+                                    />
                                 </div>
                                 <div className="flex-1 mt-1">
                                     <h3 className="text-white font-bold text-base leading-tight">Analista Consejero</h3>
