@@ -1,6 +1,8 @@
 import { createPortal } from 'react-dom'
 import CamisetaSVG from '../jugador/CamisetaSVG'
 import clsx from 'clsx'
+import { useAuthStore } from '../../store/authStore'
+import { Infinity } from 'lucide-react'
 
 export default function ConfirmarTransferenciaModal({ 
     torneoId, 
@@ -13,6 +15,7 @@ export default function ConfirmarTransferenciaModal({
     esFaseRestringida,
     loading
 }) {
+    const { usuario } = useAuthStore();
     const isDT = !jugadorEntrante.posicion || jugadorEntrante.posicion === 'DT';
     const esModoDraft = torneoId != null;
 
@@ -88,11 +91,19 @@ export default function ConfirmarTransferenciaModal({
                         <div className="flex justify-between items-center text-sm">
                             <span className="text-textMuted">Transferencias restantes:</span>
                             <div className="flex items-center gap-2">
-                                <span className="line-through opacity-50">{transferenciasRestantes}</span>
-                                <span>→</span>
-                                <span className={clsx("font-bold", transferenciasRestantes - 1 < 0 ? "text-red-400" : "text-textMain")}>
-                                    {Math.max(0, transferenciasRestantes - 1)}
-                                </span>
+                                {usuario?.isPremium ? (
+                                    <span className="font-bold text-amber-400 flex items-center">
+                                        <Infinity size={16} />
+                                    </span>
+                                ) : (
+                                    <>
+                                        <span className="line-through opacity-50">{transferenciasRestantes}</span>
+                                        <span>→</span>
+                                        <span className={clsx("font-bold", transferenciasRestantes - 1 < 0 ? "text-red-400" : "text-textMain")}>
+                                            {Math.max(0, transferenciasRestantes - 1)}
+                                        </span>
+                                    </>
+                                )}
                             </div>
                         </div>
                         
