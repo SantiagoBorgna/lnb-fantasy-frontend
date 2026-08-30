@@ -1005,7 +1005,7 @@ export default function CanchitaPage() {
             {usuario?.isPremium && !modoLectura && (
                 <button
                     onClick={() => setConsejeroOpen(true)}
-                    className="fixed bottom-24 right-4 z-40 bg-gradient-to-br from-amber-500 to-amber-600 p-3 rounded-full shadow-lg shadow-amber-500/20 hover:scale-110 active:scale-95 transition-transform lg:bottom-8 lg:right-8 overflow-hidden"
+                    className="fixed bottom-36 right-4 z-40 bg-gradient-to-br from-amber-500 to-amber-600 p-3 rounded-full shadow-lg shadow-amber-500/20 hover:scale-110 active:scale-95 transition-transform lg:bottom-8 lg:right-8 overflow-hidden"
                 >
                     <img src="/consejero.png" alt="Consejero" className="w-6 h-6 object-contain brightness-0 invert" />
                 </button>
