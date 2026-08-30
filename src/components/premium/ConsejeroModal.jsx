@@ -63,13 +63,10 @@ export default function ConsejeroModal({ isOpen, onClose }) {
                         </div>
                         <div>
                             {usuario?.isPremium ? (
-                                <>
-                                    <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                                        Analista Consejero
-                                        <Crown size={16} className="text-amber-400" />
-                                    </h2>
-                                    <p className="text-xs text-gray-400">Inteligencia deportiva LNB</p>
-                                </>
+                                <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                                    Analista Consejero
+                                    <Crown size={16} className="text-amber-400" />
+                                </h2>
                             ) : (
                                 <h2 className="text-lg font-bold text-white">
                                     Subscribite al plan premium
