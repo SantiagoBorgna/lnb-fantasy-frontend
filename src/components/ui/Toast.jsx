@@ -23,7 +23,7 @@ export default function Toast() {
                 : "top-28 md:top-12 left-1/2 -translate-x-1/2"
         )}>
             <div className={clsx(
-                "rounded-2xl shadow-xl border font-semibold flex items-center gap-3 backdrop-blur-md",
+                "relative rounded-2xl shadow-xl border font-semibold flex items-center gap-3 backdrop-blur-md",
                 toast.size === 'lg' ? "px-8 py-5 text-lg" : "px-5 py-3 text-sm",
                 toast.tipo === 'success' 
                     ? "bg-green-950/80 text-green-400 border-green-500/30" 
@@ -53,7 +53,7 @@ export default function Toast() {
                 <span className="whitespace-normal md:whitespace-nowrap text-center md:text-left leading-tight">{toast.mensaje}</span>
                 <button 
                     onClick={hideToast}
-                    className="ml-2 text-current opacity-50 hover:opacity-100 transition-opacity"
+                    className="absolute top-1 right-2 md:static md:top-auto md:right-auto md:ml-2 text-current opacity-50 hover:opacity-100 transition-opacity"
                 >
                     &times;
                 </button>
