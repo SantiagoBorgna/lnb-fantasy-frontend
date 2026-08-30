@@ -22,7 +22,7 @@ export default function ConfirmarTransferenciaModal({
     // Calculos de transferencias
     const limiteTransferencias = esModoDraft ? 4 : 3;
     const transferenciasUsadas = plantelActivo?.transferenciasUsadas || 0;
-    const transferenciasRestantes = limiteTransferencias - transferenciasUsadas;
+    const transferenciasRestantes = Math.max(0, limiteTransferencias - transferenciasUsadas);
 
     // Calculos de presupuesto (solo clásico)
     const precioCompra = jugadorEntrante.valorMercadoActual || 0;
