@@ -8,10 +8,11 @@ import AdminShowdownPanel from './AdminShowdownPanel'
 import AdminQuintetosPanel from './AdminQuintetosPanel'
 import AdminJugadoresPanel from './AdminJugadoresPanel'
 import AdminDtsPanel from './AdminDtsPanel'
+import AdminJornadasPanel from './AdminJornadasPanel'
 
 export default function AdminPage() {
     const usuario = useAuthStore(state => state.usuario)
-    const [tab, setTab] = useState('RELAMPAGOS') // 'RELAMPAGOS' o 'QUINTETOS'
+    const [tab, setTab] = useState('JORNADAS') // Default to JORNADAS
 
     if (!usuario || usuario.rol !== 'ADMIN') {
         return <Navigate to="/" replace />
@@ -32,11 +33,20 @@ export default function AdminPage() {
                     </div>
 
                     {/* Tabs */}
-                    <div className="flex p-1 bg-surface rounded-xl border border-border w-full md:w-max mx-auto md:mx-0">
+                    <div className="flex p-1 bg-surface rounded-xl border border-border w-full md:w-max mx-auto md:mx-0 flex-wrap">
+                        <button
+                            onClick={() => setTab('JORNADAS')}
+                            className={clsx(
+                                "flex-1 md:w-32 py-2 text-sm font-bold rounded-lg transition-all",
+                                tab === 'JORNADAS' ? "bg-card text-textMain shadow-sm border border-border" : "text-textMuted hover:text-textMain"
+                            )}
+                        >
+                            Jornadas
+                        </button>
                         <button
                             onClick={() => setTab('RELAMPAGOS')}
                             className={clsx(
-                                "flex-1 md:w-48 py-2 text-sm font-bold rounded-lg transition-all",
+                                "flex-1 md:w-40 py-2 text-sm font-bold rounded-lg transition-all",
                                 tab === 'RELAMPAGOS' ? "bg-card text-textMain shadow-sm border border-border" : "text-textMuted hover:text-textMain"
                             )}
                         >
@@ -73,6 +83,7 @@ export default function AdminPage() {
 
                     {/* Content */}
                     <div className="mt-4">
+                        {tab === 'JORNADAS' && <AdminJornadasPanel />}
                         {tab === 'RELAMPAGOS' && <AdminShowdownPanel />}
                         {tab === 'QUINTETOS' && <AdminQuintetosPanel />}
                         {tab === 'JUGADORES' && <AdminJugadoresPanel />}
