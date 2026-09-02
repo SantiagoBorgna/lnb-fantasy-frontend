@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Plus, Edit2, RotateCw } from 'lucide-react'
 import AdminPartidoModal from './AdminPartidoModal'
@@ -14,6 +14,12 @@ export default function AdminPartidosPanel() {
     const [modalOpen, setModalOpen] = useState(false)
     const [partidoToEdit, setPartidoToEdit] = useState(null)
     const [scrapingId, setScrapingId] = useState(null)
+
+    // Filters state
+    const [filtroJornada, setFiltroJornada] = useState('')
+    const [filtroEstado, setFiltroEstado] = useState('')
+    const [filtroFecha, setFiltroFecha] = useState('')
+    const [filtroEquipo, setFiltroEquipo] = useState('')
 
     const scrapeMutation = useMutation({
         mutationFn: scrapePartido,
@@ -36,12 +42,114 @@ export default function AdminPartidosPanel() {
         }
     }
 
+    // Apply filters
+    const partidosFiltrados = useMemo(() => {
+        if (!partidos) return []
+        return partidos.filter(p => {
+            let match = true
+            
+            if (filtroJornada && p.jornada.numero.toString() !== filtroJornada) {
+                match = false
+            }
+            if (filtroEstado && p.estado !== filtroEstado) {
+                match = false
+            }
+            if (filtroFecha) {
+                const pFecha = new Date(p.fechaHora).toISOString().split('T')[0]
+                if (pFecha !== filtroFecha) match = false
+            }
+            if (filtroEquipo) {
+                const search = filtroEquipo.toLowerCase()
+                if (!p.equipoLocal.nombre.toLowerCase().includes(search) &&
+                    !p.equipoVisitante.nombre.toLowerCase().includes(search)) {
+                    match = false
+                }
+            }
+            return match
+        }).sort((a, b) => new Date(a.fechaHora) - new Date(b.fechaHora))
+    }, [partidos, filtroJornada, filtroEstado, filtroFecha, filtroEquipo])
+
+    // Get unique jornadas for the select
+    const jornadasDisponibles = useMemo(() => {
+        if (!partidos) return []
+        const nums = partidos.map(p => p.jornada.numero)
+        return [...new Set(nums)].sort((a, b) => a - b)
+    }, [partidos])
+
     if (isLoading) return <div className="text-white">Cargando...</div>
 
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold text-white">Gestión de Partidos</h2>
+            </div>
+
+            {/* Filtros */}
+            <div className="bg-surface rounded-xl border border-border p-4 flex flex-wrap gap-4">
+                <div className="flex-1 min-w-[150px]">
+                    <label className="block text-xs font-bold text-textMuted uppercase mb-1">Jornada</label>
+                    <select
+                        value={filtroJornada}
+                        onChange={(e) => setFiltroJornada(e.target.value)}
+                        className="w-full bg-card border border-border rounded-lg px-3 py-2 text-textMain outline-none focus:border-primary transition-colors text-sm"
+                    >
+                        <option value="">Todas</option>
+                        {jornadasDisponibles.map(num => (
+                            <option key={num} value={num}>Jornada {num}</option>
+                        ))}
+                    </select>
+                </div>
+                
+                <div className="flex-1 min-w-[150px]">
+                    <label className="block text-xs font-bold text-textMuted uppercase mb-1">Estado</label>
+                    <select
+                        value={filtroEstado}
+                        onChange={(e) => setFiltroEstado(e.target.value)}
+                        className="w-full bg-card border border-border rounded-lg px-3 py-2 text-textMain outline-none focus:border-primary transition-colors text-sm"
+                    >
+                        <option value="">Todos</option>
+                        <option value="PROGRAMADO">Programado</option>
+                        <option value="FINALIZADO">Finalizado</option>
+                        <option value="PROCESADO">Procesado</option>
+                    </select>
+                </div>
+
+                <div className="flex-1 min-w-[150px]">
+                    <label className="block text-xs font-bold text-textMuted uppercase mb-1">Fecha</label>
+                    <input
+                        type="date"
+                        value={filtroFecha}
+                        onChange={(e) => setFiltroFecha(e.target.value)}
+                        className="w-full bg-card border border-border rounded-lg px-3 py-2 text-textMain outline-none focus:border-primary transition-colors text-sm"
+                        style={{ colorScheme: 'dark' }}
+                    />
+                </div>
+
+                <div className="flex-[2] min-w-[200px]">
+                    <label className="block text-xs font-bold text-textMuted uppercase mb-1">Equipo (Buscar por nombre)</label>
+                    <input
+                        type="text"
+                        placeholder="Ej: Boca Juniors, Quimsa..."
+                        value={filtroEquipo}
+                        onChange={(e) => setFiltroEquipo(e.target.value)}
+                        className="w-full bg-card border border-border rounded-lg px-3 py-2 text-textMain outline-none focus:border-primary transition-colors text-sm"
+                    />
+                </div>
+                
+                {/* Botón para limpiar filtros */}
+                <div className="flex items-end">
+                    <button
+                        onClick={() => {
+                            setFiltroJornada('')
+                            setFiltroEstado('')
+                            setFiltroFecha('')
+                            setFiltroEquipo('')
+                        }}
+                        className="px-4 py-2 bg-card border border-border text-textMuted font-bold rounded-lg hover:text-white transition-colors text-sm"
+                    >
+                        Limpiar
+                    </button>
+                </div>
             </div>
 
             <div className="bg-surface rounded-xl border border-border overflow-hidden">
@@ -59,18 +167,16 @@ export default function AdminPartidosPanel() {
                             </tr>
                         </thead>
                         <tbody>
-                            {partidos?.sort((a, b) => new Date(a.fechaHora) - new Date(b.fechaHora)).map((partido) => (
+                            {partidosFiltrados.map((partido) => (
                                 <tr key={partido.id} className="border-b border-border hover:bg-card/50 transition-colors">
                                     <td className="px-6 py-4 font-bold text-white">
                                         J{partido.jornada.numero}
                                     </td>
                                     <td className="px-6 py-4 text-white">
                                         <div className="flex items-center gap-2">
-                                            <img src={partido.equipoLocal.logoUrl} alt="" className="w-6 h-6 object-contain" />
-                                            <span className="font-bold">{partido.equipoLocal.sigla}</span>
+                                            <span className="font-bold">{partido.equipoLocal.nombre}</span>
                                             <span className="text-textMuted mx-1">vs</span>
-                                            <span className="font-bold">{partido.equipoVisitante.sigla}</span>
-                                            <img src={partido.equipoVisitante.logoUrl} alt="" className="w-6 h-6 object-contain" />
+                                            <span className="font-bold">{partido.equipoVisitante.nombre}</span>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-white font-bold">
@@ -119,10 +225,10 @@ export default function AdminPartidosPanel() {
                                     </td>
                                 </tr>
                             ))}
-                            {partidos?.length === 0 && (
+                            {partidosFiltrados.length === 0 && (
                                 <tr>
                                     <td colSpan="7" className="px-6 py-8 text-center">
-                                        No hay partidos cargados.
+                                        No se encontraron partidos con esos filtros.
                                     </td>
                                 </tr>
                             )}
