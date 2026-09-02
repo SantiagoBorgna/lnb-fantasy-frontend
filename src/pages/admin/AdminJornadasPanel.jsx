@@ -22,19 +22,15 @@ export default function AdminJornadasPanel() {
 
     const [modalOpen, setModalOpen] = useState(false)
     const [jornadaToEdit, setJornadaToEdit] = useState(null)
+    const [jornadaToDelete, setJornadaToDelete] = useState(null)
 
     const deleteMutation = useMutation({
         mutationFn: deleteJornada,
         onSuccess: () => {
             queryClient.invalidateQueries(['adminJornadas'])
+            setJornadaToDelete(null)
         }
     })
-
-    const handleDelete = (id) => {
-        if (window.confirm('¿Seguro que querés eliminar esta jornada?')) {
-            deleteMutation.mutate(id)
-        }
-    }
 
     if (isLoading) return <div className="text-white">Cargando...</div>
 
@@ -47,7 +43,7 @@ export default function AdminJornadasPanel() {
                         setJornadaToEdit(null)
                         setModalOpen(true)
                     }}
-                    className="flex items-center gap-2 px-4 py-2 bg-primary text-background font-bold rounded-lg hover:bg-primary/90 transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 bg-primary text-white font-bold rounded-lg hover:bg-primary/90 transition-colors"
                 >
                     <Plus size={18} />
                     Nueva Jornada
@@ -100,7 +96,7 @@ export default function AdminJornadasPanel() {
                                                 <Edit2 size={16} />
                                             </button>
                                             <button
-                                                onClick={() => handleDelete(jornada.id)}
+                                                onClick={() => setJornadaToDelete(jornada)}
                                                 className="p-2 text-textMuted hover:text-red-500 transition-colors bg-background rounded-lg"
                                                 title="Eliminar"
                                             >
@@ -127,6 +123,36 @@ export default function AdminJornadasPanel() {
                     jornada={jornadaToEdit}
                     onClose={() => setModalOpen(false)}
                 />
+            )}
+
+            {jornadaToDelete && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+                    <div className="bg-surface border border-border rounded-xl w-full max-w-sm overflow-hidden shadow-2xl p-6 text-center">
+                        <div className="mx-auto w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center mb-4 text-red-500">
+                            <Trash2 size={24} />
+                        </div>
+                        <h3 className="text-xl font-bold text-white mb-2">Eliminar Jornada {jornadaToDelete.numero}</h3>
+                        <p className="text-textMuted mb-6">
+                            ¿Estás seguro de que querés eliminar esta jornada? Esta acción no se puede deshacer.
+                        </p>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setJornadaToDelete(null)}
+                                className="flex-1 py-2 rounded-lg font-bold text-textMuted hover:text-white transition-colors bg-card border border-border"
+                                disabled={deleteMutation.isPending}
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={() => deleteMutation.mutate(jornadaToDelete.id)}
+                                disabled={deleteMutation.isPending}
+                                className="flex-1 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                            >
+                                {deleteMutation.isPending ? 'Eliminando...' : 'Sí, eliminar'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     )
