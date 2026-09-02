@@ -21,25 +21,31 @@ export default function AdminPartidosPanel() {
     const [filtroFecha, setFiltroFecha] = useState('')
     const [filtroEquipo, setFiltroEquipo] = useState('')
 
+    const [partidoToScrape, setPartidoToScrape] = useState(null)
+
     const scrapeMutation = useMutation({
         mutationFn: scrapePartido,
         onSuccess: () => {
             queryClient.invalidateQueries(['adminPartidos'])
             alert('Estadísticas recolectadas exitosamente')
+            setPartidoToScrape(null)
         },
         onError: (err) => {
             alert('Error al recolectar estadísticas: ' + err.message)
+            setPartidoToScrape(null)
         },
         onSettled: () => {
             setScrapingId(null)
         }
     })
 
-    const handleScrape = (partido) => {
-        if (window.confirm(`¿Estás seguro de recalcular las estadísticas del partido ${partido.equipoLocal.nombre} vs ${partido.equipoVisitante.nombre}? Se borrarán las estadísticas previas y se descargarán nuevamente de GES Deportiva.`)) {
-            setScrapingId(partido.id)
-            scrapeMutation.mutate(partido.id)
-        }
+    const handleScrapeClick = (partido) => {
+        setPartidoToScrape(partido)
+    }
+
+    const confirmScrape = () => {
+        setScrapingId(partidoToScrape.id)
+        scrapeMutation.mutate(partidoToScrape.id)
     }
 
     // Apply filters
@@ -204,7 +210,7 @@ export default function AdminPartidosPanel() {
                                     <td className="px-6 py-4 text-right">
                                         <div className="flex items-center justify-end gap-3">
                                             <button
-                                                onClick={() => handleScrape(partido)}
+                                                onClick={() => handleScrapeClick(partido)}
                                                 className="p-2 text-textMuted hover:text-green-500 transition-colors bg-background rounded-lg"
                                                 title="Recolectar Estadísticas"
                                                 disabled={scrapingId === partido.id}
@@ -242,6 +248,39 @@ export default function AdminPartidosPanel() {
                     partido={partidoToEdit}
                     onClose={() => setModalOpen(false)}
                 />
+            )}
+
+            {partidoToScrape && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+                    <div className="bg-surface border border-border rounded-xl w-full max-w-sm overflow-hidden shadow-2xl p-6 text-center">
+                        <div className="mx-auto w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center mb-4 text-amber-500">
+                            <RotateCw size={24} />
+                        </div>
+                        <h3 className="text-xl font-bold text-white mb-2">Recalcular Estadísticas</h3>
+                        <p className="text-textMuted mb-2">
+                            {partidoToScrape.equipoLocal.nombre} vs {partidoToScrape.equipoVisitante.nombre}
+                        </p>
+                        <p className="text-textMuted text-sm mb-6">
+                            ¿Estás seguro de querer recalcular? Se borrarán las estadísticas previas y se descargarán nuevamente de GES Deportiva.
+                        </p>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setPartidoToScrape(null)}
+                                className="flex-1 py-2 rounded-lg font-bold text-textMuted hover:text-white transition-colors bg-card border border-border"
+                                disabled={scrapeMutation.isPending}
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={confirmScrape}
+                                disabled={scrapeMutation.isPending}
+                                className="flex-1 py-2 bg-amber-600 text-white font-bold rounded-lg hover:bg-amber-700 transition-colors disabled:opacity-50"
+                            >
+                                {scrapeMutation.isPending ? 'Recolectando...' : 'Sí, recalcular'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     )
