@@ -9,6 +9,7 @@ import AdminQuintetosPanel from './AdminQuintetosPanel'
 import AdminJugadoresPanel from './AdminJugadoresPanel'
 import AdminDtsPanel from './AdminDtsPanel'
 import AdminJornadasPanel from './AdminJornadasPanel'
+import AdminPartidosPanel from './AdminPartidosPanel'
 
 export default function AdminPage() {
     const usuario = useAuthStore(state => state.usuario)
@@ -42,6 +43,15 @@ export default function AdminPage() {
                             )}
                         >
                             Jornadas
+                        </button>
+                        <button
+                            onClick={() => setTab('PARTIDOS')}
+                            className={clsx(
+                                "flex-1 md:w-32 py-2 text-sm font-bold rounded-lg transition-all",
+                                tab === 'PARTIDOS' ? "bg-card text-textMain shadow-sm border border-border" : "text-textMuted hover:text-textMain"
+                            )}
+                        >
+                            Partidos
                         </button>
                         <button
                             onClick={() => setTab('RELAMPAGOS')}
@@ -84,6 +94,7 @@ export default function AdminPage() {
                     {/* Content */}
                     <div className="mt-4">
                         {tab === 'JORNADAS' && <AdminJornadasPanel />}
+                        {tab === 'PARTIDOS' && <AdminPartidosPanel />}
                         {tab === 'RELAMPAGOS' && <AdminShowdownPanel />}
                         {tab === 'QUINTETOS' && <AdminQuintetosPanel />}
                         {tab === 'JUGADORES' && <AdminJugadoresPanel />}

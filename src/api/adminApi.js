@@ -20,9 +20,27 @@ export const eliminarShowdown = async (id) => {
     return data;
 };
 
-export const getQuintetosPorJornada = async (jornadaId) => {
-    const { data } = await api.get(`/admin/quintetos?jornadaId=${jornadaId}`);
-    return data;
+// --- ADMIN QUINTETOS ---
+export const getQuintetosPorJornada = async (id) => {
+    const response = await api.get(`/admin/jornadas/${id}/quintetos`)
+    return response.data
+}
+
+// --- ADMIN PARTIDOS ---
+export const getPartidos = async (jornadaId) => {
+    const url = jornadaId ? `/admin/partidos?jornadaId=${jornadaId}` : '/admin/partidos'
+    const response = await api.get(url)
+    return response.data
+}
+
+export const updatePartido = async (id, data) => {
+    const response = await api.put(`/admin/partidos/${id}`, data)
+    return response.data
+}
+
+export const scrapePartido = async (id) => {
+    const response = await api.post(`/admin/partidos/${id}/scrape`)
+    return response.data
 };
 
 
