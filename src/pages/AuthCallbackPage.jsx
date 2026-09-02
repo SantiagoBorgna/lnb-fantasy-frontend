@@ -3,11 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { getMe } from '../api/authApi'
 import { useGameStore } from '../store/gameStore'
+import { useQueryClient } from '@tanstack/react-query'
 
 export default function AuthCallbackPage() {
     const setAuth = useAuthStore(state => state.setAuth)
     const { setContextoActual } = useGameStore()
     const navigate = useNavigate()
+
+    const queryClient = useQueryClient()
 
     useEffect(() => {
         const hash = window.location.hash  // "#token=eyJ..."
@@ -30,6 +33,7 @@ export default function AuthCallbackPage() {
         getMe()
             .then(usuario => {
                 setAuth(token, usuario)
+                queryClient.clear() // Limpiamos la caché de react-query de un usuario anterior
                 
                 localStorage.removeItem('redirectUrl'); // Limpiamos la memoria por si quedó algo guardado
                 navigate('/', { replace: true });
@@ -39,7 +43,7 @@ export default function AuthCallbackPage() {
                 setAuth(null, null)
                 navigate('/login', { replace: true })
             })
-    }, [navigate, setAuth])
+    }, [navigate, setAuth, queryClient])
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-surface">

@@ -5,10 +5,12 @@ import { getEquiposParaOnboarding, actualizarPerfil, logout } from '../../api/au
 import { useAuthStore } from '../../store/authStore'
 import { useNavigate } from 'react-router-dom'
 import CamisetaSVG from '../jugador/CamisetaSVG'
+import { useQueryClient } from '@tanstack/react-query'
 
 export default function PerfilModal({ isOpen, onClose }) {
     const { usuario, setAuth, setUsuario, setToken } = useAuthStore()
     const navigate = useNavigate()
+    const queryClient = useQueryClient()
 
     const [equipos, setEquipos] = useState([])
     const [cargandoEquipos, setCargandoEquipos] = useState(false)
@@ -61,6 +63,11 @@ export default function PerfilModal({ isOpen, onClose }) {
             })
             // Actualizar store con el nuevo usuario sin tocar el token
             setUsuario(data)
+            
+            // Invalidate queries so that Canchita updates its nombreEquipo
+            queryClient.invalidateQueries({ queryKey: ['plantel'] })
+            queryClient.invalidateQueries({ queryKey: ['me'] })
+
             onClose()
         } catch (err) {
             setError(err.response?.data?.mensaje || 'Error al actualizar perfil')

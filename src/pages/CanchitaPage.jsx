@@ -260,6 +260,12 @@ export default function CanchitaPage() {
                 rol: j.rol,
             }))
 
+            // Optimistic update of the cache so it persists through navigation
+            queryClient.setQueryData(['plantel', contextoActual, usuario?.id], (old) => {
+                if (!old) return old
+                return { ...old, formacion: formacionFinal, jugadores: nuevosJugadores }
+            })
+
             await guardarPlantel({
                 dtId: plantel.dt?.dtId,
                 formacion: formacionFinal,
