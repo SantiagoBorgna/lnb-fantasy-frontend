@@ -109,11 +109,13 @@ export default function AdminJugadoresPanel() {
                     <table className="w-full text-left border-collapse table-fixed">
                         <thead>
                             <tr className="bg-card border-b border-border">
-                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-1/3">Nombre</th>
-                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[15%]">Club</th>
-                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[15%]">Posición</th>
-                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[15%]">Precio</th>
-                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[12%]">Estado</th>
+                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[22%]">Nombre</th>
+                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[12%]">Club</th>
+                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[12%]">Posición</th>
+                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[12%]">Precio</th>
+                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider text-center w-[12%]">En Planteles</th>
+                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider text-center w-[10%]">Capitán</th>
+                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[10%]">Estado</th>
                                 <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider text-right w-[10%]">Acción</th>
                             </tr>
                         </thead>
@@ -126,6 +128,8 @@ export default function AdminJugadoresPanel() {
                                     <td className="p-4 text-sm text-textMuted font-medium truncate">{j.equipoSigla}</td>
                                     <td className="p-4 text-sm text-textMuted truncate">{j.posicion.replace("_", " ")}</td>
                                     <td className="p-4 font-bold text-accent truncate">${j.valorMercadoActual.toFixed(1)}m</td>
+                                    <td className="p-4 text-center font-bold text-white">{j.cantidadPlanteles ?? 0}</td>
+                                    <td className="p-4 text-center text-yellow-500 font-bold">{j.cantidadCapitan ?? 0}</td>
                                     <td className="p-4">
                                         <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded ${
                                             j.estado === "DISPONIBLE" ? "bg-green-500/10 text-green-500" :
@@ -149,7 +153,7 @@ export default function AdminJugadoresPanel() {
                             ))}
                             {jugadoresFiltrados.length === 0 && (
                                 <tr>
-                                    <td colSpan="6" className="p-8 text-center text-textMuted text-sm">
+                                    <td colSpan="8" className="p-8 text-center text-textMuted text-sm">
                                         No se encontraron jugadores que coincidan con la búsqueda.
                                     </td>
                                 </tr>
