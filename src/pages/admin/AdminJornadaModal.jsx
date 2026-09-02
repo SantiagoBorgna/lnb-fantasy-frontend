@@ -2,19 +2,17 @@ import { useState, useEffect } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { X } from 'lucide-react'
 
+import api from '../../api/axiosClient'
+
 const saveJornada = async (data) => {
-    const url = data.id ? `/api/admin/jornadas/${data.id}` : '/api/admin/jornadas'
-    const method = data.id ? 'PUT' : 'POST'
-    const res = await fetch(url, {
+    const url = data.id ? `/admin/jornadas/${data.id}` : '/admin/jornadas'
+    const method = data.id ? 'put' : 'post'
+    const res = await api({
         method,
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + localStorage.getItem('token')
-        },
-        body: JSON.stringify(data)
+        url,
+        data
     })
-    if (!res.ok) throw new Error('Error al guardar jornada')
-    return res.json()
+    return res.data
 }
 
 export default function AdminJornadaModal({ jornada, onClose }) {
