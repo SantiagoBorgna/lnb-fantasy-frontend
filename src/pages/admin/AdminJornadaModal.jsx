@@ -62,7 +62,7 @@ export default function AdminJornadaModal({ jornada, onClose }) {
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
             <div className="bg-surface border border-border rounded-xl w-full max-w-md overflow-hidden shadow-2xl">
                 <div className="flex items-center justify-between p-4 border-b border-border">
                     <h3 className="text-lg font-bold text-white">
@@ -82,7 +82,7 @@ export default function AdminJornadaModal({ jornada, onClose }) {
                             min="1"
                             value={numero}
                             onChange={(e) => setNumero(e.target.value)}
-                            className="w-full bg-background border border-border rounded-lg px-3 py-2 text-white outline-none focus:border-primary transition-colors"
+                            className="w-full bg-card border border-border rounded-lg px-3 py-2 text-textMain outline-none focus:border-primary transition-colors"
                         />
                     </div>
                     
@@ -93,7 +93,7 @@ export default function AdminJornadaModal({ jornada, onClose }) {
                             required
                             value={fechaInicio}
                             onChange={(e) => setFechaInicio(e.target.value)}
-                            className="w-full bg-background border border-border rounded-lg px-3 py-2 text-white outline-none focus:border-primary transition-colors"
+                            className="w-full bg-card border border-border rounded-lg px-3 py-2 text-textMain outline-none focus:border-primary transition-colors"
                             style={{ colorScheme: 'dark' }}
                         />
                     </div>
@@ -105,7 +105,7 @@ export default function AdminJornadaModal({ jornada, onClose }) {
                             required
                             value={fechaFin}
                             onChange={(e) => setFechaFin(e.target.value)}
-                            className="w-full bg-background border border-border rounded-lg px-3 py-2 text-white outline-none focus:border-primary transition-colors"
+                            className="w-full bg-card border border-border rounded-lg px-3 py-2 text-textMain outline-none focus:border-primary transition-colors"
                             style={{ colorScheme: 'dark' }}
                         />
                     </div>
@@ -115,7 +115,7 @@ export default function AdminJornadaModal({ jornada, onClose }) {
                         <select
                             value={estado}
                             onChange={(e) => setEstado(e.target.value)}
-                            className="w-full bg-background border border-border rounded-lg px-3 py-2 text-white outline-none focus:border-primary transition-colors"
+                            className="w-full bg-card border border-border rounded-lg px-3 py-2 text-textMain outline-none focus:border-primary transition-colors"
                         >
                             <option value="ABIERTA_A_CAMBIOS">Abierta a Cambios</option>
                             <option value="EN_JUEGO">En Juego</option>
@@ -134,7 +134,7 @@ export default function AdminJornadaModal({ jornada, onClose }) {
                         <button
                             type="submit"
                             disabled={mutation.isPending}
-                            className="flex-1 py-2 bg-primary text-background font-bold rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
+                            className="flex-1 py-2 bg-primary text-white font-bold rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50"
                         >
                             {mutation.isPending ? 'Guardando...' : 'Guardar'}
                         </button>
