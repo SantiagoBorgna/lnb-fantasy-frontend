@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Plus, Edit2, Trash2 } from 'lucide-react'
 import AdminJornadaModal from './AdminJornadaModal'
-import api from '../../api/axiosConfig'
+import api from '../../api/axiosClient'
 
 const fetchJornadas = async () => {
     const res = await api.get('/admin/jornadas')
