@@ -9,6 +9,7 @@ import LoadingSpinner from '../../components/ui/LoadingSpinner'
 import { createPortal } from 'react-dom'
 import clsx from 'clsx'
 import { useUiStore } from '../../store/uiStore'
+import { useQueryClient } from '@tanstack/react-query'
 
 const FORMACIONES = ['1-2-2', '1-3-1', '2-1-2', '2-2-1', '3-1-1']
 
@@ -22,6 +23,7 @@ const PRESUPUESTO_INICIAL = 100.0 // <-- Presupuesto fijo inicial
 
 export default function OnboardingCanchitaPage() {
     const navigate = useNavigate()
+    const queryClient = useQueryClient()
     const { token, setAuth } = useAuthStore()
     const {
         formacion, slots, dt,
@@ -79,6 +81,10 @@ export default function OnboardingCanchitaPage() {
             resetDraft()
             const usuarioActualizado = await getMe()
             setAuth(token, usuarioActualizado)
+            
+            // Invalidate the cache so the dashboard/canchita fetches the new squad
+            queryClient.invalidateQueries({ queryKey: ['plantel'] })
+            
             navigate('/onboarding/draft', { replace: true })
         } catch (e) {
             showToast(e.response?.data?.mensaje ?? 'Error al guardar el equipo.', 'error')
