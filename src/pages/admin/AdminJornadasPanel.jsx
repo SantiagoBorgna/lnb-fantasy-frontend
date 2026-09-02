@@ -2,21 +2,15 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Plus, Edit2, Trash2 } from 'lucide-react'
 import AdminJornadaModal from './AdminJornadaModal'
+import api from '../../api/axiosConfig'
 
 const fetchJornadas = async () => {
-    const res = await fetch('/api/admin/jornadas', {
-        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-    })
-    if (!res.ok) throw new Error('Error al cargar jornadas')
-    return res.json()
+    const res = await api.get('/admin/jornadas')
+    return res.data
 }
 
 const deleteJornada = async (id) => {
-    const res = await fetch(`/api/admin/jornadas/${id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-    })
-    if (!res.ok) throw new Error('Error al eliminar jornada')
+    await api.delete(`/admin/jornadas/${id}`)
 }
 
 export default function AdminJornadasPanel() {

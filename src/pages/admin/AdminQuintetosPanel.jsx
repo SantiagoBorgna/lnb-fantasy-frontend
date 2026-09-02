@@ -27,7 +27,7 @@ export default function AdminQuintetosPanel() {
         try {
             const list = await getJornadas()
             // Filtramos solo las que ya empezaron o terminaron
-            const jugadas = list.filter(j => j.estado === 'ACTIVA' || j.estado === 'FINALIZADA')
+            const jugadas = list.filter(j => j.estado === 'EN_JUEGO' || j.estado === 'FINALIZADA')
             setJornadas(jugadas)
             if (jugadas.length > 0) {
                 setJornadaSeleccionada(jugadas[jugadas.length - 1].id.toString())
