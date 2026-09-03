@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { getTodosLosJugadoresAdmin, updateJugadorAdmin, getTodosLosEquiposAdmin } from "../../api/adminApi";
-import { Search, Edit2, Loader2, Filter } from "lucide-react";
+import { Search, Edit2, Loader2, Filter, ChevronUp, ChevronDown } from "lucide-react";
 import { useUiStore } from "../../store/uiStore";
 import AdminEditarJugadorModal from "../../components/admin/AdminEditarJugadorModal";
 
@@ -16,6 +16,14 @@ export default function AdminJugadoresPanel() {
     const [filtroEstado, setFiltroEstado] = useState("");
 
     const [editingJugador, setEditingJugador] = useState(null);
+    const [sortConfig, setSortConfig] = useState({ key: 'nombreCompleto', direction: 'asc' });
+
+    const handleSort = (key) => {
+        setSortConfig(current => ({
+            key,
+            direction: current.key === key && current.direction === 'asc' ? 'desc' : 'asc'
+        }));
+    };
 
     const cargarDatos = async () => {
         try {
@@ -39,13 +47,39 @@ export default function AdminJugadoresPanel() {
     }, []);
 
     const jugadoresFiltrados = useMemo(() => {
-        return jugadores.filter(j => {
+        let filtered = jugadores.filter(j => {
             const matchSearch = j.nombreCompleto.toLowerCase().includes(search.toLowerCase());
             const matchEquipo = filtroEquipo ? j.equipoRealId?.toString() === filtroEquipo : true;
             const matchEstado = filtroEstado ? j.estado === filtroEstado : true;
             return matchSearch && matchEquipo && matchEstado;
-        }).sort((a, b) => a.nombreCompleto.localeCompare(b.nombreCompleto));
-    }, [jugadores, search, filtroEquipo, filtroEstado]);
+        });
+
+        filtered.sort((a, b) => {
+            let valA = a[sortConfig.key];
+            let valB = b[sortConfig.key];
+            
+            // Handle nulls safely for the new properties
+            if (sortConfig.key === 'cantidadPlanteles') {
+                valA = valA ?? 0;
+                valB = valB ?? 0;
+            } else if (sortConfig.key === 'cantidadCapitan') {
+                valA = valA ?? 0;
+                valB = valB ?? 0;
+            }
+
+            // String comparison vs Number comparison
+            if (typeof valA === 'string' && typeof valB === 'string') {
+                const comparison = valA.localeCompare(valB);
+                return sortConfig.direction === 'asc' ? comparison : -comparison;
+            }
+
+            if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
+            if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
+            return 0;
+        });
+
+        return filtered;
+    }, [jugadores, search, filtroEquipo, filtroEstado, sortConfig]);
 
     const handleSaveJugador = async (id, payload) => {
         try {
@@ -62,6 +96,24 @@ export default function AdminJugadoresPanel() {
     if (loading && jugadores.length === 0) {
         return <div className="flex justify-center p-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
     }
+
+    const renderSortableHeader = (label, key, className) => {
+        const isActive = sortConfig.key === key;
+        return (
+            <th 
+                className={`${className} cursor-pointer hover:bg-white/5 transition-colors group select-none`}
+                onClick={() => handleSort(key)}
+            >
+                <div className={`flex items-center gap-1 ${className.includes('text-center') ? 'justify-center' : ''} ${className.includes('text-right') ? 'justify-end' : ''}`}>
+                    {label}
+                    <div className="flex flex-col opacity-50 group-hover:opacity-100 transition-opacity">
+                        <ChevronUp className={`w-3 h-3 -mb-1 ${isActive && sortConfig.direction === 'asc' ? 'text-primary' : ''}`} />
+                        <ChevronDown className={`w-3 h-3 ${isActive && sortConfig.direction === 'desc' ? 'text-primary' : ''}`} />
+                    </div>
+                </div>
+            </th>
+        );
+    };
 
     return (
         <div className="space-y-6 pt-2">
@@ -109,12 +161,12 @@ export default function AdminJugadoresPanel() {
                     <table className="w-full text-left border-collapse table-fixed">
                         <thead>
                             <tr className="bg-card border-b border-border">
-                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[22%]">Nombre</th>
-                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[12%]">Club</th>
-                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[12%]">Posición</th>
-                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[12%]">Precio</th>
-                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider text-center w-[12%]">En Planteles</th>
-                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider text-center w-[10%]">Capitán</th>
+                                {renderSortableHeader("Nombre", "nombreCompleto", "p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[22%]")}
+                                {renderSortableHeader("Club", "equipoSigla", "p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[12%]")}
+                                {renderSortableHeader("Posición", "posicion", "p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[12%]")}
+                                {renderSortableHeader("Precio", "valorMercadoActual", "p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[12%]")}
+                                {renderSortableHeader("En Planteles", "cantidadPlanteles", "p-4 text-xs font-bold text-textMuted uppercase tracking-wider text-center w-[12%]")}
+                                {renderSortableHeader("Capitán", "cantidadCapitan", "p-4 text-xs font-bold text-textMuted uppercase tracking-wider text-center w-[10%]")}
                                 <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[10%]">Estado</th>
                                 <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider text-right w-[10%]">Acción</th>
                             </tr>
