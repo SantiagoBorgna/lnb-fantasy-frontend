@@ -59,10 +59,7 @@ export default function AdminJugadoresPanel() {
             let valB = b[sortConfig.key];
             
             // Handle nulls safely for the new properties
-            if (sortConfig.key === 'cantidadPlanteles') {
-                valA = valA ?? 0;
-                valB = valB ?? 0;
-            } else if (sortConfig.key === 'cantidadCapitan') {
+            if (sortConfig.key === 'cantidadPlanteles' || sortConfig.key === 'cantidadCapitan' || sortConfig.key === 'promedioFantasy') {
                 valA = valA ?? 0;
                 valB = valB ?? 0;
             }
@@ -161,14 +158,15 @@ export default function AdminJugadoresPanel() {
                     <table className="w-full text-left border-collapse table-fixed">
                         <thead>
                             <tr className="bg-card border-b border-border">
-                                {renderSortableHeader("Nombre", "nombreCompleto", "p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[22%]")}
-                                {renderSortableHeader("Club", "equipoSigla", "p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[12%]")}
-                                {renderSortableHeader("Posición", "posicion", "p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[12%]")}
-                                {renderSortableHeader("Precio", "valorMercadoActual", "p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[12%]")}
-                                {renderSortableHeader("En Planteles", "cantidadPlanteles", "p-4 text-xs font-bold text-textMuted uppercase tracking-wider text-center w-[12%]")}
-                                {renderSortableHeader("Capitán", "cantidadCapitan", "p-4 text-xs font-bold text-textMuted uppercase tracking-wider text-center w-[10%]")}
+                                {renderSortableHeader("Nombre", "nombreCompleto", "p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[20%]")}
+                                {renderSortableHeader("Club", "equipoSigla", "p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[10%]")}
+                                {renderSortableHeader("Posición", "posicion", "p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[11%]")}
+                                {renderSortableHeader("Precio", "valorMercadoActual", "p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[10%]")}
+                                {renderSortableHeader("Promedio", "promedioFantasy", "p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[10%]")}
+                                {renderSortableHeader("En Planteles", "cantidadPlanteles", "p-4 text-xs font-bold text-textMuted uppercase tracking-wider text-center w-[11%]")}
+                                {renderSortableHeader("Capitán", "cantidadCapitan", "p-4 text-xs font-bold text-textMuted uppercase tracking-wider text-center w-[9%]")}
                                 <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[10%]">Estado</th>
-                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider text-right w-[10%]">Acción</th>
+                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider text-right w-[9%]">Acción</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-border">
@@ -180,6 +178,7 @@ export default function AdminJugadoresPanel() {
                                     <td className="p-4 text-sm text-textMuted font-medium truncate">{j.equipoSigla}</td>
                                     <td className="p-4 text-sm text-textMuted truncate">{j.posicion.replace("_", " ")}</td>
                                     <td className="p-4 font-bold text-accent truncate">${j.valorMercadoActual.toFixed(1)}m</td>
+                                    <td className="p-4 font-bold text-blue-400 truncate">{j.promedioFantasy?.toFixed(1) ?? "0.0"} pts</td>
                                     <td className="p-4 text-center font-bold text-white">{j.cantidadPlanteles ?? 0}</td>
                                     <td className="p-4 text-center text-yellow-500 font-bold">{j.cantidadCapitan ?? 0}</td>
                                     <td className="p-4">
@@ -205,7 +204,7 @@ export default function AdminJugadoresPanel() {
                             ))}
                             {jugadoresFiltrados.length === 0 && (
                                 <tr>
-                                    <td colSpan="8" className="p-8 text-center text-textMuted text-sm">
+                                    <td colSpan="9" className="p-8 text-center text-textMuted text-sm">
                                         No se encontraron jugadores que coincidan con la búsqueda.
                                     </td>
                                 </tr>

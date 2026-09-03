@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Search, Edit2, Loader2 } from 'lucide-react';
 import { getDtsAdmin, updateDtAdmin, getTodosLosEquiposAdmin } from '../../api/adminApi';
+import { Search, Edit2, Loader2, ChevronUp, ChevronDown } from 'lucide-react';
 import { useUiStore } from '../../store/uiStore';
 import AdminEditarDtModal from './AdminEditarDtModal';
 
@@ -17,6 +17,14 @@ export default function AdminDtsPanel() {
 
     // Edición
     const [editingDt, setEditingDt] = useState(null);
+    const [sortConfig, setSortConfig] = useState({ key: 'nombreCompleto', direction: 'asc' });
+
+    const handleSort = (key) => {
+        setSortConfig(current => ({
+            key,
+            direction: current.key === key && current.direction === 'asc' ? 'desc' : 'asc'
+        }));
+    };
 
     const cargarDatos = async () => {
         try {
@@ -40,13 +48,34 @@ export default function AdminDtsPanel() {
     }, []);
 
     const dtsFiltrados = useMemo(() => {
-        return dts.filter(dt => {
+        let filtered = dts.filter(dt => {
             const matchSearch = dt.nombreCompleto.toLowerCase().includes(search.toLowerCase());
             const matchEquipo = filtroEquipo ? dt.equipoId?.toString() === filtroEquipo : true;
             const matchEstado = filtroEstado ? dt.estado === filtroEstado : true;
             return matchSearch && matchEquipo && matchEstado;
-        }).sort((a, b) => a.nombreCompleto.localeCompare(b.nombreCompleto));
-    }, [dts, search, filtroEquipo, filtroEstado]);
+        });
+
+        filtered.sort((a, b) => {
+            let valA = a[sortConfig.key];
+            let valB = b[sortConfig.key];
+            
+            if (sortConfig.key === 'cantidadPlanteles' || sortConfig.key === 'promedioFantasy') {
+                valA = valA ?? 0;
+                valB = valB ?? 0;
+            }
+
+            if (typeof valA === 'string' && typeof valB === 'string') {
+                const comparison = valA.localeCompare(valB);
+                return sortConfig.direction === 'asc' ? comparison : -comparison;
+            }
+
+            if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
+            if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
+            return 0;
+        });
+
+        return filtered;
+    }, [dts, search, filtroEquipo, filtroEstado, sortConfig]);
 
     const handleSaveDt = async (id, payload) => {
         try {
@@ -63,6 +92,24 @@ export default function AdminDtsPanel() {
     if (loading && dts.length === 0) {
         return <div className="flex justify-center p-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
     }
+
+    const renderSortableHeader = (label, key, className) => {
+        const isActive = sortConfig.key === key;
+        return (
+            <th 
+                className={`${className} cursor-pointer hover:bg-white/5 transition-colors group select-none`}
+                onClick={() => handleSort(key)}
+            >
+                <div className={`flex items-center gap-1 ${className.includes('text-center') ? 'justify-center' : ''} ${className.includes('text-right') ? 'justify-end' : ''}`}>
+                    {label}
+                    <div className="flex flex-col opacity-50 group-hover:opacity-100 transition-opacity">
+                        <ChevronUp className={`w-3 h-3 -mb-1 ${isActive && sortConfig.direction === 'asc' ? 'text-primary' : ''}`} />
+                        <ChevronDown className={`w-3 h-3 ${isActive && sortConfig.direction === 'desc' ? 'text-primary' : ''}`} />
+                    </div>
+                </div>
+            </th>
+        );
+    };
 
     return (
         <div className="space-y-6 pt-2">
@@ -110,10 +157,11 @@ export default function AdminDtsPanel() {
                     <table className="w-full text-left border-collapse table-fixed">
                         <thead>
                             <tr className="bg-card border-b border-border">
-                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-1/3">Nombre</th>
-                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[20%]">Club</th>
-                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[15%]">Promedio</th>
-                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[12%]">Estado</th>
+                                {renderSortableHeader("Nombre", "nombreCompleto", "p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-1/3")}
+                                {renderSortableHeader("Club", "equipoSigla", "p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[20%]")}
+                                {renderSortableHeader("Promedio", "promedioFantasy", "p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[15%]")}
+                                {renderSortableHeader("En Planteles", "cantidadPlanteles", "p-4 text-xs font-bold text-textMuted uppercase tracking-wider text-center w-[12%]")}
+                                <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider w-[10%]">Estado</th>
                                 <th className="p-4 text-xs font-bold text-textMuted uppercase tracking-wider text-right w-[10%]">Acción</th>
                             </tr>
                         </thead>
@@ -125,6 +173,7 @@ export default function AdminDtsPanel() {
                                     </td>
                                     <td className="p-4 text-sm text-textMuted font-medium truncate">{dt.equipoSigla}</td>
                                     <td className="p-4 font-bold text-accent truncate">{dt.promedioFantasy.toFixed(1)} pts</td>
+                                    <td className="p-4 text-center font-bold text-white">{dt.cantidadPlanteles ?? 0}</td>
                                     <td className="p-4">
                                         <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded ${
                                             dt.estado === 'DISPONIBLE' ? 'bg-green-500/10 text-green-500' :
@@ -148,7 +197,7 @@ export default function AdminDtsPanel() {
                             ))}
                             {dtsFiltrados.length === 0 && (
                                 <tr>
-                                    <td colSpan="5" className="p-8 text-center text-textMuted text-sm">
+                                    <td colSpan="6" className="p-8 text-center text-textMuted text-sm">
                                         No se encontraron DTs que coincidan con la búsqueda.
                                     </td>
                                 </tr>
