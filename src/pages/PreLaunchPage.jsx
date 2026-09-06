@@ -9,7 +9,7 @@ export default function PreLaunchPage() {
                 
                 {/* Logo */}
                 <img 
-                    src="/logo.png" 
+                    src="/icons/logo-cuadrado.jpg" 
                     alt="Sexto Hombre" 
                     className="w-48 h-48 md:w-56 md:h-56 object-cover rounded-[2rem] shadow-2xl mb-8"
                 />
@@ -54,7 +54,7 @@ export default function PreLaunchPage() {
             </div>
 
             {/* Footer */}
-            <div className="absolute bottom-6">
+            <div className="absolute bottom-12">
                 <p className="text-gray-500 text-xs font-medium">
                     © 2026 Sexto Hombre Fantasy.
                 </p>
