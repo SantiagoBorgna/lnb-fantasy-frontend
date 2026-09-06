@@ -26,7 +26,7 @@ export default function PreLaunchPage() {
                 {/* Botones */}
                 <div className="w-full space-y-4 px-4">
                     <a 
-                        href="https://instagram.com/sextohombre" 
+                        href="https://www.instagram.com/sexto.hombre.fantasy/" 
                         target="_blank" 
                         rel="noreferrer"
                         className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl text-white font-bold text-sm bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 hover:opacity-90 transition-opacity shadow-lg shadow-pink-500/20"
@@ -40,7 +40,7 @@ export default function PreLaunchPage() {
                     </a>
 
                     <a 
-                        href="https://twitter.com/sextohombre" 
+                        href="https://x.com/SextoHombreFant" 
                         target="_blank" 
                         rel="noreferrer"
                         className="flex items-center justify-center gap-2 w-full py-3.5 rounded-xl text-white font-bold text-sm bg-black border border-white/10 hover:bg-white/5 transition-colors shadow-lg shadow-black/50"
