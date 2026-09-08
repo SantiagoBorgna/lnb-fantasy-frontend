@@ -1,7 +1,7 @@
 import api from './axiosClient';
 
-export const checkoutPremium = async () => {
-    const response = await api.post('/premium/checkout');
+export const checkoutPremium = async (email) => {
+    const response = await api.post('/premium/checkout', { email });
     return response.data;
 };
 

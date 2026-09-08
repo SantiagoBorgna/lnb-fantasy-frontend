@@ -10,6 +10,9 @@ export default function ConsejeroModal({ isOpen, onClose }) {
     const [loading, setLoading] = useState(false);
     const [comprando, setComprando] = useState(false);
     const [consejeroData, setConsejeroData] = useState(null);
+    const [mpEmail, setMpEmail] = useState('');
+
+    const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mpEmail);
 
     useEffect(() => {
         if (isOpen && usuario?.isPremium) {
@@ -30,9 +33,10 @@ export default function ConsejeroModal({ isOpen, onClose }) {
     };
 
     const handleComprarPremium = async () => {
+        if (!emailValido) return;
         try {
             setComprando(true);
-            const { init_point } = await checkoutPremium();
+            const { init_point } = await checkoutPremium(mpEmail.trim());
             window.location.href = init_point; // Redirigir a Mercado Pago
         } catch (error) {
             showToast("Error al conectar con Mercado Pago", "error");
@@ -116,10 +120,22 @@ export default function ConsejeroModal({ isOpen, onClose }) {
                                 </div>
                             </div>
 
-                            <div className="flex flex-col items-center mt-2">
-                                <button 
+                            <div className="flex flex-col items-center gap-3 mt-2">
+                                <div className="w-full">
+                                    <label className="text-xs text-gray-400 mb-1.5 block">
+                                        Mail de tu cuenta de Mercado Pago
+                                    </label>
+                                    <input
+                                        type="email"
+                                        value={mpEmail}
+                                        onChange={(e) => setMpEmail(e.target.value)}
+                                        placeholder="tumail@ejemplo.com"
+                                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:border-amber-500"
+                                    />
+                                </div>
+                                <button
                                     onClick={handleComprarPremium}
-                                    disabled={comprando}
+                                    disabled={comprando || !emailValido}
                                     className="w-full relative group overflow-hidden bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold py-3.5 px-6 rounded-xl transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:hover:scale-100 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(245,158,11,0.3)]"
                                 >
                                     <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform" />
@@ -132,7 +148,6 @@ export default function ConsejeroModal({ isOpen, onClose }) {
                                         </>
                                     )}
                                 </button>
-                                <p className="text-[10px] text-gray-500 mt-4 uppercase tracking-wider font-semibold">Simulador de pago</p>
                             </div>
                         </div>
                     ) : (
