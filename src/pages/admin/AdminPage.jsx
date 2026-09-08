@@ -10,6 +10,7 @@ import AdminJugadoresPanel from './AdminJugadoresPanel'
 import AdminDtsPanel from './AdminDtsPanel'
 import AdminJornadasPanel from './AdminJornadasPanel'
 import AdminPartidosPanel from './AdminPartidosPanel'
+import AdminUtilidadesPanel from './AdminUtilidadesPanel'
 
 export default function AdminPage() {
     const usuario = useAuthStore(state => state.usuario)
@@ -89,6 +90,15 @@ export default function AdminPage() {
                         >
                             DTs
                         </button>
+                        <button
+                            onClick={() => setTab('UTILIDADES')}
+                            className={clsx(
+                                "flex-1 md:w-32 py-2 text-sm font-bold rounded-lg transition-all",
+                                tab === 'UTILIDADES' ? "bg-card text-textMain shadow-sm border border-border" : "text-textMuted hover:text-textMain"
+                            )}
+                        >
+                            Utilidades
+                        </button>
                     </div>
 
                     {/* Content */}
@@ -99,6 +109,7 @@ export default function AdminPage() {
                         {tab === 'QUINTETOS' && <AdminQuintetosPanel />}
                         {tab === 'JUGADORES' && <AdminJugadoresPanel />}
                         {tab === 'DTS' && <AdminDtsPanel />}
+                        {tab === 'UTILIDADES' && <AdminUtilidadesPanel />}
                     </div>
                 </div>
             </main>

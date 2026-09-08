@@ -14,6 +14,7 @@ export default function AdminJugadoresPanel() {
     const [search, setSearch] = useState("");
     const [filtroEquipo, setFiltroEquipo] = useState("");
     const [filtroEstado, setFiltroEstado] = useState("");
+    const [filtroPosicion, setFiltroPosicion] = useState("");
 
     const [editingJugador, setEditingJugador] = useState(null);
     const [sortConfig, setSortConfig] = useState({ key: 'nombreCompleto', direction: 'asc' });
@@ -51,7 +52,8 @@ export default function AdminJugadoresPanel() {
             const matchSearch = j.nombreCompleto.toLowerCase().includes(search.toLowerCase());
             const matchEquipo = filtroEquipo ? j.equipoRealId?.toString() === filtroEquipo : true;
             const matchEstado = filtroEstado ? j.estado === filtroEstado : true;
-            return matchSearch && matchEquipo && matchEstado;
+            const matchPosicion = filtroPosicion ? j.posicion === filtroPosicion : true;
+            return matchSearch && matchEquipo && matchEstado && matchPosicion;
         });
 
         filtered.sort((a, b) => {
@@ -76,7 +78,7 @@ export default function AdminJugadoresPanel() {
         });
 
         return filtered;
-    }, [jugadores, search, filtroEquipo, filtroEstado, sortConfig]);
+    }, [jugadores, search, filtroEquipo, filtroEstado, filtroPosicion, sortConfig]);
 
     const handleSaveJugador = async (id, payload) => {
         try {
@@ -126,8 +128,8 @@ export default function AdminJugadoresPanel() {
                         className="w-full bg-bg border border-border rounded-lg pl-9 pr-4 py-2.5 text-sm text-black focus:outline-none focus:border-primary transition-colors"
                     />
                 </div>
-                <div className="flex w-full md:w-auto gap-4">
-                    <select 
+                <div className="flex flex-wrap w-full md:w-auto gap-4">
+                    <select
                         value={filtroEquipo}
                         onChange={e => setFiltroEquipo(e.target.value)}
                         className="bg-bg border border-border rounded-lg px-4 py-2.5 text-sm text-black focus:outline-none focus:border-primary flex-1 md:w-48 appearance-none"
@@ -137,7 +139,19 @@ export default function AdminJugadoresPanel() {
                             <option key={eq.id} value={eq.id} className="bg-card text-textMain">{eq.sigla}</option>
                         ))}
                     </select>
-                    <select 
+                    <select
+                        value={filtroPosicion}
+                        onChange={e => setFiltroPosicion(e.target.value)}
+                        className="bg-bg border border-border rounded-lg px-4 py-2.5 text-sm text-black focus:outline-none focus:border-primary flex-1 md:w-40 appearance-none"
+                    >
+                        <option value="" className="bg-card text-textMain">Todas las Posiciones</option>
+                        <option value="BASE" className="bg-card text-textMain">Base</option>
+                        <option value="ESCOLTA" className="bg-card text-textMain">Escolta</option>
+                        <option value="ALERO" className="bg-card text-textMain">Alero</option>
+                        <option value="ALA_PIVOT" className="bg-card text-textMain">Ala-Pivot</option>
+                        <option value="PIVOT" className="bg-card text-textMain">Pivot</option>
+                    </select>
+                    <select
                         value={filtroEstado}
                         onChange={e => setFiltroEstado(e.target.value)}
                         className="bg-bg border border-border rounded-lg px-4 py-2.5 text-sm text-black focus:outline-none focus:border-primary flex-1 md:w-40 appearance-none"

@@ -6,7 +6,8 @@ export default function AdminEditarJugadorModal({ isOpen, onClose, jugador, equi
         estado: "DISPONIBLE",
         posicion: "BASE",
         equipoRealId: "",
-        valorMercadoActual: 0
+        valorMercadoActual: 0,
+        numeroCamiseta: ""
     });
 
     useEffect(() => {
@@ -15,7 +16,8 @@ export default function AdminEditarJugadorModal({ isOpen, onClose, jugador, equi
                 estado: jugador.estado || "DISPONIBLE",
                 posicion: jugador.posicion || "BASE",
                 equipoRealId: jugador.equipoRealId || "",
-                valorMercadoActual: jugador.valorMercadoActual || 0
+                valorMercadoActual: jugador.valorMercadoActual || 0,
+                numeroCamiseta: jugador.numeroCamiseta ?? ""
             });
         }
     }, [jugador]);
@@ -28,7 +30,8 @@ export default function AdminEditarJugadorModal({ isOpen, onClose, jugador, equi
             estado: formData.estado,
             posicion: formData.posicion,
             equipoRealId: formData.equipoRealId ? Number(formData.equipoRealId) : null,
-            valorMercadoActual: Number(formData.valorMercadoActual)
+            valorMercadoActual: Number(formData.valorMercadoActual),
+            numeroCamiseta: formData.numeroCamiseta !== "" ? Number(formData.numeroCamiseta) : null
         });
     };
 
@@ -78,6 +81,18 @@ export default function AdminEditarJugadorModal({ isOpen, onClose, jugador, equi
                                 <option value="ALA_PIVOT" className="bg-card text-textMain">ALA PIVOT</option>
                                 <option value="PIVOT" className="bg-card text-textMain">PIVOT</option>
                             </select>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-textMain mb-1.5 ml-1">Número de Camiseta</label>
+                            <input
+                                type="number"
+                                min="0"
+                                step="1"
+                                value={formData.numeroCamiseta}
+                                onChange={(e) => setFormData({...formData, numeroCamiseta: e.target.value})}
+                                className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-textMain focus:outline-none focus:border-primary transition-colors"
+                            />
                         </div>
 
                         <div>

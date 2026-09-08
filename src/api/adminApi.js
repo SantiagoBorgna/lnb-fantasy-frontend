@@ -71,3 +71,9 @@ export const updateDtAdmin = async (id, payload) => {
     return data;
 };
 
+// --- ADMIN UTILIDADES (correr crons manualmente) ---
+export const correrCronAdmin = async (cronKey) => {
+    const { data } = await api.post(`/admin/utilidades/crons/${cronKey}`);
+    return data;
+};
+
