@@ -83,7 +83,7 @@ export default function ConsejeroModal({ isOpen, onClose }) {
                 {/* Content */}
                 <div className="p-5 overflow-y-auto custom-scrollbar flex-1">
                     {!usuario?.isPremium ? (
-                        <div className="flex flex-col gap-6 py-2">
+                        <div className="flex flex-col gap-4 py-2">
                             <div className="flex items-start gap-4">
                                 <div className="w-12 h-12 rounded-full border border-amber-500 flex items-center justify-center shrink-0 bg-amber-500/10">
                                     <Infinity size={24} className="text-amber-400" />
@@ -95,21 +95,21 @@ export default function ConsejeroModal({ isOpen, onClose }) {
                                     </p>
                                 </div>
                             </div>
-                            
-                            <div className="flex items-start gap-4 mb-2">
+
+                            <div className="flex items-start gap-4">
                                 <div className="w-12 h-12 rounded-full border border-amber-500 flex items-center justify-center shrink-0 bg-amber-500/10">
-                                    <div 
-                                        className="w-6 h-6 bg-amber-400" 
-                                        style={{ 
-                                            WebkitMaskImage: 'url(/consejero.png)', 
-                                            maskImage: 'url(/consejero.png)', 
-                                            WebkitMaskSize: 'contain', 
-                                            maskSize: 'contain', 
-                                            WebkitMaskRepeat: 'no-repeat', 
+                                    <div
+                                        className="w-6 h-6 bg-amber-400"
+                                        style={{
+                                            WebkitMaskImage: 'url(/consejero.png)',
+                                            maskImage: 'url(/consejero.png)',
+                                            WebkitMaskSize: 'contain',
+                                            maskSize: 'contain',
+                                            WebkitMaskRepeat: 'no-repeat',
                                             maskRepeat: 'no-repeat',
                                             WebkitMaskPosition: 'center',
                                             maskPosition: 'center'
-                                        }} 
+                                        }}
                                     />
                                 </div>
                                 <div className="flex-1 mt-1">
@@ -120,9 +120,9 @@ export default function ConsejeroModal({ isOpen, onClose }) {
                                 </div>
                             </div>
 
-                            <div className="flex flex-col items-center gap-3 mt-2">
+                            <div className="flex flex-col items-center gap-3">
                                 <div className="w-full">
-                                    <label className="text-xs text-gray-400 mb-1.5 block">
+                                    <label className="text-xs text-gray-400 mb-1.5 block text-center">
                                         Mail de tu cuenta de Mercado Pago
                                     </label>
                                     <input
