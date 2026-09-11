@@ -70,6 +70,7 @@ export default function AppRouter() {
         return (
             <BrowserRouter>
                 <Routes>
+                    <Route path="/terminos" element={<TerminosPage />} />
                     <Route path="*" element={<PreLaunchPage />} />
                 </Routes>
             </BrowserRouter>
@@ -80,6 +81,7 @@ export default function AppRouter() {
         return (
             <BrowserRouter>
                 <Routes>
+                    <Route path="/terminos" element={<TerminosPage />} />
                     <Route path="*" element={<MaintenancePage />} />
                 </Routes>
             </BrowserRouter>
