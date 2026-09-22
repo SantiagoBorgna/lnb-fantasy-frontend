@@ -45,8 +45,8 @@ self.addEventListener('push', function (event) {
             // En cualquier otro caso (app cerrada, minimizada, o mirando otra pantalla), tiramos la notificación nativa
             const options = {
                 body: data.body,
-                icon: '/icons/icon-192.png', 
-                badge: '/icons/icon-192.png',
+                icon: '/icons/logo-cuadrado.jpg',
+                badge: '/icons/logo-cuadrado.jpg',
                 vibrate: [200, 100, 200, 100, 200, 100, 200], 
                 data: { url: targetUrl }
             };
