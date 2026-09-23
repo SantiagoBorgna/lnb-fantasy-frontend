@@ -61,7 +61,7 @@ export default function AdminPartidosPanel() {
                 match = false
             }
             if (filtroFecha) {
-                const pFecha = new Date(p.fechaHora).toISOString().split('T')[0]
+                const pFecha = p.fechaHora.substring(0, 10)
                 if (pFecha !== filtroFecha) match = false
             }
             if (filtroEquipo) {
