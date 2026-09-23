@@ -881,7 +881,6 @@ export default function CanchitaPage() {
                         {partidosFixture.map(partido => {
                             // 1. Creamos la fecha base tal cual viene de la DB
                             const fecha = new Date(partido.fechaHora)
-                            fecha.setHours(fecha.getHours() + 3)
                             const diaStr = fecha.toLocaleDateString('es-AR', { weekday: 'short', day: '2-digit', month: '2-digit' }).replace(',', '')
                             const horaStr = fecha.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false })
                             const terminado = partido.estado === 'FINALIZADO' || partido.estado === 'PROCESADO'
