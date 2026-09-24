@@ -42,8 +42,8 @@ export default function PatronEquipo({
                 // Franja vertical + franja horizontal a la altura del pecho (Ej: Platense)
                 return (
                     <g>
-                        <rect x="76" y="0" width="8" height="100" fill={colorSecundario} />
-                        <rect x="0" y="23" width="100" height="8" fill={colorSecundario} />
+                        <rect x="70" y="0" width="8" height="100" fill={colorSecundario} />
+                        <rect x="0" y="30" width="100" height="8" fill={colorSecundario} />
                     </g>
                 );
             default:

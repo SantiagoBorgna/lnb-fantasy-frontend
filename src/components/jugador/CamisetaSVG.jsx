@@ -89,8 +89,8 @@ export default function CamisetaSVG({
                 // Franja vertical + franja horizontal a la altura del pecho (Ej: Platense)
                 return (
                     <g>
-                        <rect x="84" y="0" width="8" height="120" fill={colorSecundario} />
-                        <rect x="0" y="28" width="100" height="8" fill={colorSecundario} />
+                        <rect x="78" y="0" width="8" height="120" fill={colorSecundario} />
+                        <rect x="0" y="36" width="100" height="8" fill={colorSecundario} />
                     </g>
                 );
             default:
