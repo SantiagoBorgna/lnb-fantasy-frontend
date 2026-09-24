@@ -39,11 +39,11 @@ export default function PatronEquipo({
                     <rect x="0" y="0" width="100" height="35" fill={colorSecundario} />
                 );
             case 6:
-                // Bandolera diagonal + franja horizontal en el abdomen (Ej: Platense)
+                // Franja vertical + franja horizontal a la altura del pecho (Ej: Platense)
                 return (
                     <g>
-                        <polygon points="32,0 48,0 88,100 72,100" fill={colorSecundario} />
-                        <rect x="0" y="58" width="100" height="17" fill={colorSecundario} />
+                        <rect x="76" y="0" width="8" height="100" fill={colorSecundario} />
+                        <rect x="0" y="23" width="100" height="8" fill={colorSecundario} />
                     </g>
                 );
             default:

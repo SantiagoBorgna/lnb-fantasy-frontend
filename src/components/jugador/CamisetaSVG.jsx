@@ -86,11 +86,11 @@ export default function CamisetaSVG({
                     <rect x="0" y="0" width="100" height="35" fill={colorSecundario} />
                 );
             case 6:
-                // Bandolera diagonal + franja horizontal en el abdomen (Ej: Platense)
+                // Franja vertical + franja horizontal a la altura del pecho (Ej: Platense)
                 return (
                     <g>
-                        <polygon points="32,0 48,0 96,120 80,120" fill={colorSecundario} />
-                        <rect x="0" y="70" width="100" height="20" fill={colorSecundario} />
+                        <rect x="84" y="0" width="8" height="120" fill={colorSecundario} />
+                        <rect x="0" y="28" width="100" height="8" fill={colorSecundario} />
                     </g>
                 );
             default:
