@@ -7,6 +7,7 @@ export default function SlotJugador({
     esSexto = false,
     jornadaEstado = 'ABIERTA_A_CAMBIOS',
     puntosJornada,
+    descansa = false,
     onClick, // <-- 1. Recibimos onClick en vez de onPointerUp
     onDragStart,
     onDragOver,
@@ -16,6 +17,7 @@ export default function SlotJugador({
 }) {
     const esCap = jugador.rol === 'CAPITAN'
     const esBaja = jugador.estado === 'BAJA'
+    const esDescansa = descansa && !esBaja
 
     // El valor mostrado depende del modo:
     // - undefined → modo edición → mostrar créditos (o nada en draft)
@@ -57,6 +59,7 @@ export default function SlotJugador({
                 'w-[100px] h-[116px] p-2 rounded-2xl',
                 'cursor-pointer select-none transition-opacity duration-150',
                 esBaja ? 'bg-red-500/20 ring-2 ring-red-500 opacity-60' :
+                esDescansa ? 'bg-slate-500/20 ring-2 ring-slate-400 opacity-60' :
                 (esSexto
                     ? 'bg-accent/25 ring-1 ring-accent/60'
                     : 'bg-white/15'),
@@ -64,7 +67,7 @@ export default function SlotJugador({
             )}
         >
             {/* Badges superpuestos */}
-            {esCap && !esBaja && (
+            {esCap && !esBaja && !esDescansa && (
                 <div className="absolute -top-1.5 -right-1.5 z-10
                         w-5 h-5 rounded-full bg-yellow-500
                         flex items-center justify-center
@@ -72,7 +75,7 @@ export default function SlotJugador({
                     <span className="text-white text-xs font-black leading-none">C</span>
                 </div>
             )}
-            {esSexto && !esBaja && (
+            {esSexto && !esBaja && !esDescansa && (
                 <div className="absolute -top-1.5 -right-1.5 z-10
                         w-5 h-5 rounded-full bg-accent
                         flex items-center justify-center
@@ -86,6 +89,14 @@ export default function SlotJugador({
                         flex items-center justify-center
                         ring-2 ring-surface">
                     <span className="text-white text-[9px] font-black leading-none">CORTADO</span>
+                </div>
+            )}
+            {esDescansa && (
+                <div className="absolute -top-1.5 -right-1.5 z-20
+                        bg-slate-600 rounded px-1.5 py-0.5
+                        flex items-center justify-center
+                        ring-2 ring-surface">
+                    <span className="text-white text-[9px] font-black leading-none">DESCANSA</span>
                 </div>
             )}
             {jugador.rol === 'SUPLENTE' && (

@@ -585,6 +585,13 @@ export default function CanchitaPage() {
 
     const estaVacio = !plantelActual || (plantelActual.jugadores && plantelActual.jugadores.length === 0)
 
+    // Equipos que sí tienen partido en la jornada mostrada (para marcar "DESCANSA")
+    const equiposConPartido = new Set(
+        partidosFixture.flatMap(p => [p.siglaLocal, p.siglaVisitante]).filter(Boolean)
+    )
+    const jugadorDescansa = (jugador) =>
+        partidosFixture.length > 0 && !!jugador.equipoSigla && !equiposConPartido.has(jugador.equipoSigla)
+
     const titulares = getTitularesOrdenados()
     const banco = jugadoresActuales.filter(j => esBanco(j.rol))
     const sexto = banco.find(j => j.rol === 'SEXTO_HOMBRE')
@@ -808,6 +815,7 @@ export default function CanchitaPage() {
                                             key={jugador.jugadorRealId}
                                             jugador={jugador}
                                             opaco={debeOpacar(jugador.jugadorRealId)}
+                                            descansa={jugadorDescansa(jugador)}
                                             puntosJornada={modoLectura
                                                 ? (stats?.jugó ? (stats.puntajeFantasy * jugador.multiplicador) : null)
                                                 : undefined
@@ -837,6 +845,7 @@ export default function CanchitaPage() {
                                     jugador={jugador}
                                     esSexto={jugador.rol === 'SEXTO_HOMBRE'}
                                     opaco={debeOpacar(jugador.jugadorRealId)}
+                                    descansa={jugadorDescansa(jugador)}
                                     puntosJornada={modoLectura
                                         ? (stats?.jugó ? (stats.puntajeFantasy * jugador.multiplicador) : null)
                                         : undefined
