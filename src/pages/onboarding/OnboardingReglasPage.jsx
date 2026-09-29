@@ -19,7 +19,7 @@ const REGLAS = [
     },
     {
         titulo: 'Jornadas',
-        texto: 'Las jornadas duran 3-4 días. No podés cambiar tu equipo mientras se juega.',
+        texto: 'Las jornadas duran 3-4 días. No podés cambiar tu equipo mientras se juega. Si un equipo juega más de 1 partido, los jugadores solo van a sumar puntos en el primer partido.',
     },
     {
         titulo: 'Torneos',

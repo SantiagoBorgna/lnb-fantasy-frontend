@@ -30,7 +30,7 @@ export const AYUDA = {
             },
             {
                 titulo: 'Puntuación Extra',
-                texto: 'El Capitán multiplica sus puntos por 1.5. El Sexto Hombre suma un 75% de sus puntos y los suplentes un 50%.',
+                texto: 'El Capitán multiplica sus puntos por 1.5. El Sexto Hombre suma un 75% de sus puntos y los suplentes un 50%. Si un equipo juega más de 1 partido en la jornada, los jugadores solo suman puntos en el primero.',
             },
             {
                 titulo: 'Transferencias',
