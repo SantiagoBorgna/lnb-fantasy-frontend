@@ -17,7 +17,7 @@ export default function AuthCallbackPage() {
 
         if (!hash || !hash.includes('token=')) {
             // Si no hay token en el fragment, volver al login
-            navigate('/login?motivo=sin_token', { replace: true })
+            navigate('/login', { replace: true })
             return
         }
 
@@ -38,13 +38,10 @@ export default function AuthCallbackPage() {
                 localStorage.removeItem('redirectUrl'); // Limpiamos la memoria por si quedó algo guardado
                 navigate('/', { replace: true });
             })
-            .catch(err => {
+            .catch(() => {
                 // Token inválido o expirado
                 setAuth(null, null)
-                const detalle = err?.response?.status
-                    ? `http_${err.response.status}`
-                    : (err?.code || err?.message || 'desconocido')
-                navigate(`/login?motivo=getme_fallo&detalle=${encodeURIComponent(detalle)}`, { replace: true })
+                navigate('/login', { replace: true })
             })
     }, [navigate, setAuth, queryClient])
 
