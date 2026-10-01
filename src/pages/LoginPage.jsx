@@ -1,10 +1,20 @@
 import { useEffect } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, useSearchParams } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 
 export default function LoginPage() {
     const token = useAuthStore(state => state.token)
     const navigate = useNavigate()
+    const [searchParams] = useSearchParams()
+    // TEMPORAL: diagnóstico de fallos de login (visible en PWA donde no se ve la URL)
+    const motivo = searchParams.get('motivo')
+    const detalle = searchParams.get('detalle')
+    const errorBackend = searchParams.get('error')
+    const diagnostico = errorBackend
+        ? `Error del servidor: ${errorBackend}`
+        : motivo
+            ? `Fallo de login: ${motivo}${detalle ? ` (${detalle})` : ''}`
+            : null
 
     // Si ya está autenticado, redirigir al dashboard
     useEffect(() => {
@@ -26,6 +36,10 @@ export default function LoginPage() {
 
             {/* Botones de login */}
             <div className="w-full max-w-sm space-y-3">
+
+                {diagnostico && (
+                    <p className="text-xs text-red-400 text-center break-words">{diagnostico}</p>
+                )}
 
                 <a
                     href={import.meta.env.VITE_OAUTH2_GOOGLE_URL}
