@@ -67,7 +67,7 @@ export default function SlotJugador({
             )}
         >
             {/* Badges superpuestos */}
-            {esCap && !esBaja && !esDescansa && (
+            {esCap && !esBaja && (
                 <div className="absolute -top-1.5 -right-1.5 z-10
                         w-5 h-5 rounded-full bg-yellow-500
                         flex items-center justify-center
@@ -75,7 +75,7 @@ export default function SlotJugador({
                     <span className="text-white text-xs font-black leading-none">C</span>
                 </div>
             )}
-            {esSexto && !esBaja && !esDescansa && (
+            {esSexto && !esBaja && (
                 <div className="absolute -top-1.5 -right-1.5 z-10
                         w-5 h-5 rounded-full bg-accent
                         flex items-center justify-center
@@ -92,7 +92,7 @@ export default function SlotJugador({
                 </div>
             )}
             {esDescansa && (
-                <div className="absolute -top-1.5 -right-1.5 z-20
+                <div className="absolute -top-1.5 left-0 z-20
                         bg-slate-600 rounded px-1.5 py-0.5
                         flex items-center justify-center
                         ring-2 ring-surface">
