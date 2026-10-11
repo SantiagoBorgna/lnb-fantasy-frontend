@@ -133,6 +133,13 @@ export default function AdminQuintetosPanel() {
                             <p className="text-textMuted mt-1 relative z-10">
                                 Ganador de la fecha: <span className="text-primary font-bold">{data.nombreUsuarioGanador}</span>
                             </p>
+                            {data.usuarioIdGanador && (
+                                <div className="mt-3 flex flex-col gap-1 text-sm text-textMuted relative z-10">
+                                    <p>Usuario: <span className="text-textMain font-medium">{data.nombreDisplayUsuarioGanador}</span></p>
+                                    <p>ID de usuario: <span className="text-textMain font-medium select-all">{data.usuarioIdGanador}</span></p>
+                                    <p>Email: <span className="text-textMain font-medium select-all">{data.emailUsuarioGanador}</span></p>
+                                </div>
+                            )}
                             <div className="mt-4 inline-flex items-center gap-2 bg-primary/10 border border-primary/20 px-3 py-1.5 rounded-lg relative z-10">
                                 <span className="text-sm font-medium text-textMuted">Puntaje Total:</span>
                                 <span className="text-primary font-black">{data.puntajeUsuarioGanador.toFixed(1)}</span>
