@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { correrCronAdmin } from "../../api/adminApi";
+import { useState, useEffect } from "react";
+import { correrCronAdmin, recalcularJornadaAdmin } from "../../api/adminApi";
+import { getJornadas } from "../../api/jornadaApi";
 import { Play, Loader2 } from "lucide-react";
 import { useUiStore } from "../../store/uiStore";
 
@@ -46,9 +47,44 @@ const CRONS = [
     },
 ];
 
+const RECALCULO_KEY = "recalcular-jornada";
+
 export default function AdminUtilidadesPanel() {
     const showToast = useUiStore(state => state.showToast);
     const [ejecutando, setEjecutando] = useState(null);
+    const [jornadasCerradas, setJornadasCerradas] = useState([]);
+    const [jornadaId, setJornadaId] = useState("");
+
+    useEffect(() => {
+        getJornadas()
+            .then(lista => {
+                const cerradas = lista
+                    .filter(j => j.estado === "FINALIZADA")
+                    .sort((a, b) => a.numero - b.numero);
+                setJornadasCerradas(cerradas);
+                if (cerradas.length > 0) {
+                    setJornadaId(cerradas[cerradas.length - 1].id.toString());
+                }
+            })
+            .catch(console.error);
+    }, []);
+
+    const handleRecalcularJornada = async () => {
+        const jornada = jornadasCerradas.find(j => j.id.toString() === jornadaId);
+        if (!jornada) return;
+        if (!window.confirm(`Se va a recalcular la Jornada ${jornada.numero}: estadísticas faltantes, puntajes de los planteles, rankings, torneos H2H y promedios. ¿Continuar?`)) return;
+
+        setEjecutando(RECALCULO_KEY);
+        try {
+            const data = await recalcularJornadaAdmin(jornada.id);
+            showToast(data?.mensaje || `Recálculo de la Jornada ${jornada.numero} iniciado`, "success");
+        } catch (error) {
+            console.error(error);
+            showToast(error.response?.data?.mensaje || `Error al recalcular la Jornada ${jornada.numero}`, "error");
+        } finally {
+            setEjecutando(null);
+        }
+    };
 
     const handleEjecutar = async (cron) => {
         setEjecutando(cron.key);
@@ -71,6 +107,43 @@ export default function AdminUtilidadesPanel() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-surface border border-border rounded-2xl p-5 flex flex-col gap-3 md:col-span-2">
+                    <div>
+                        <h3 className="font-bold text-textMain text-sm">Recalcular jornada cerrada</h3>
+                        <p className="text-xs text-textMuted mt-1">
+                            Corrige una jornada FINALIZADA que se cerró con estadísticas faltantes: completa las stats
+                            de los equipos que quedaron sin ninguna, recalcula los puntajes de todos los planteles,
+                            reconstruye el ranking global y el de los torneos, rehace la tabla de los H2H y actualiza los
+                            promedios. Se puede repetir sin duplicar puntos. No modifica los precios.
+                        </p>
+                    </div>
+                    <div className="mt-auto flex flex-wrap items-center gap-3">
+                        <select
+                            value={jornadaId}
+                            onChange={(e) => setJornadaId(e.target.value)}
+                            disabled={jornadasCerradas.length === 0 || ejecutando !== null}
+                            className="bg-card text-textMain border border-border rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary outline-none disabled:opacity-50"
+                        >
+                            {jornadasCerradas.length === 0 && <option value="">No hay jornadas finalizadas</option>}
+                            {jornadasCerradas.map(j => (
+                                <option key={j.id} value={j.id}>Jornada {j.numero}</option>
+                            ))}
+                        </select>
+                        <button
+                            onClick={handleRecalcularJornada}
+                            disabled={!jornadaId || ejecutando !== null}
+                            className="flex items-center gap-2 bg-primary text-black font-bold text-sm px-4 py-2 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {ejecutando === RECALCULO_KEY ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                                <Play className="w-4 h-4" />
+                            )}
+                            Recalcular
+                        </button>
+                    </div>
+                </div>
+
                 {CRONS.map(cron => (
                     <div key={cron.key} className="bg-surface border border-border rounded-2xl p-5 flex flex-col gap-3">
                         <div>

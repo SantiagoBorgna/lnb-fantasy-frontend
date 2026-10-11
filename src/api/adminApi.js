@@ -22,7 +22,7 @@ export const eliminarShowdown = async (id) => {
 
 // --- ADMIN QUINTETOS ---
 export const getQuintetosPorJornada = async (id) => {
-    const response = await api.get(`/admin/jornadas/${id}/quintetos`)
+    const response = await api.get('/admin/quintetos', { params: { jornadaId: id } })
     return response.data
 }
 
@@ -74,6 +74,11 @@ export const updateDtAdmin = async (id, payload) => {
 // --- ADMIN UTILIDADES (correr crons manualmente) ---
 export const correrCronAdmin = async (cronKey) => {
     const { data } = await api.post(`/admin/utilidades/crons/${cronKey}`);
+    return data;
+};
+
+export const recalcularJornadaAdmin = async (jornadaId) => {
+    const { data } = await api.post(`/admin/utilidades/jornadas/${jornadaId}/recalcular`);
     return data;
 };
 
