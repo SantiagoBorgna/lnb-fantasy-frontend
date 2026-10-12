@@ -82,3 +82,8 @@ export const recalcularJornadaAdmin = async (jornadaId) => {
     return data;
 };
 
+export const sincronizarFixtureAdmin = async (jornadaId, urlFixture) => {
+    const { data } = await api.post('/admin/scraper/fixture/sincronizar', { jornadaId, urlFixture });
+    return data;
+};
+

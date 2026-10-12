@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { correrCronAdmin, recalcularJornadaAdmin } from "../../api/adminApi";
+import { correrCronAdmin, recalcularJornadaAdmin, sincronizarFixtureAdmin } from "../../api/adminApi";
 import { getJornadas } from "../../api/jornadaApi";
 import { Play, Loader2 } from "lucide-react";
 import { useUiStore } from "../../store/uiStore";
@@ -48,12 +48,17 @@ const CRONS = [
 ];
 
 const RECALCULO_KEY = "recalcular-jornada";
+const FIXTURE_KEY = "sincronizar-fixture";
+const FIXTURE_URL_DEFAULT = "https://www.laliganacional.com.ar/laliga/fixture";
 
 export default function AdminUtilidadesPanel() {
     const showToast = useUiStore(state => state.showToast);
     const [ejecutando, setEjecutando] = useState(null);
     const [jornadasCerradas, setJornadasCerradas] = useState([]);
     const [jornadaId, setJornadaId] = useState("");
+    const [jornadas, setJornadas] = useState([]);
+    const [fixtureJornadaId, setFixtureJornadaId] = useState("");
+    const [fixtureUrl, setFixtureUrl] = useState(FIXTURE_URL_DEFAULT);
 
     useEffect(() => {
         getJornadas()
@@ -65,9 +70,36 @@ export default function AdminUtilidadesPanel() {
                 if (cerradas.length > 0) {
                     setJornadaId(cerradas[cerradas.length - 1].id.toString());
                 }
+
+                // El fixture se carga en jornadas que todavía no se jugaron: por defecto
+                // la primera que no está finalizada (o la última si ya cerraron todas).
+                const todas = [...lista].sort((a, b) => a.numero - b.numero);
+                setJornadas(todas);
+                const destino = todas.find(j => j.estado !== "FINALIZADA") ?? todas[todas.length - 1];
+                if (destino) {
+                    setFixtureJornadaId(destino.id.toString());
+                }
             })
             .catch(console.error);
     }, []);
+
+    const handleSincronizarFixture = async () => {
+        const jornada = jornadas.find(j => j.id.toString() === fixtureJornadaId);
+        const url = fixtureUrl.trim();
+        if (!jornada || !url) return;
+        if (!window.confirm(`Se van a cargar en la Jornada ${jornada.numero} los partidos de:\n${url}\n\nLos partidos que ya estén cargados (mismos equipos y día) se actualizan, no se duplican. ¿Continuar?`)) return;
+
+        setEjecutando(FIXTURE_KEY);
+        try {
+            const data = await sincronizarFixtureAdmin(jornada.id, url);
+            showToast(data?.mensaje || `Sincronización del fixture de la Jornada ${jornada.numero} iniciada`, "success");
+        } catch (error) {
+            console.error(error);
+            showToast(error.response?.data?.mensaje || `Error al sincronizar el fixture de la Jornada ${jornada.numero}`, "error");
+        } finally {
+            setEjecutando(null);
+        }
+    };
 
     const handleRecalcularJornada = async () => {
         const jornada = jornadasCerradas.find(j => j.id.toString() === jornadaId);
@@ -141,6 +173,61 @@ export default function AdminUtilidadesPanel() {
                             )}
                             Recalcular
                         </button>
+                    </div>
+                </div>
+
+                <div className="bg-surface border border-border rounded-2xl p-5 flex flex-col gap-3 md:col-span-2">
+                    <div>
+                        <h3 className="font-bold text-textMain text-sm">Sincronizar fixture</h3>
+                        <p className="text-xs text-textMuted mt-1">
+                            Carga en la jornada elegida los partidos que publica la LNB. Se puede repetir sin duplicar:
+                            los partidos que ya están cargados (mismos equipos y día) solo se actualizan, por ejemplo
+                            cuando la LNB confirma una hora que estaba en 00:00. No toca los partidos ya procesados.
+                        </p>
+                        <p className="text-xs text-textMuted mt-2">
+                            Sin fechas en la URL trae desde hace 2 días hasta 2 meses y asigna todo a la jornada elegida.
+                            Para acotarlo agregá <code className="text-textMain">?handler=ProximosPartidos&amp;fechaInicio=AAAA-MM-DD&amp;fechaFin=AAAA-MM-DD</code>.
+                            La LNB toma el rango desde las 00:00 de fechaInicio (sin incluirlas) hasta las 00:00 del día
+                            siguiente a fechaFin: para que entren los partidos con hora pendiente (00:00) de un día,
+                            fechaInicio tiene que ser el día anterior.
+                        </p>
+                    </div>
+                    <div className="mt-auto flex flex-col gap-3">
+                        <input
+                            type="text"
+                            value={fixtureUrl}
+                            onChange={(e) => setFixtureUrl(e.target.value)}
+                            disabled={ejecutando !== null}
+                            placeholder={FIXTURE_URL_DEFAULT}
+                            className="w-full bg-card text-textMain border border-border rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary outline-none disabled:opacity-50"
+                        />
+                        <div className="flex flex-wrap items-center gap-3">
+                            <select
+                                value={fixtureJornadaId}
+                                onChange={(e) => setFixtureJornadaId(e.target.value)}
+                                disabled={jornadas.length === 0 || ejecutando !== null}
+                                className="bg-card text-textMain border border-border rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary outline-none disabled:opacity-50"
+                            >
+                                {jornadas.length === 0 && <option value="">No hay jornadas</option>}
+                                {jornadas.map(j => (
+                                    <option key={j.id} value={j.id}>
+                                        Jornada {j.numero}{j.estado === "FINALIZADA" ? " (finalizada)" : ""}
+                                    </option>
+                                ))}
+                            </select>
+                            <button
+                                onClick={handleSincronizarFixture}
+                                disabled={!fixtureJornadaId || !fixtureUrl.trim() || ejecutando !== null}
+                                className="flex items-center gap-2 bg-primary text-black font-bold text-sm px-4 py-2 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {ejecutando === FIXTURE_KEY ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                    <Play className="w-4 h-4" />
+                                )}
+                                Sincronizar
+                            </button>
+                        </div>
                     </div>
                 </div>
 
