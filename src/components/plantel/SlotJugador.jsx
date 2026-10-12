@@ -11,6 +11,7 @@ export default function SlotJugador({
     onClick, // <-- 1. Recibimos onClick en vez de onPointerUp
     onDragStart,
     onDragOver,
+    onDragEnd,
     onDrop,
     readonly = false, // <-- Prop de solo lectura
     esDraft = false,
@@ -37,6 +38,9 @@ export default function SlotJugador({
 
     const handleDragStart = (e) => {
         e.stopPropagation()
+        // Firefox no inicia el drag si no se carga algún dato
+        e.dataTransfer.setData('text/plain', String(jugador.jugadorRealId))
+        e.dataTransfer.effectAllowed = 'move'
         onDragStart?.()
     }
 
@@ -51,6 +55,7 @@ export default function SlotJugador({
             draggable={!readonly}
             onDragStart={handleDragStart}
             onDragOver={(e) => { e.preventDefault(); onDragOver?.() }}
+            onDragEnd={() => onDragEnd?.()}
             onDrop={(e) => { e.preventDefault(); onDrop?.() }}
             onClick={handleClick} // <-- 3. Se lo pasamos al div contenedor
             className={clsx(

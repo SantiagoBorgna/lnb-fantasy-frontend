@@ -408,6 +408,13 @@ export default function CanchitaPage() {
         setDraggingId(id)
     }
 
+    // Se dispara siempre al terminar el drag (soltar en cualquier lado o Esc).
+    // Sin esto, un drop inválido deja draggingId seteado y los slots grises.
+    const handleDragEnd = () => {
+        setDraggingId(null)
+        setTimeout(() => { isDragging.current = false }, 100)
+    }
+
     const handleDrop = (targetId) => {
         if (modoLectura || !draggingId || draggingId === targetId) {
             setDraggingId(null)
@@ -826,8 +833,10 @@ export default function CanchitaPage() {
                                                 : undefined
                                             }
                                             esDraft={!!contextoActual}
+                                            readonly={modoLectura}
                                             onClick={() => handleClickSlot(jugador)}
                                             onDragStart={() => handleDragStart(jugador.jugadorRealId)}
+                                            onDragEnd={handleDragEnd}
                                             onDrop={() => handleDrop(jugador.jugadorRealId)}
                                         />
                                     )
@@ -856,8 +865,10 @@ export default function CanchitaPage() {
                                         : undefined
                                     }
                                     esDraft={!!contextoActual}
+                                    readonly={modoLectura}
                                     onClick={() => handleClickSlot(jugador)}
                                     onDragStart={() => handleDragStart(jugador.jugadorRealId)}
+                                    onDragEnd={handleDragEnd}
                                     onDrop={() => handleDrop(jugador.jugadorRealId)}
                                 />
                             )
