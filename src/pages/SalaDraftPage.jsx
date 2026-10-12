@@ -125,6 +125,11 @@ export default function SalaDraftPage() {
                         .filter(t => t.completado)
                         .map(t => t.jugadorRealIdElegido)
                     setJugadoresDisponibles(prev => prev.filter(j => !elegidosIds.includes(j.id)))
+
+                    const dtsElegidosIds = estado.turnos
+                        .filter(t => t.completado && t.dtIdElegido)
+                        .map(t => t.dtIdElegido)
+                    setDtsDisponibles(prev => prev.filter(dt => !dtsElegidosIds.includes(dt.id)))
                 })
             }
         }, 5000)
