@@ -49,7 +49,13 @@ const CRONS = [
 
 const RECALCULO_KEY = "recalcular-jornada";
 const FIXTURE_KEY = "sincronizar-fixture";
-const FIXTURE_URL_DEFAULT = "https://www.laliganacional.com.ar/laliga/fixture";
+const FIXTURE_BASE_URL = "https://www.laliganacional.com.ar/laliga/fixture";
+
+// Las jornadas llegan como "2026-10-12T20:00:00": el día es lo que va antes de la T.
+const diaDeLaJornada = (fechaIso) => (fechaIso ? fechaIso.substring(0, 10) : "");
+
+const armarUrlFixture = (desde, hasta) =>
+    `${FIXTURE_BASE_URL}?handler=ProximosPartidos&fechaInicio=${desde}&fechaFin=${hasta}`;
 
 export default function AdminUtilidadesPanel() {
     const showToast = useUiStore(state => state.showToast);
@@ -58,7 +64,22 @@ export default function AdminUtilidadesPanel() {
     const [jornadaId, setJornadaId] = useState("");
     const [jornadas, setJornadas] = useState([]);
     const [fixtureJornadaId, setFixtureJornadaId] = useState("");
-    const [fixtureUrl, setFixtureUrl] = useState(FIXTURE_URL_DEFAULT);
+    const [fixtureDesde, setFixtureDesde] = useState("");
+    const [fixtureHasta, setFixtureHasta] = useState("");
+
+    // Sin fechas la LNB devuelve de hace 2 días a 2 meses y todo se asignaría a una
+    // sola jornada, así que el rango es obligatorio para poder sincronizar.
+    const fixtureRangoValido = fixtureDesde !== "" && fixtureHasta !== "" && fixtureDesde <= fixtureHasta;
+    const fixtureUrl = fixtureRangoValido ? armarUrlFixture(fixtureDesde, fixtureHasta) : "";
+
+    const elegirJornadaFixture = (id) => {
+        setFixtureJornadaId(id);
+        const jornada = jornadas.find(j => j.id.toString() === id);
+        if (jornada) {
+            setFixtureDesde(diaDeLaJornada(jornada.fechaInicio));
+            setFixtureHasta(diaDeLaJornada(jornada.fechaFin));
+        }
+    };
 
     useEffect(() => {
         getJornadas()
@@ -78,6 +99,8 @@ export default function AdminUtilidadesPanel() {
                 const destino = todas.find(j => j.estado !== "FINALIZADA") ?? todas[todas.length - 1];
                 if (destino) {
                     setFixtureJornadaId(destino.id.toString());
+                    setFixtureDesde(diaDeLaJornada(destino.fechaInicio));
+                    setFixtureHasta(diaDeLaJornada(destino.fechaFin));
                 }
             })
             .catch(console.error);
@@ -85,13 +108,12 @@ export default function AdminUtilidadesPanel() {
 
     const handleSincronizarFixture = async () => {
         const jornada = jornadas.find(j => j.id.toString() === fixtureJornadaId);
-        const url = fixtureUrl.trim();
-        if (!jornada || !url) return;
-        if (!window.confirm(`Se van a cargar en la Jornada ${jornada.numero} los partidos de:\n${url}\n\nLos partidos que ya estén cargados (mismos equipos y día) se actualizan, no se duplican. ¿Continuar?`)) return;
+        if (!jornada || !fixtureUrl) return;
+        if (!window.confirm(`Se van a cargar en la Jornada ${jornada.numero} los partidos del ${fixtureDesde} al ${fixtureHasta}:\n${fixtureUrl}\n\nLos partidos que ya estén cargados (mismos equipos y día) se actualizan, no se duplican. ¿Continuar?`)) return;
 
         setEjecutando(FIXTURE_KEY);
         try {
-            const data = await sincronizarFixtureAdmin(jornada.id, url);
+            const data = await sincronizarFixtureAdmin(jornada.id, fixtureUrl);
             showToast(data?.mensaje || `Sincronización del fixture de la Jornada ${jornada.numero} iniciada`, "success");
         } catch (error) {
             console.error(error);
@@ -185,39 +207,53 @@ export default function AdminUtilidadesPanel() {
                             cuando la LNB confirma una hora que estaba en 00:00. No toca los partidos ya procesados.
                         </p>
                         <p className="text-xs text-textMuted mt-2">
-                            Sin fechas en la URL trae desde hace 2 días hasta 2 meses y asigna todo a la jornada elegida.
-                            Para acotarlo agregá <code className="text-textMain">?handler=ProximosPartidos&amp;fechaInicio=AAAA-MM-DD&amp;fechaFin=AAAA-MM-DD</code>.
-                            La LNB toma el rango desde las 00:00 de fechaInicio (sin incluirlas) hasta las 00:00 del día
-                            siguiente a fechaFin: para que entren los partidos con hora pendiente (00:00) de un día,
-                            fechaInicio tiene que ser el día anterior.
+                            Todo lo que traiga la LNB entre Desde y Hasta se asigna a la jornada elegida. Las fechas se
+                            precargan con las de la jornada y se pueden cambiar. La LNB cuenta desde las 00:00 de Desde
+                            (sin incluirlas) hasta las 00:00 del día siguiente a Hasta: si un partido tiene la hora
+                            pendiente (00:00) de un día, Desde tiene que ser el día anterior.
                         </p>
                     </div>
                     <div className="mt-auto flex flex-col gap-3">
-                        <input
-                            type="text"
-                            value={fixtureUrl}
-                            onChange={(e) => setFixtureUrl(e.target.value)}
-                            disabled={ejecutando !== null}
-                            placeholder={FIXTURE_URL_DEFAULT}
-                            className="w-full bg-card text-textMain border border-border rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary outline-none disabled:opacity-50"
-                        />
-                        <div className="flex flex-wrap items-center gap-3">
-                            <select
-                                value={fixtureJornadaId}
-                                onChange={(e) => setFixtureJornadaId(e.target.value)}
-                                disabled={jornadas.length === 0 || ejecutando !== null}
-                                className="bg-card text-textMain border border-border rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary outline-none disabled:opacity-50"
-                            >
-                                {jornadas.length === 0 && <option value="">No hay jornadas</option>}
-                                {jornadas.map(j => (
-                                    <option key={j.id} value={j.id}>
-                                        Jornada {j.numero}{j.estado === "FINALIZADA" ? " (finalizada)" : ""}
-                                    </option>
-                                ))}
-                            </select>
+                        <div className="flex flex-wrap items-end gap-3">
+                            <label className="flex flex-col gap-1 text-xs text-textMuted">
+                                Jornada
+                                <select
+                                    value={fixtureJornadaId}
+                                    onChange={(e) => elegirJornadaFixture(e.target.value)}
+                                    disabled={jornadas.length === 0 || ejecutando !== null}
+                                    className="bg-card text-textMain border border-border rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary outline-none disabled:opacity-50"
+                                >
+                                    {jornadas.length === 0 && <option value="">No hay jornadas</option>}
+                                    {jornadas.map(j => (
+                                        <option key={j.id} value={j.id}>
+                                            Jornada {j.numero}{j.estado === "FINALIZADA" ? " (finalizada)" : ""}
+                                        </option>
+                                    ))}
+                                </select>
+                            </label>
+                            <label className="flex flex-col gap-1 text-xs text-textMuted">
+                                Desde
+                                <input
+                                    type="date"
+                                    value={fixtureDesde}
+                                    onChange={(e) => setFixtureDesde(e.target.value)}
+                                    disabled={ejecutando !== null}
+                                    className="bg-card text-textMain border border-border rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary outline-none disabled:opacity-50"
+                                />
+                            </label>
+                            <label className="flex flex-col gap-1 text-xs text-textMuted">
+                                Hasta
+                                <input
+                                    type="date"
+                                    value={fixtureHasta}
+                                    onChange={(e) => setFixtureHasta(e.target.value)}
+                                    disabled={ejecutando !== null}
+                                    className="bg-card text-textMain border border-border rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary outline-none disabled:opacity-50"
+                                />
+                            </label>
                             <button
                                 onClick={handleSincronizarFixture}
-                                disabled={!fixtureJornadaId || !fixtureUrl.trim() || ejecutando !== null}
+                                disabled={!fixtureJornadaId || !fixtureRangoValido || ejecutando !== null}
                                 className="flex items-center gap-2 bg-primary text-black font-bold text-sm px-4 py-2 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {ejecutando === FIXTURE_KEY ? (
@@ -228,6 +264,11 @@ export default function AdminUtilidadesPanel() {
                                 Sincronizar
                             </button>
                         </div>
+                        <p className="text-xs text-textMuted break-all">
+                            {fixtureRangoValido
+                                ? `Se va a pedir: ${fixtureUrl}`
+                                : "Elegí un rango válido: las dos fechas son obligatorias y Desde no puede ser posterior a Hasta."}
+                        </p>
                     </div>
                 </div>
 
