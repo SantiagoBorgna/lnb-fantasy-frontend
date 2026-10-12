@@ -759,7 +759,12 @@ export default function CanchitaPage() {
                     <div className="w-9 h-9 bg-primary rounded-full flex items-center justify-center text-white font-bold text-xs shrink-0">DT</div>
                     <div className="flex-1 min-w-0">
                         <p className="text-textMain font-semibold text-sm truncate">{plantelActual.dt.nombreCompleto}</p>
-                        <p className="text-textMuted text-xs">{plantelActual.dt.equipoSigla}</p>
+                        <div className="flex items-center gap-2">
+                            <p className="text-textMuted text-xs">{plantelActual.dt.equipoSigla}</p>
+                            {jugadorDescansa(plantelActual.dt) && (
+                                <span className="bg-slate-600 text-white text-[9px] font-black leading-none rounded px-1.5 py-0.5">DESCANSA</span>
+                            )}
+                        </div>
                     </div>
                     {modoLectura && plantelActual?.puntajeDt != null && (
                         <div className="flex flex-col items-end shrink-0">
