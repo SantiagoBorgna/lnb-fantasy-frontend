@@ -329,7 +329,7 @@ function SlotLleno({ slot, onTap }) {
     const etiqueta = inicial ? `${apellido}, ${inicial}.` : apellido
 
     return (
-        <div onClick={onTap} className={clsx('relative w-[90px] h-[105px] rounded-2xl flex flex-col items-center justify-between p-2 cursor-pointer', esSexto ? 'bg-accent/25 ring-1 ring-accent/60' : 'bg-white/15')}>
+        <div onClick={onTap} className={clsx('relative w-[90px] h-[105px] rounded-2xl flex flex-col items-center justify-between p-2 cursor-pointer', esSexto ? 'bg-white/30 ring-1 ring-white/80' : 'bg-white/15')}>
             
             {esCap && (
                 <div className="absolute -top-1.5 -right-1.5 z-10 w-6 h-6 rounded-full bg-yellow-500 flex items-center justify-center ring-2 ring-surface shadow-md">
@@ -339,8 +339,8 @@ function SlotLleno({ slot, onTap }) {
             
             {/* --- NUEVAS PASTILLAS AGREGADAS --- */}
             {esSexto && (
-                <div className="absolute -top-1.5 -right-1.5 z-10 w-6 h-6 rounded-full bg-accent flex items-center justify-center ring-2 ring-surface shadow-md">
-                    <span className="text-white text-xs font-black">6</span>
+                <div className="absolute -top-1.5 -right-1.5 z-10 w-6 h-6 rounded-full bg-white flex items-center justify-center ring-2 ring-surface shadow-md">
+                    <span className="text-surface text-xs font-black">6</span>
                 </div>
             )}
             {esSuplente && (
