@@ -1,7 +1,7 @@
 export const ROL_CONFIG = {
     CAPITAN: { label: 'CAP', badge: 'bg-yellow-500', mult: '×1.5' },
     TITULAR: { label: 'TIT', badge: 'bg-primary', mult: '×1.0' },
-    SEXTO_HOMBRE: { label: '6TO', badge: 'bg-accent', mult: '×0.75' },
+    SEXTO_HOMBRE: { label: '6TO', badge: 'bg-white', mult: '×0.75' },
     SUPLENTE: { label: 'SUP', badge: 'bg-border', mult: '×0.5' },
 }
 

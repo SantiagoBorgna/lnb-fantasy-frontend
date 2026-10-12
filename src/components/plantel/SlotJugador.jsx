@@ -61,7 +61,7 @@ export default function SlotJugador({
                 esBaja ? 'bg-red-500/20 ring-2 ring-red-500 opacity-60' :
                 esDescansa ? 'bg-slate-500/20 ring-2 ring-slate-400 opacity-60' :
                 (esSexto
-                    ? 'bg-accent/25 ring-1 ring-accent/60'
+                    ? 'bg-white/30 ring-1 ring-white/80'
                     : 'bg-white/15'),
                 opaco && 'opacity-20 pointer-events-none',
             )}
@@ -77,10 +77,10 @@ export default function SlotJugador({
             )}
             {esSexto && !esBaja && (
                 <div className="absolute -top-1.5 -right-1.5 z-10
-                        w-5 h-5 rounded-full bg-accent
+                        w-5 h-5 rounded-full bg-white
                         flex items-center justify-center
                         ring-2 ring-surface">
-                    <span className="text-white text-xs font-black leading-none">6</span>
+                    <span className="text-surface text-xs font-black leading-none">6</span>
                 </div>
             )}
             {esBaja && (
