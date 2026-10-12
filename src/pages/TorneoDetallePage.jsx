@@ -273,8 +273,8 @@ export default function TorneoDetallePage() {
                 tablaArr.map(fila => {
                     const esMiEquipo = fila.nombreUsuario === usuario?.nombreDisplay;
                     
-                    // Solo son clickeables en la tabla general
-                    const esClickeable = !esMiEquipo && !isJornada;
+                    // Solo son clickeables en la tabla general y únicamente si participás del torneo
+                    const esClickeable = !esMiEquipo && !isJornada && yaParticipa;
                     
                     // A dónde mandamos
                     let idJornadaLink = 'actual';
@@ -331,8 +331,11 @@ export default function TorneoDetallePage() {
                         const visitaMio = e.equipoVisitanteId === miFila?.equipoVirtualId
                         const miEnfrentamiento = localMio || visitaMio
                         
+                        // Ver el equipo de otro participante es solo para quienes forman parte del torneo
+                        const puedeVerEquipos = yaParticipa
+
                         const handleEquipoClick = (equipoId, esMio) => {
-                            if (esMio) return;
+                            if (esMio || !puedeVerEquipos) return;
                             const idJornadaLink = torneo?.modalidad === 'DRAFT' ? 999999 : e.jornadaId;
                             navigate(`/v/${encodeMultiple([torneo.id, equipoId, idJornadaLink])}`);
                         }
@@ -348,7 +351,7 @@ export default function TorneoDetallePage() {
                                             onClick={() => handleEquipoClick(e.equipoLocalId, localMio)}
                                             className={clsx(
                                                 "text-sm font-semibold text-right transition-colors",
-                                                localMio ? "text-primary cursor-default" : "text-textMain hover:text-textMain/80 cursor-pointer"
+                                                localMio ? "text-primary cursor-default" : puedeVerEquipos ? "text-textMain hover:text-textMain/80 cursor-pointer" : "text-textMain cursor-default"
                                             )}
                                         >
                                             {e.equipoLocalNombre}
@@ -375,7 +378,7 @@ export default function TorneoDetallePage() {
                                                 onClick={() => handleEquipoClick(e.equipoVisitanteId, visitaMio)}
                                                 className={clsx(
                                                     "text-sm font-semibold text-left transition-colors",
-                                                    visitaMio ? "text-primary cursor-default" : "text-textMain hover:text-textMain/80 cursor-pointer"
+                                                    visitaMio ? "text-primary cursor-default" : puedeVerEquipos ? "text-textMain hover:text-textMain/80 cursor-pointer" : "text-textMain cursor-default"
                                                 )}
                                             >
                                                 {e.equipoVisitanteNombre}
