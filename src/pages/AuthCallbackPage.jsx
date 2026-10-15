@@ -4,6 +4,7 @@ import { useAuthStore } from '../store/authStore'
 import { getMe } from '../api/authApi'
 import { useGameStore } from '../store/gameStore'
 import { useQueryClient } from '@tanstack/react-query'
+import { consumirRedirectPendiente } from '../utils/redirectPendiente'
 
 export default function AuthCallbackPage() {
     const setAuth = useAuthStore(state => state.setAuth)
@@ -35,8 +36,10 @@ export default function AuthCallbackPage() {
                 setAuth(token, usuario)
                 queryClient.clear() // Limpiamos la caché de react-query de un usuario anterior
                 
-                localStorage.removeItem('redirectUrl'); // Limpiamos la memoria por si quedó algo guardado
-                navigate('/', { replace: true });
+                // Si venía de un link (ej. invitación a un torneo) y ya tiene el equipo armado,
+                // lo mandamos ahí. Si le falta el onboarding, la URL queda guardada y se usa al terminarlo.
+                const destino = usuario?.estadoOnboarding === 'ACTIVO' ? consumirRedirectPendiente() : null
+                navigate(destino || '/', { replace: true });
             })
             .catch(() => {
                 // Token inválido o expirado
