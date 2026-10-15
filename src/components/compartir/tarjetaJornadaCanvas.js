@@ -81,19 +81,19 @@ export function dibujarTarjetaJornada(canvas, d, logo) {
     ctx.textBaseline = 'alphabetic'
 
     // ── Logo y marca ──
-    const L = 190
+    const L = 260
     if (logo) {
         ctx.save()
         ctx.beginPath()
-        ctx.roundRect(cx - L / 2, 120, L, L, 44)
+        ctx.roundRect(cx - L / 2, 90, L, L, 60)
         ctx.clip()
-        ctx.drawImage(logo, cx - L / 2, 120, L, L)
+        ctx.drawImage(logo, cx - L / 2, 90, L, L)
         ctx.restore()
     }
     ctx.fillStyle = GRIS
     ctx.font = fuente(34)
     ctx.letterSpacing = '8px'
-    ctx.fillText('SEXTO HOMBRE FANTASY', cx, 380)
+    ctx.fillText('SEXTO HOMBRE FANTASY', cx, 420)
     ctx.letterSpacing = '0px'
 
     // ── Jornada y equipo ──
@@ -113,18 +113,16 @@ export function dibujarTarjetaJornada(canvas, d, logo) {
 
     // ── Puestos ──
     const yCajas = 1080
-    const hCajas = 250
+    const hCajas = 210
     const anchoCaja = (ANCHO - 160 - 40) / 2
     const cajas = [
         {
             label: 'EN LA FECHA',
             valor: d.posicionFecha ? `#${d.posicionFecha}` : '—',
-            sub: d.totalParticipantesFecha ? `de ${d.totalParticipantesFecha}` : '',
         },
         {
             label: 'GENERAL',
             valor: d.posicionGlobal ? `#${d.posicionGlobal}` : '—',
-            sub: 'en el ranking',
         },
     ]
     cajas.forEach((c, i) => {
@@ -135,19 +133,16 @@ export function dibujarTarjetaJornada(canvas, d, logo) {
         ctx.font = fuente(32, 600)
         ctx.fillText(c.label, centro, yCajas + 66)
         ctx.fillStyle = BLANCO
-        textoAjustado(ctx, c.valor, centro, yCajas + 170, anchoCaja - 40, 104)
-        ctx.fillStyle = GRIS
-        ctx.font = fuente(32, 500)
-        ctx.fillText(c.sub, centro, yCajas + 220)
+        textoAjustado(ctx, c.valor, centro, yCajas + 172, anchoCaja - 40, 104)
     })
 
     // ── MVP y capitán ──
     const filas = [
-        d.mvp && { label: 'MVP DE MI EQUIPO', ...d.mvp },
+        d.mvp && { label: d.mvpEsCapitan ? 'MVP Y CAPITÁN' : 'MVP DE MI EQUIPO', ...d.mvp },
         d.capitan && { label: 'CAPITÁN', ...d.capitan },
     ].filter(Boolean)
 
-    let y = 1380
+    let y = 1340
     filas.forEach(f => {
         caja(ctx, 80, y, ANCHO - 160, 130, 32)
         ctx.textAlign = 'left'
