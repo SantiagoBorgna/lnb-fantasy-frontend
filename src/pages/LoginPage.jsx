@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Trophy, Users, TrendingUp, Crown, Wallet, Ticket } from 'lucide-react'
+import { Trophy, Users, TrendingUp, Ticket } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
 import { verRedirectPendiente } from '../utils/redirectPendiente'
 import Footer from '../components/ui/Footer'
@@ -10,17 +10,14 @@ const NARANJA = 'text-[#F5862E]'
 
 const PASOS = [
     {
-        icono: Wallet,
         titulo: 'Armá tu equipo',
         texto: 'Tenés 100 créditos para fichar 10 jugadores reales de la Liga Nacional. Máximo 2 por club.',
     },
     {
-        icono: Crown,
         titulo: 'Elegí capitán y sexto hombre',
         texto: 'El capitán suma x1.5 y el sexto hombre x0.75 de sus puntos. Ahí se ganan las jornadas.',
     },
     {
-        icono: TrendingUp,
         titulo: 'Sumá con los partidos reales',
         texto: 'Puntos, rebotes, asistencias, robos y tapas de cada jugador se convierten en puntos para tu equipo',
     },
@@ -60,10 +57,10 @@ export default function LoginPage() {
         <div className="min-h-screen bg-surface text-textMain">
 
             {/* ── Hero ─────────────────────────────────────────── */}
-            <section className="relative overflow-hidden px-6 pt-16 pb-8 md:pt-16 md:pb-20">
+            <section className="relative overflow-hidden px-6 pt-16 pb-8 md:pt-24 md:pb-24">
                 <div className="absolute inset-0 bg-gradient-to-b from-primary/40 via-surface to-surface pointer-events-none" />
 
-                <div className="relative max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-10 md:gap-16">
+                <div className="relative max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-10 md:gap-20">
                     <div className="flex-1 text-center md:text-left">
                         {vieneInvitado && (
                             <div className="mb-6 inline-flex items-center gap-2 rounded-2xl border border-[#F5862E]/40 bg-[#F5862E]/10 px-4 py-2 text-sm font-semibold">
@@ -78,33 +75,33 @@ export default function LoginPage() {
                             className="w-36 h-36 md:hidden mx-auto mb-8 object-cover rounded-[28px] drop-shadow-xl"
                         />
 
-                        <p className="text-textMuted text-xs font-bold uppercase tracking-[0.2em] mb-3">
+                        <p className="text-textMuted text-xs md:text-sm font-bold uppercase tracking-[0.2em] mb-3 md:mb-4">
                             Sexto Hombre Fantasy
                         </p>
-                        <h1 className="text-4xl md:text-5xl font-black tracking-tight leading-[1.05]">
+                        <h1 className="text-4xl md:text-6xl font-black tracking-tight leading-[1.05]">
                             El fantasy de la <span className={NARANJA}>Liga Nacional</span> de Básquet
                         </h1>
-                        <p className="text-textMuted mt-4 text-base md:text-lg max-w-md mx-auto md:mx-0">
+                        <p className="text-textMuted mt-4 md:mt-6 text-base md:text-xl max-w-md md:max-w-xl mx-auto md:mx-0">
                             Armá tu equipo con jugadores reales, sumá puntos con cada partido y competí con tus amigos.
                         </p>
 
-                        <div className="mt-5 flex flex-wrap justify-center md:justify-start gap-2">
+                        <div className="mt-5 md:mt-6 flex flex-wrap justify-center md:justify-start gap-2">
                             {['Gratis', 'Premio todas las jornadas'].map(t => (
-                                <span key={t} className="rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold">
+                                <span key={t} className="rounded-full border border-border bg-card px-3 py-1 md:px-4 md:py-1.5 text-xs md:text-sm font-semibold">
                                     {t}
                                 </span>
                             ))}
                         </div>
 
-                        <div className="mt-8 max-w-sm mx-auto md:mx-0">
-                            <BotonesLogin />
+                        <div className="mt-8 md:mt-10 max-w-sm md:max-w-md mx-auto md:mx-0">
+                            <BotonesLogin grande />
                         </div>
                     </div>
 
                     <img
                         src="/icons/logo-cuadrado.jpg"
                         alt=""
-                        className="hidden md:block w-72 h-72 object-cover rounded-[36px] shadow-2xl shadow-black/40"
+                        className="hidden md:block w-80 h-80 lg:w-96 lg:h-96 object-cover rounded-[40px] shadow-2xl shadow-black/40"
                     />
                 </div>
             </section>
@@ -113,18 +110,14 @@ export default function LoginPage() {
             <section className="px-6 pt-6 pb-8 md:py-12 max-w-5xl mx-auto">
                 <h2 className="text-2xl md:text-3xl font-black text-center mb-8">Cómo se juega</h2>
                 <ol className="grid gap-4 md:grid-cols-3">
-                    {PASOS.map(({ icono: Icono, titulo, texto }, i) => (
-                        <li key={titulo} className="card flex gap-4 md:flex-col">
-                            <div className="flex items-center gap-3 shrink-0">
-                                <span className="w-9 h-9 rounded-full bg-primary flex items-center justify-center font-black">
-                                    {i + 1}
-                                </span>
-                                <Icono size={22} className={`${NARANJA} hidden md:block`} />
-                            </div>
-                            <div>
-                                <p className="font-bold">{titulo}</p>
-                                <p className="text-textMuted text-sm mt-1 leading-relaxed">{texto}</p>
-                            </div>
+                    {/* Celular: número a la izquierda de título y texto. PC: número y título en la misma fila, texto abajo */}
+                    {PASOS.map(({ titulo, texto }, i) => (
+                        <li key={titulo} className="card grid grid-cols-[auto_1fr] gap-x-4 md:gap-x-3 md:gap-y-3 items-center">
+                            <span className="row-span-2 md:row-span-1 w-9 h-9 rounded-full bg-primary flex items-center justify-center font-black">
+                                {i + 1}
+                            </span>
+                            <p className="font-bold self-end md:self-center">{titulo}</p>
+                            <p className="text-textMuted text-sm mt-1 md:mt-0 leading-relaxed self-start md:col-span-2">{texto}</p>
                         </li>
                     ))}
                 </ol>
@@ -134,8 +127,15 @@ export default function LoginPage() {
             <section className="px-6 pt-4 pb-12 md:py-12 max-w-5xl mx-auto">
                 <h2 className="text-2xl md:text-3xl font-black text-center mb-8">Mucho más que armar un quinteto</h2>
                 <div className="grid gap-4 sm:grid-cols-2">
-                    {BENEFICIOS.map(({ icono: Icono, titulo, texto }) => (
-                        <div key={titulo} className="card flex gap-4">
+                    {BENEFICIOS.map(({ icono: Icono, titulo, texto }, i) => (
+                        <div
+                            key={titulo}
+                            className={`card flex gap-4 ${
+                                i === BENEFICIOS.length - 1 && BENEFICIOS.length % 2 === 1
+                                    ? 'sm:col-span-2 sm:justify-self-center sm:w-[calc(50%-0.5rem)]'
+                                    : ''
+                            }`}
+                        >
                             <Icono size={26} className={`${NARANJA} shrink-0 mt-0.5`} />
                             <div>
                                 <p className="font-bold">{titulo}</p>
@@ -162,18 +162,19 @@ export default function LoginPage() {
     )
 }
 
-function BotonesLogin() {
+function BotonesLogin({ grande = false }) {
+    const tamano = grande ? 'md:py-4 md:text-lg' : ''
     return (
         <div className="space-y-3">
             <a
                 href={import.meta.env.VITE_OAUTH2_GOOGLE_URL}
-                className="
+                className={`${tamano}
                 flex items-center justify-center gap-3
                 w-full py-3 px-4 rounded-2xl
                 bg-white text-gray-800 font-semibold
                 hover:bg-gray-100 transition-colors
                 shadow-lg
-                "
+                `}
             >
                 <GoogleIcon />
                 Continuar con Google
@@ -181,19 +182,19 @@ function BotonesLogin() {
 
             <a
                 href={import.meta.env.VITE_OAUTH2_MICROSOFT_URL}
-                className="
+                className={`${tamano}
                 flex items-center justify-center gap-3
                 w-full py-3 px-4 rounded-2xl
                 bg-[#2F2F2F] text-white font-semibold
                 hover:bg-[#404040] transition-colors
                 shadow-lg
-                "
+                `}
             >
                 <MicrosoftIcon />
                 Continuar con Microsoft
             </a>
 
-            <p className="text-textMuted text-xs text-center pt-1">
+            <p className={`text-textMuted text-xs text-center pt-1 ${grande ? 'md:text-sm' : ''}`}>
                 Al continuar, aceptás nuestros{' '}
                 <Link to="/terminos" className="text-textMain hover:underline font-semibold">
                     Términos y Condiciones
