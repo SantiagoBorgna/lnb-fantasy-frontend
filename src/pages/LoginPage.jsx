@@ -5,14 +5,18 @@ import { useAuthStore } from '../store/authStore'
 import { verRedirectPendiente } from '../utils/redirectPendiente'
 import { track } from '../utils/analytics'
 import Footer from '../components/ui/Footer'
+import { LIGAS } from '../config/ligas'
+import { useLigaActual } from '../store/ligaStore'
+import { cambiarLiga } from '../utils/cambiarLiga'
+import LigaLogo from '../components/liga/LigaLogo'
 
 // Naranja de la pelota del logo, para destacar
 const NARANJA = 'text-[#F5862E]'
 
-const PASOS = [
+const pasos = (liga) => [
     {
         titulo: 'Armá tu equipo',
-        texto: 'Tenés 100 créditos para fichar 10 jugadores reales de la Liga Nacional. Máximo 2 por club.',
+        texto: `Tenés 100 créditos para fichar 10 jugadores reales de la ${liga.nombre}. Máximo 2 por club.`,
     },
     {
         titulo: 'Elegí capitán y sexto hombre',
@@ -45,6 +49,7 @@ const BENEFICIOS = [
 export default function LoginPage() {
     const token = useAuthStore(state => state.token)
     const navigate = useNavigate()
+    const liga = useLigaActual()
 
     // Si ya está autenticado, redirigir al dashboard
     useEffect(() => {
@@ -80,7 +85,7 @@ export default function LoginPage() {
                             Sexto Hombre Fantasy
                         </p>
                         <h1 className="text-4xl md:text-6xl font-black tracking-tight leading-[1.05]">
-                            El fantasy de la <span className={NARANJA}>Liga Nacional</span> de Básquet
+                            El fantasy de la <span className={NARANJA}>{liga.nombre}</span> de Básquet
                         </h1>
                         <p className="text-textMuted mt-4 md:mt-6 text-base md:text-xl max-w-md md:max-w-xl mx-auto md:mx-0">
                             Armá tu equipo con jugadores reales, sumá puntos con cada partido y competí con tus amigos.
@@ -95,6 +100,7 @@ export default function LoginPage() {
                         </div>
 
                         <div className="mt-8 md:mt-10 max-w-sm md:max-w-md mx-auto md:mx-0">
+                            <SelectorLiga ligaId={liga.id} />
                             <BotonesLogin grande seccion="hero" />
                         </div>
                     </div>
@@ -112,7 +118,7 @@ export default function LoginPage() {
                 <h2 className="text-2xl md:text-3xl font-black text-center mb-8">Cómo se juega</h2>
                 <ol className="grid gap-4 md:grid-cols-3">
                     {/* Celular: número a la izquierda de título y texto. PC: número y título en la misma fila, texto abajo */}
-                    {PASOS.map(({ titulo, texto }, i) => (
+                    {pasos(liga).map(({ titulo, texto }, i) => (
                         <li key={titulo} className="card grid grid-cols-[auto_1fr] gap-x-4 md:gap-x-3 md:gap-y-3 items-center">
                             <span className="row-span-2 md:row-span-1 w-9 h-9 rounded-full bg-primary flex items-center justify-center font-black">
                                 {i + 1}
@@ -158,6 +164,44 @@ export default function LoginPage() {
 
             <div className="pb-[calc(env(safe-area-inset-bottom)+2rem)] md:pb-0">
                 <Footer />
+            </div>
+        </div>
+    )
+}
+
+// Con más de una liga: elegir en cuál jugar antes de entrar (se recuerda para la próxima)
+function SelectorLiga({ ligaId }) {
+    if (LIGAS.length < 2) return null
+
+    const elegir = (id) => {
+        if (cambiarLiga(id)) track('cambiar_liga', { ubicacion: 'landing' })
+    }
+
+    return (
+        <div className="mb-6">
+            <p className="text-sm md:text-base font-bold mb-3 text-center md:text-left">¿En qué liga querés jugar?</p>
+            <div className="grid grid-cols-2 gap-3">
+                {LIGAS.map(l => {
+                    const elegida = l.id === ligaId
+                    return (
+                        <button
+                            key={l.id}
+                            type="button"
+                            onClick={() => elegir(l.id)}
+                            aria-pressed={elegida}
+                            className={`flex flex-col items-center gap-2 rounded-2xl border-2 px-3 py-4 transition-colors ${
+                                elegida
+                                    ? 'border-[#F5862E] bg-[#F5862E]/10'
+                                    : 'border-border bg-card hover:border-textMuted'
+                            }`}
+                        >
+                            <LigaLogo liga={l} className="w-14 h-14 md:w-16 md:h-16" textoIniciales="text-base" />
+                            <span className={`text-sm md:text-base font-bold leading-tight ${elegida ? '' : 'text-textMuted'}`}>
+                                {l.nombre}
+                            </span>
+                        </button>
+                    )
+                })}
             </div>
         </div>
     )

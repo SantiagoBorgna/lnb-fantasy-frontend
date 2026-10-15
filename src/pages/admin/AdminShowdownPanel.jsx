@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { ligaActual } from '../../store/ligaStore'
 import { getTodosLosShowdowns, getPartidosDisponiblesParaShowdown, crearShowdownManual, eliminarShowdown } from '../../api/adminApi'
 import { Loader2, Copy, CheckCircle, Trash2, ShieldAlert } from 'lucide-react'
 import { useAuthStore } from '../../store/authStore'
@@ -54,7 +55,8 @@ export default function AdminShowdownPanel() {
     }
 
     const handleCopiar = (codigo, id) => {
-        const link = `${window.location.origin}/showdown/${codigo}`
+        // Con la liga en el link: el QR abre el Modo Estadio de esta liga aunque el celular tenga otra elegida
+        const link = `${window.location.origin}/showdown/${codigo}?liga=${ligaActual().id}`
         navigator.clipboard.writeText(link)
         setCopiadoId(id)
         setTimeout(() => setCopiadoId(null), 2000)

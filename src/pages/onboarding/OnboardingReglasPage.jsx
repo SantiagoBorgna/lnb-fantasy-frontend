@@ -7,7 +7,7 @@ const REGLAS = [
     },
     {
         titulo: 'Puntuación',
-        texto: 'Tus jugadores suman puntos según su rendimiento real en la LNB.',
+        texto: 'Tus jugadores suman puntos según su rendimiento real en cada partido.',
     },
     {
         titulo: 'El Capitán',

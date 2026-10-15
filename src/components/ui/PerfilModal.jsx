@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useLigaActual } from '../../store/ligaStore'
 import { createPortal } from 'react-dom'
 import clsx from 'clsx'
 import { getEquiposParaOnboarding, actualizarPerfil, logout } from '../../api/authApi'
@@ -11,6 +12,7 @@ export default function PerfilModal({ isOpen, onClose }) {
     const { usuario, setAuth, setUsuario, setToken } = useAuthStore()
     const navigate = useNavigate()
     const queryClient = useQueryClient()
+    const liga = useLigaActual()
 
     const [equipos, setEquipos] = useState([])
     const [cargandoEquipos, setCargandoEquipos] = useState(false)
@@ -163,7 +165,7 @@ export default function PerfilModal({ isOpen, onClose }) {
                     </div>
 
                     <div>
-                        <label className="block text-textMuted text-xs font-bold uppercase tracking-wider mb-2">Club Favorito de la LNB</label>
+                        <label className="block text-textMuted text-xs font-bold uppercase tracking-wider mb-2">Club Favorito {liga.deLaLiga}</label>
                         <select
                             value={equipoFavoritoId}
                             onChange={e => setEquipoFavoritoId(e.target.value)}

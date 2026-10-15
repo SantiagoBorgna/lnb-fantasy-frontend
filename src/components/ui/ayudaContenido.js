@@ -80,7 +80,7 @@ export const AYUDA = {
         pasos: [
             {
                 titulo: 'Estadísticas reales',
-                texto: 'Descubrí a los jugadores de la LNB con los mejores promedios en cada rubro estadístico.',
+                texto: 'Descubrí a los jugadores de la liga con los mejores promedios en cada rubro estadístico.',
             },
             {
                 titulo: 'Top 5',

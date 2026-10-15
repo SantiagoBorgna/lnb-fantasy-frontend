@@ -1,4 +1,5 @@
 // Utilidades para compartir por WhatsApp / menú nativo del celular
+import { ligaActual } from '../store/ligaStore'
 
 // Link que abre WhatsApp (app en el celular, web en la compu) con el texto ya escrito
 export const linkWhatsApp = (texto) => `https://wa.me/?text=${encodeURIComponent(texto)}`
@@ -34,8 +35,8 @@ const esCelular = () => typeof navigator !== 'undefined' && (
 
 // En la PC va sin emojis: la app de WhatsApp para Windows los rompe (muestra �) al recibirlos por link
 export const mensajeInvitacionTorneo = (torneo) => esCelular()
-    ? `Sumate a mi liga "${torneo.nombre}" en Sexto Hombre Fantasy, el fantasy de la Liga Nacional 🏀 Es gratis 👇\n${linkInvitacion(torneo, 'whatsapp')}`
-    : `Sumate a mi liga "${torneo.nombre}" en Sexto Hombre Fantasy, el fantasy de la Liga Nacional. Es gratis:\n${linkInvitacion(torneo, 'whatsapp')}`
+    ? `Sumate a mi liga "${torneo.nombre}" en Sexto Hombre Fantasy, el fantasy de la ${ligaActual().nombre} 🏀 Es gratis 👇\n${linkInvitacion(torneo, 'whatsapp')}`
+    : `Sumate a mi liga "${torneo.nombre}" en Sexto Hombre Fantasy, el fantasy de la ${ligaActual().nombre}. Es gratis:\n${linkInvitacion(torneo, 'whatsapp')}`
 
 // ¿El navegador puede compartir archivos con el menú nativo? (Android/iOS sí, la mayoría de las compus no)
 export const puedeCompartirArchivos = (archivo) =>

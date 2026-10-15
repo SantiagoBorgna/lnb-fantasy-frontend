@@ -7,6 +7,7 @@ import { createPortal } from 'react-dom'
 import TopNav from './TopNav'
 import NotificacionesPrompt from './NotificacionesPrompt' 
 import ContextSwitcher from './ContextSwitcher'
+import LigaSwitcher from '../liga/LigaSwitcher'
 import { useUiStore } from '../../store/uiStore'
 import Footer from './Footer'
 
@@ -103,7 +104,10 @@ export default function AppShell() {
 
             {/* Header en mobile para el logo y el Context Switcher */}
             <div className="md:hidden flex items-center justify-between px-4 py-3 bg-card border-b border-border shrink-0 z-10 h-14">
-                <img src="/icons/logo-redondo.png" alt="Sexto Hombre Fantasy" className="h-8 object-contain pointer-events-none drop-shadow-[0_0_1px_#ffffff]" />
+                <div className="flex items-center gap-2">
+                    <img src="/icons/logo-redondo.png" alt="Sexto Hombre Fantasy" className="h-8 object-contain pointer-events-none drop-shadow-[0_0_1px_#ffffff]" />
+                    <LigaSwitcher />
+                </div>
                 <ContextSwitcher />
             </div>
 

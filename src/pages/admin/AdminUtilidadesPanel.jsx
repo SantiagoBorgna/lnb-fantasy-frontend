@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getConfigLiga } from "../../api/configApi";
 import { correrCronAdmin, recalcularJornadaAdmin, sincronizarFixtureAdmin } from "../../api/adminApi";
 import { getJornadas } from "../../api/jornadaApi";
 import { Play, Loader2 } from "lucide-react";
@@ -49,13 +51,13 @@ const CRONS = [
 
 const RECALCULO_KEY = "recalcular-jornada";
 const FIXTURE_KEY = "sincronizar-fixture";
-const FIXTURE_BASE_URL = "https://www.laliganacional.com.ar/laliga/fixture";
 
 // Las jornadas llegan como "2026-10-12T20:00:00": el día es lo que va antes de la T.
 const diaDeLaJornada = (fechaIso) => (fechaIso ? fechaIso.substring(0, 10) : "");
 
-const armarUrlFixture = (desde, hasta) =>
-    `${FIXTURE_BASE_URL}?handler=ProximosPartidos&fechaInicio=${desde}&fechaFin=${hasta}`;
+// La URL base del fixture depende de la liga (la da el backend en /config)
+const armarUrlFixture = (base, desde, hasta) =>
+    `${base}?handler=ProximosPartidos&fechaInicio=${desde}&fechaFin=${hasta}`;
 
 export default function AdminUtilidadesPanel() {
     const showToast = useUiStore(state => state.showToast);
@@ -66,11 +68,13 @@ export default function AdminUtilidadesPanel() {
     const [fixtureJornadaId, setFixtureJornadaId] = useState("");
     const [fixtureDesde, setFixtureDesde] = useState("");
     const [fixtureHasta, setFixtureHasta] = useState("");
+    const { data: configLiga } = useQuery({ queryKey: ['configLiga'], queryFn: getConfigLiga, staleTime: Infinity });
 
     // Sin fechas la LNB devuelve de hace 2 días a 2 meses y todo se asignaría a una
     // sola jornada, así que el rango es obligatorio para poder sincronizar.
     const fixtureRangoValido = fixtureDesde !== "" && fixtureHasta !== "" && fixtureDesde <= fixtureHasta;
-    const fixtureUrl = fixtureRangoValido ? armarUrlFixture(fixtureDesde, fixtureHasta) : "";
+    const fixtureUrl = fixtureRangoValido && configLiga?.urlFixture
+        ? armarUrlFixture(configLiga.urlFixture, fixtureDesde, fixtureHasta) : "";
 
     const elegirJornadaFixture = (id) => {
         setFixtureJornadaId(id);
@@ -253,7 +257,7 @@ export default function AdminUtilidadesPanel() {
                             </label>
                             <button
                                 onClick={handleSincronizarFixture}
-                                disabled={!fixtureJornadaId || !fixtureRangoValido || ejecutando !== null}
+                                disabled={!fixtureJornadaId || !fixtureUrl || ejecutando !== null}
                                 className="flex items-center gap-2 bg-primary text-black font-bold text-sm px-4 py-2 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {ejecutando === FIXTURE_KEY ? (

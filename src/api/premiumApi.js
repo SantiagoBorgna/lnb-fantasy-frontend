@@ -1,7 +1,9 @@
 import api from './axiosClient';
+import { LIGA_PRINCIPAL } from '../config/ligas';
 
+// El Premium es uno solo para todas las ligas y se compra en la Liga Nacional
 export const checkoutPremium = async (email) => {
-    const response = await api.post('/premium/checkout', { email });
+    const response = await api.post('/premium/checkout', { email }, { baseURL: LIGA_PRINCIPAL.apiUrl });
     return response.data;
 };
 

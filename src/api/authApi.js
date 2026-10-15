@@ -1,4 +1,5 @@
 import axiosClient from './axiosClient'
+import { LIGAS } from '../config/ligas'
 
 export const getMe = () =>
     axiosClient.get('/auth/me').then(r => r.data)
@@ -6,8 +7,9 @@ export const getMe = () =>
 export const setEquipoFavorito = (equipoId) =>
     axiosClient.patch(`/auth/equipo-favorito/${equipoId}`).then(r => r.data)
 
+// La sesión es la misma en todas las ligas: se cierra en todos los backends
 export const logout = () =>
-    axiosClient.post('/auth/logout').then(r => r.data)
+    Promise.allSettled(LIGAS.map(liga => axiosClient.post('/auth/logout', null, { baseURL: liga.apiUrl })))
 
 export const getPerfil = () =>
     axiosClient.get('/onboarding/perfil').then(r => r.data)
