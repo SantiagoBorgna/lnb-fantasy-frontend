@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
+import CargandoUsuario from '../components/ui/CargandoUsuario'
 import { guardarRedirectPendiente } from '../utils/redirectPendiente'
 
 import LoginPage from '../pages/LoginPage'
@@ -48,6 +49,9 @@ function OnboardingGuard({ children }) {
     const location = useLocation()
 
     if (!token) return <Navigate to="/login" replace />
+
+    // Recién se cambió de liga: todavía no sabemos en qué estado está en esta liga
+    if (!usuario) return <CargandoUsuario />
 
     const estado = usuario?.estadoOnboarding
 

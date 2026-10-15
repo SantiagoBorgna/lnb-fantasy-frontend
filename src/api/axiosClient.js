@@ -1,8 +1,10 @@
 import axios from 'axios'
 import { useAuthStore } from '../store/authStore'
+import { ligaActual } from '../store/ligaStore'
 
+// Sin baseURL fija: cada pedido va al backend de la liga que se está jugando
+// (un pedido puede forzar otra con su propio baseURL, ej. la compra del Premium)
 const axiosClient = axios.create({
-    baseURL: import.meta.env.VITE_API_URL,
     headers: {
         'Content-Type': 'application/json',
         'ngrok-skip-browser-warning': 'true' // <-- El pase VIP para saltar la pantalla de ngrok
@@ -13,6 +15,8 @@ const axiosClient = axios.create({
 // ── Interceptor de request: inyecta el JWT en cada llamada ──────────────────
 axiosClient.interceptors.request.use(
     (config) => {
+        config.baseURL ??= ligaActual().apiUrl
+
         // Leemos el token directamente del store de Zustand
         // sin necesidad de pasar props — acceso global
         const token = useAuthStore.getState().token

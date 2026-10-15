@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
+import { useLigaActual } from '../../store/ligaStore'
+import { LIGAS } from '../../config/ligas'
+import CargandoUsuario from '../../components/ui/CargandoUsuario'
 import clsx from 'clsx'
 import { ChevronLeft } from 'lucide-react'
 
@@ -14,8 +17,13 @@ import AdminUtilidadesPanel from './AdminUtilidadesPanel'
 import AdminComunidadPanel from './AdminComunidadPanel'
 
 export default function AdminPage() {
+    const token = useAuthStore(state => state.token)
     const usuario = useAuthStore(state => state.usuario)
+    const liga = useLigaActual()
     const [tab, setTab] = useState('JORNADAS') // Default to JORNADAS
+
+    // Recién se cambió de liga: falta el perfil en esta liga
+    if (token && !usuario) return <CargandoUsuario />
 
     if (!usuario || usuario.rol !== 'ADMIN') {
         return <Navigate to="/" replace />
@@ -32,6 +40,12 @@ export default function AdminPage() {
                             Volver al inicio
                         </Link>
                         <h1 className="text-3xl font-black text-textMain font-display tracking-tight">Panel de Administrador</h1>
+                        {/* Con más de una liga, que quede claro en cuál se está tocando */}
+                        {LIGAS.length > 1 && (
+                            <span className="inline-block mt-2 rounded-full bg-accent/15 border border-accent/40 text-accent text-xs font-bold px-3 py-1">
+                                {liga.nombre}
+                            </span>
+                        )}
                         <p className="text-textMuted mt-1">Gestioná los modos de juego y estadísticas</p>
                     </div>
 

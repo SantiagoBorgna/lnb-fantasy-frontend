@@ -11,6 +11,7 @@ import {
 } from './BottomNav'
 
 import ContextSwitcher from './ContextSwitcher'
+import LigaSwitcher from '../liga/LigaSwitcher'
 import { useAuthStore } from '../../store/authStore'
 
 const NAV_ITEMS = [
@@ -44,6 +45,7 @@ export default function TopNav({ onLogout, className }) {
                 <NavLink to="/" className="shrink-0 hover:scale-105 transition-transform">
                     <img src="/icons/logo-redondo.png" alt="Sexto Hombre Fantasy" className="h-10 object-contain drop-shadow-[0_0_1px_#ffffff]" />
                 </NavLink>
+                <LigaSwitcher />
                 <ContextSwitcher />
             </div>
 

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useLigaActual } from '../../store/ligaStore'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import { getEquiposParaOnboarding, completarPerfil } from '../../api/authApi'
@@ -9,6 +10,7 @@ import PatronEquipo from '../../components/ui/PatronEquipo'
 export default function OnboardingPerfilPage() {
     const navigate = useNavigate()
     const { token, setAuth, usuario } = useAuthStore()
+    const liga = useLigaActual()
     const { showToast } = useUiStore()
 
     const [equipos, setEquipos] = useState([])
@@ -99,7 +101,7 @@ export default function OnboardingPerfilPage() {
             {/* Selector de equipo favorito */}
             <div className="space-y-2 mb-6 flex-1 flex flex-col min-h-0">
                 <label className="text-textMain text-sm font-semibold shrink-0">
-                    Tu equipo favorito de la LNB
+                    Tu equipo favorito {liga.deLaLiga}
                 </label>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3 flex-1 md:max-h-80 overflow-y-auto pr-2 custom-scrollbar">
                     {equipos.map(equipo => (
