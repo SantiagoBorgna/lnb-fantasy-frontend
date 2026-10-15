@@ -1,8 +1,15 @@
-import React from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function TerminosPage() {
     const navigate = useNavigate();
+
+    // Al llegar desde la landing la página venía scrolleada: arrancamos arriba de todo.
+    // html, body y #root tienen h-full + overflow-x hidden, así que el que scrollea es #root.
+    useEffect(() => {
+        document.getElementById('root')?.scrollTo(0, 0);
+        window.scrollTo(0, 0);
+    }, []);
 
     return (
         <div className="min-h-screen bg-surface p-6 overflow-y-auto">
