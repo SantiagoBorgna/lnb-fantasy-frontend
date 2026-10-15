@@ -3,8 +3,16 @@
 // Link que abre WhatsApp (app en el celular, web en la compu) con el texto ya escrito
 export const linkWhatsApp = (texto) => `https://wa.me/?text=${encodeURIComponent(texto)}`
 
-export const mensajeInvitacionTorneo = (torneo) =>
-    `Sumate a mi liga "${torneo.nombre}" en Sexto Hombre Fantasy, el fantasy de la Liga Nacional 🏀 Es gratis 👇\n${torneo.urlInvitacion}`
+// Celular/tablet (los iPad nuevos se presentan como Mac con pantalla táctil)
+const esCelular = () => typeof navigator !== 'undefined' && (
+    /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+)
+
+// En la PC va sin emojis: la app de WhatsApp para Windows los rompe (muestra �) al recibirlos por link
+export const mensajeInvitacionTorneo = (torneo) => esCelular()
+    ? `Sumate a mi liga "${torneo.nombre}" en Sexto Hombre Fantasy, el fantasy de la Liga Nacional 🏀 Es gratis 👇\n${torneo.urlInvitacion}`
+    : `Sumate a mi liga "${torneo.nombre}" en Sexto Hombre Fantasy, el fantasy de la Liga Nacional. Es gratis:\n${torneo.urlInvitacion}`
 
 // ¿El navegador puede compartir archivos con el menú nativo? (Android/iOS sí, la mayoría de las compus no)
 export const puedeCompartirArchivos = (archivo) =>
