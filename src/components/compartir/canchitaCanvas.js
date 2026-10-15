@@ -14,9 +14,12 @@ const CANCHA = { x: 60, y: 260, w: 960, h: 920 }
 const MADERA = '#e29b5a'
 const LINEA = 'rgba(0,0,0,0.5)'
 
-// Apellido para mostrar debajo de la camiseta (saca el primer nombre)
+// Apellido para mostrar debajo de la camiseta. En el juego los nombres vienen como
+// "APELLIDO, Nombre" (ej. "FRONTERA, J."); si no tiene coma, se saca el primer nombre.
 export const apellido = (nombreCompleto = '') => {
-    const partes = nombreCompleto.trim().split(/\s+/)
+    const limpio = nombreCompleto.trim()
+    if (limpio.includes(',')) return limpio.split(',')[0].trim()
+    const partes = limpio.split(/\s+/)
     return partes.length > 1 ? partes.slice(1).join(' ') : partes[0] ?? ''
 }
 
@@ -109,7 +112,23 @@ function dibujarCancha(ctx) {
     ctx.restore()
 }
 
-// Etiqueta con fondo oscuro, para que se lea sobre la madera
+// Texto blanco sin fondo (con una sombra suave para que se lea sobre la madera)
+function textoJugador(ctx, texto, cx, y, { size, anchoMax }) {
+    ctx.font = fuente(size, 700)
+    let t = texto
+    while (ctx.measureText(t).width > anchoMax && t.length > 1) t = t.slice(0, -2) + '…'
+    ctx.save()
+    ctx.shadowColor = 'rgba(0,0,0,0.75)'
+    ctx.shadowBlur = 8
+    ctx.shadowOffsetY = 2
+    ctx.fillStyle = BLANCO
+    ctx.textAlign = 'center'
+    ctx.fillText(t, cx, y + size)
+    ctx.restore()
+    return size + 10
+}
+
+// Etiqueta con fondo (para los puntos)
 function etiqueta(ctx, texto, cx, y, { size, anchoMax, fondo = 'rgba(15,25,35,0.88)', color = BLANCO, weight = 700 }) {
     ctx.font = fuente(size, weight)
     let t = texto
@@ -162,10 +181,10 @@ async function dibujarJugador(ctx, j, cx, top, { ancho, conPuntos, tamTexto, anc
 
     const r = ancho * 0.17
     if (j.rol === 'CAPITAN') insignia(ctx, 'C', cx + ancho * 0.42, top + r * 0.9, r, '#EAB308', '#0F1923')
-    if (j.rol === 'SEXTO_HOMBRE') insignia(ctx, '6TO', cx + ancho * 0.42, top + r * 0.9, r, BLANCO, '#0F1923')
+    if (j.rol === 'SEXTO_HOMBRE') insignia(ctx, '6', cx + ancho * 0.42, top + r * 0.9, r, BLANCO, '#0F1923')
 
     let y = top + alto + 8
-    y += etiqueta(ctx, apellido(j.nombre), cx, y, { size: tamTexto, anchoMax: anchoTexto }) + 6
+    y += textoJugador(ctx, apellido(j.nombre), cx, y, { size: tamTexto, anchoMax: anchoTexto }) + 6
 
     if (conPuntos) {
         const jugo = j.puntos != null

@@ -727,16 +727,17 @@ export default function CanchitaPage() {
                             <div className="flex items-center justify-between">
                                 <div>
                                     <div className="flex items-center gap-2">
-                                        <h1 className="text-textMain font-bold text-xl truncate max-w-[180px]">
+                                        <h1 className="text-textMain font-bold text-xl truncate max-w-[200px]">
                                             {plantelActual?.nombreEquipo ?? 'Mi Equipo'}
                                         </h1>
                                         <button
                                             onClick={abrirCompartir}
-                                            className="flex items-center gap-1 text-xs font-semibold text-white rounded-lg px-2 py-1
+                                            className="w-8 h-8 flex items-center justify-center text-white rounded-full
                                                 bg-gradient-to-r from-[#F5862E] to-accent active:scale-95 transition-transform shrink-0"
                                             aria-label="Compartir mi equipo"
+                                            title="Compartir mi equipo"
                                         >
-                                            <Share2 size={13} /> Compartir
+                                            <Share2 size={15} />
                                         </button>
                                     </div>
 
