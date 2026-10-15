@@ -56,15 +56,8 @@ function OnboardingGuard({ children }) {
 }
 
 export default function AppRouter() {
-    // ---- LÓGICA DEL CANDADO INVISIBLE (PRE-LAUNCH) ----
-    const urlParams = new URLSearchParams(window.location.search)
-    if (urlParams.get('llave') === 'SantiAdmin') {
-        localStorage.setItem('adminBypass', 'true')
-    }
-
-    const hasBypass = localStorage.getItem('adminBypass') === 'true'
     const isMaintenance = import.meta.env.VITE_MAINTENANCE_MODE === 'true'
-    const isPrelaunch = import.meta.env.VITE_PRELAUNCH_MODE === 'true' && !hasBypass
+    const isPrelaunch = import.meta.env.VITE_PRELAUNCH_MODE === 'true'
 
     if (isPrelaunch) {
         return (
@@ -77,7 +70,7 @@ export default function AppRouter() {
         )
     }
 
-    if (isMaintenance && !hasBypass) {
+    if (isMaintenance) {
         return (
             <BrowserRouter>
                 <Routes>
