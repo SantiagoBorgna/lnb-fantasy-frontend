@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
+import { Share2 } from 'lucide-react'
 import { getRankingJornada } from '../../api/rankingApi'
+import TarjetaJornadaModal from '../compartir/TarjetaJornadaModal'
 
 function StatCard({ label, valor }) {
     return (
@@ -22,6 +24,10 @@ export default function DashboardClasicoGlobal({
     const navigate = useNavigate()
     const [jornadaSel, setJornadaSel] = useState(jornadaSelInicial)
     const [jornadaTab, setJornadaTab] = useState('global')
+    const [tarjetaAbierta, setTarjetaAbierta] = useState(false)
+
+    // Última jornada terminada (jornadas viene ordenada de la más nueva a la más vieja)
+    const ultimaFinalizada = jornadas?.[0]
 
     useEffect(() => {
         if(jornadaSelInicial && !jornadaSel) {
@@ -84,6 +90,18 @@ export default function DashboardClasicoGlobal({
                                         {miPosicion.puntajeGlobal?.toFixed(1)} pts
                                     </span>
                                 </div>
+                            )}
+
+                            {ultimaFinalizada && (
+                                <button
+                                    onClick={() => setTarjetaAbierta(true)}
+                                    className="w-full py-2.5 rounded-xl font-semibold text-sm text-white
+                                        bg-gradient-to-r from-[#F5862E] to-accent
+                                        flex items-center justify-center gap-2 active:scale-95 transition-transform"
+                                >
+                                    <Share2 size={16} />
+                                    Compartí tu jornada {ultimaFinalizada.numero}
+                                </button>
                             )}
 
                             <button
@@ -208,6 +226,12 @@ export default function DashboardClasicoGlobal({
                     </div>
                 </div>
             </div>
+            {tarjetaAbierta && ultimaFinalizada && (
+                <TarjetaJornadaModal
+                    jornadaId={ultimaFinalizada.id}
+                    onCerrar={() => setTarjetaAbierta(false)}
+                />
+            )}
         </div>
     )
 }
