@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { Trophy, Users, QrCode, TrendingUp, Crown, Wallet, Ticket } from 'lucide-react'
+import { Trophy, Users, TrendingUp, Crown, Wallet, Ticket } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
 import { verRedirectPendiente } from '../utils/redirectPendiente'
 import Footer from '../components/ui/Footer'
@@ -17,12 +17,12 @@ const PASOS = [
     {
         icono: Crown,
         titulo: 'Elegí capitán y sexto hombre',
-        texto: 'El capitán suma x1.5 y el sexto hombre el 75% de sus puntos. Ahí se ganan las jornadas.',
+        texto: 'El capitán suma x1.5 y el sexto hombre x0.75 de sus puntos. Ahí se ganan las jornadas.',
     },
     {
         icono: TrendingUp,
         titulo: 'Sumá con los partidos reales',
-        texto: 'Puntos, rebotes, asistencias, robos y tapas de cada partido se convierten en puntos para tu equipo.',
+        texto: 'Puntos, rebotes, asistencias, robos y tapas de cada jugador se convierten en puntos para tu equipo',
     },
 ]
 
@@ -36,11 +36,6 @@ const BENEFICIOS = [
         icono: Users,
         titulo: 'Ligas con amigos',
         texto: 'Creá tu liga privada y pasales el link. Modo clásico, cara a cara o draft en vivo por turnos.',
-    },
-    {
-        icono: QrCode,
-        titulo: 'Modo Estadio',
-        texto: '¿Vas a la cancha? Escaneá el QR y armá un equipo solo para el partido que estás viendo.',
     },
     {
         icono: TrendingUp,
@@ -65,7 +60,7 @@ export default function LoginPage() {
         <div className="min-h-screen bg-surface text-textMain">
 
             {/* ── Hero ─────────────────────────────────────────── */}
-            <section className="relative overflow-hidden px-6 pt-10 pb-14 md:pt-16 md:pb-20">
+            <section className="relative overflow-hidden px-6 pt-16 pb-8 md:pt-16 md:pb-20">
                 <div className="absolute inset-0 bg-gradient-to-b from-primary/40 via-surface to-surface pointer-events-none" />
 
                 <div className="relative max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-10 md:gap-16">
@@ -80,7 +75,7 @@ export default function LoginPage() {
                         <img
                             src="/icons/logo-cuadrado.jpg"
                             alt="Sexto Hombre Fantasy"
-                            className="w-24 h-24 md:hidden mx-auto mb-6 object-cover rounded-[22px] drop-shadow-xl"
+                            className="w-36 h-36 md:hidden mx-auto mb-8 object-cover rounded-[28px] drop-shadow-xl"
                         />
 
                         <p className="text-textMuted text-xs font-bold uppercase tracking-[0.2em] mb-3">
@@ -94,7 +89,7 @@ export default function LoginPage() {
                         </p>
 
                         <div className="mt-5 flex flex-wrap justify-center md:justify-start gap-2">
-                            {['Gratis', 'Premio todas las jornadas', 'Ligas con amigos'].map(t => (
+                            {['Gratis', 'Premio todas las jornadas'].map(t => (
                                 <span key={t} className="rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold">
                                     {t}
                                 </span>
@@ -115,7 +110,7 @@ export default function LoginPage() {
             </section>
 
             {/* ── Cómo se juega ────────────────────────────────── */}
-            <section className="px-6 py-12 max-w-5xl mx-auto">
+            <section className="px-6 pt-6 pb-8 md:py-12 max-w-5xl mx-auto">
                 <h2 className="text-2xl md:text-3xl font-black text-center mb-8">Cómo se juega</h2>
                 <ol className="grid gap-4 md:grid-cols-3">
                     {PASOS.map(({ icono: Icono, titulo, texto }, i) => (
@@ -136,7 +131,7 @@ export default function LoginPage() {
             </section>
 
             {/* ── Por qué jugar ────────────────────────────────── */}
-            <section className="px-6 py-12 max-w-5xl mx-auto">
+            <section className="px-6 pt-4 pb-12 md:py-12 max-w-5xl mx-auto">
                 <h2 className="text-2xl md:text-3xl font-black text-center mb-8">Mucho más que armar un quinteto</h2>
                 <div className="grid gap-4 sm:grid-cols-2">
                     {BENEFICIOS.map(({ icono: Icono, titulo, texto }) => (
@@ -160,7 +155,9 @@ export default function LoginPage() {
                 </div>
             </section>
 
-            <Footer />
+            <div className="pb-[calc(env(safe-area-inset-bottom)+2rem)] md:pb-0">
+                <Footer />
+            </div>
         </div>
     )
 }
