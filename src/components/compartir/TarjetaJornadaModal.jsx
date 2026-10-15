@@ -5,10 +5,10 @@ import { Share2, Download } from 'lucide-react'
 import { getMiResumenJornada } from '../../api/rankingApi'
 import { getPlantelJornada, getEstadisticasJornada } from '../../api/plantelApi'
 import { useUiStore } from '../../store/uiStore'
-import { compartirImagen, puedeCompartirArchivos, descargarBlob } from '../../utils/compartir'
+import { compartirImagen, puedeCompartirArchivos, descargarBlob, linkSitioCompartido } from '../../utils/compartir'
+import { track } from '../../utils/analytics'
 import { dibujarTarjetaJornada, cargarImagen, cargarFuentes } from './tarjetaJornadaCanvas'
 
-const URL_SITIO = 'https://www.sextohombrefantasy.com.ar'
 
 // iPhone/iPad (los iPad nuevos se presentan como Mac con pantalla táctil)
 const esIOS = typeof navigator !== 'undefined' && (
@@ -98,7 +98,7 @@ export default function TarjetaJornadaModal({ jornadaId, onCerrar }) {
 
     const nombreArchivo = `sexto-hombre-jornada-${resumen?.jornadaNumero ?? ''}.png`
     const texto = resumen
-        ? `Hice ${resumen.puntajeFecha?.toLocaleString('es-AR')} puntos en la jornada ${resumen.jornadaNumero} de Sexto Hombre Fantasy 🏀 ¿Te animás a ganarme? ${URL_SITIO}`
+        ? `Hice ${resumen.puntajeFecha?.toLocaleString('es-AR')} puntos en la jornada ${resumen.jornadaNumero} de Sexto Hombre Fantasy 🏀 ¿Te animás a ganarme? ${linkSitioCompartido('tarjeta_jornada')}`
         : ''
 
     const sePuedeCompartir = imagen && puedeCompartirArchivos(new File([imagen.blob], nombreArchivo, { type: 'image/png' }))
@@ -108,6 +108,9 @@ export default function TarjetaJornadaModal({ jornadaId, onCerrar }) {
         setCompartiendo(true)
         try {
             const resultado = await compartirImagen({ blob: imagen.blob, nombreArchivo, texto })
+            if (resultado !== 'cancelado') {
+                track('share', { content_type: 'tarjeta_jornada', method: resultado === 'compartido' ? 'menu_nativo' : 'descarga' })
+            }
             if (resultado === 'descargado') showToast('Imagen descargada. ¡Subila a tus historias!')
         } finally {
             setCompartiendo(false)
@@ -161,7 +164,10 @@ export default function TarjetaJornadaModal({ jornadaId, onCerrar }) {
                             ahí se guarda desde "Compartir" → "Guardar imagen" */}
                         {sePuedeCompartir && !esIOS && (
                             <button
-                                onClick={() => descargarBlob(imagen.blob, nombreArchivo)}
+                                onClick={() => {
+                                    descargarBlob(imagen.blob, nombreArchivo)
+                                    track('share', { content_type: 'tarjeta_jornada', method: 'descarga' })
+                                }}
                                 className="w-full py-2 text-textMuted text-sm flex items-center justify-center gap-2"
                             >
                                 <Download size={16} /> Descargar

@@ -14,6 +14,7 @@ import { useAyuda } from '../hooks/useAyuda'
 import ModalAyuda from '../components/ui/ModalAyuda'
 import BotonAyuda from '../components/ui/BotonAyuda'
 import { AYUDA } from '../components/ui/ayudaContenido'
+import { track } from '../utils/analytics'
 
 const TABS = ['Mis Torneos', 'Explorar']
 
@@ -228,6 +229,7 @@ export default function TorneosPage() {
                     onCreado={async (body) => {
                         try {
                             const nuevo = await crearTorneo(body)
+                            track('crear_liga', { modalidad: body.modalidad, tipo: body.tipo, puntuacion: body.tipoPuntuacion })
                             setModalCrear(false)
                             navigate(`/t/${encodeId(nuevo.id)}?invitar=1`)
                         } catch (e) {

@@ -4,7 +4,8 @@ import { useAuthStore } from '../store/authStore'
 import { getMe } from '../api/authApi'
 import { useGameStore } from '../store/gameStore'
 import { useQueryClient } from '@tanstack/react-query'
-import { consumirRedirectPendiente } from '../utils/redirectPendiente'
+import { consumirRedirectPendiente, verRedirectPendiente } from '../utils/redirectPendiente'
+import { track } from '../utils/analytics'
 
 export default function AuthCallbackPage() {
     const setAuth = useAuthStore(state => state.setAuth)
@@ -39,6 +40,19 @@ export default function AuthCallbackPage() {
             .then(usuario => {
                 if (descartado) return
                 setAuth(token, usuario)
+
+                // Usuario recién creado = registro; si no, es un login de alguien que ya existía.
+                // Si abandona el onboarding y vuelve, sigue NUEVO: lo marcamos para no contarlo dos veces.
+                const claveRegistro = `ga_sign_up_${usuario?.id}`
+                let yaContado = false
+                try { yaContado = localStorage.getItem(claveRegistro) === '1' } catch { /* sin storage */ }
+                const esRegistro = usuario?.estadoOnboarding === 'NUEVO' && !yaContado
+                track(esRegistro ? 'sign_up' : 'login', {
+                    invitado: !!verRedirectPendiente()?.startsWith('/u/'),
+                })
+                if (esRegistro) {
+                    try { localStorage.setItem(claveRegistro, '1') } catch { /* sin storage */ }
+                }
                 queryClient.clear() // Limpiamos la caché de react-query de un usuario anterior
                 
                 // Si venía de un link (ej. invitación a un torneo) y ya tiene el equipo armado,

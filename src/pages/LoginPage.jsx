@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { Trophy, Users, TrendingUp, Ticket } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
 import { verRedirectPendiente } from '../utils/redirectPendiente'
+import { track } from '../utils/analytics'
 import Footer from '../components/ui/Footer'
 
 // Naranja de la pelota del logo, para destacar
@@ -94,7 +95,7 @@ export default function LoginPage() {
                         </div>
 
                         <div className="mt-8 md:mt-10 max-w-sm md:max-w-md mx-auto md:mx-0">
-                            <BotonesLogin grande />
+                            <BotonesLogin grande seccion="hero" />
                         </div>
                     </div>
 
@@ -151,7 +152,7 @@ export default function LoginPage() {
                 <div className="max-w-md mx-auto text-center card bg-gradient-to-b from-primary/60 to-card py-8 px-6">
                     <h2 className="text-2xl font-black">¿Listo para armar tu equipo?</h2>
                     <p className="text-textMuted text-sm mt-2 mb-6">Es gratis y en 2 minutos estás jugando.</p>
-                    <BotonesLogin />
+                    <BotonesLogin seccion="final" />
                 </div>
             </section>
 
@@ -162,12 +163,18 @@ export default function LoginPage() {
     )
 }
 
-function BotonesLogin({ grande = false }) {
+function BotonesLogin({ grande = false, seccion }) {
+    const medirClick = (metodo) => () => track('login_click', {
+        metodo,
+        seccion,
+        invitado: !!verRedirectPendiente()?.startsWith('/u/'),
+    })
     const tamano = grande ? 'md:py-4 md:text-lg' : ''
     return (
         <div className="space-y-3">
             <a
                 href={import.meta.env.VITE_OAUTH2_GOOGLE_URL}
+                onClick={medirClick('google')}
                 className={`${tamano}
                 flex items-center justify-center gap-3
                 w-full py-3 px-4 rounded-2xl
@@ -182,6 +189,7 @@ function BotonesLogin({ grande = false }) {
 
             <a
                 href={import.meta.env.VITE_OAUTH2_MICROSOFT_URL}
+                onClick={medirClick('microsoft')}
                 className={`${tamano}
                 flex items-center justify-center gap-3
                 w-full py-3 px-4 rounded-2xl

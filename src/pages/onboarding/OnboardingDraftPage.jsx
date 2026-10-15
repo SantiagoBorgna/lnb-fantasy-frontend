@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { consumirRedirectPendiente } from '../../utils/redirectPendiente'
+import { track } from '../../utils/analytics'
 
 const REGLAS = [
     {
@@ -54,7 +55,11 @@ export default function OnboardingDraftPage() {
             </div>
 
             <button
-                onClick={() => navigate(consumirRedirectPendiente() || '/', { replace: true })}
+                onClick={() => {
+                    const destino = consumirRedirectPendiente()
+                    track('tutorial_complete', { invitado: !!destino?.startsWith('/u/') })
+                    navigate(destino || '/', { replace: true })
+                }}
                 className="btn-primary w-full mt-auto"
             >
                 ¡Entendido, a jugar!

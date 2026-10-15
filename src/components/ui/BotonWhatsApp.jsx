@@ -5,12 +5,13 @@ import { linkWhatsApp } from '../../utils/compartir'
  * Botón que abre WhatsApp con un mensaje ya escrito.
  * compacto: versión chica para tarjetas/listas.
  */
-export default function BotonWhatsApp({ texto, children = 'Invitar por WhatsApp', compacto = false, className = '' }) {
+export default function BotonWhatsApp({ texto, children = 'Invitar por WhatsApp', compacto = false, className = '', onClick }) {
     return (
         <a
             href={linkWhatsApp(texto)}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={onClick}
             className={clsx(
                 'flex items-center justify-center gap-2 font-semibold text-white bg-[#25D366] hover:bg-[#1EBE5A] transition-colors active:scale-95',
                 compacto ? 'text-xs rounded-lg px-2 py-1' : 'w-full py-3 rounded-xl',
