@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, lazy, Suspense } from 'react'
 import { getPlantel, guardarPlantel, getEstadisticasJornada, cambiarDt, realizarTransferencia } from '../api/plantelApi'
 import { getJornadaActiva, getJornadas, getPartidosJornada, getJornadaProxima } from '../api/jornadaApi'
 import { getDts } from '../api/dtApi'
@@ -26,8 +26,11 @@ import { AYUDA } from '../components/ui/ayudaContenido'
 import MercadoPanel from '../components/mercado/MercadoPanel'
 import ConfirmarTransferenciaModal from '../components/mercado/ConfirmarTransferenciaModal'
 import ConsejeroModal from '../components/premium/ConsejeroModal'
-import { Crown, X, ChevronRight } from 'lucide-react'
+import { Crown, X, ChevronRight, Share2 } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+
+// Se carga recién al tocar "Compartir": trae react-dom/server para dibujar las camisetas
+const CanchitaCompartirModal = lazy(() => import('../components/compartir/CanchitaCompartirModal'))
 
 export default function CanchitaPage() {
     const navigate = useNavigate()
@@ -61,6 +64,7 @@ export default function CanchitaPage() {
     // ── Switch de jornada (Última Fecha) ─────────────────────────────────────
     const [jornadaAnterior, setJornadaAnterior] = useState(null)
     const [jornadaVista, setJornadaVista] = useState(null)
+    const [datosCompartir, setDatosCompartir] = useState(null)
     const [plantelVista, setPlantelVista] = useState(null)
     const [estadisticas, setEstadisticas] = useState({})
 
@@ -627,8 +631,44 @@ export default function CanchitaPage() {
         puntajeEnVivo = sum
     }
 
+    // Foto de lo que se ve en pantalla para la imagen de "Compartir mi equipo"
+    const abrirCompartir = () => {
+        const conPuntos = modoLectura && Object.keys(estadisticas).length > 0
+        const aDibujo = (j) => {
+            const s = estadisticas[j.jugadorRealId]
+            return {
+                nombre: j.nombreCompleto,
+                numero: j.numeroCamiseta,
+                colorPrincipal: j.colorPrincipal,
+                colorSecundario: j.colorSecundario,
+                modelo: j.modeloCamiseta,
+                rol: j.rol,
+                puntos: s?.jugó ? s.puntajeFantasy * j.multiplicador : null,
+            }
+        }
+        setDatosCompartir({
+            nombreEquipo: plantelActual?.nombreEquipo,
+            jornadaNumero: plantelActual?.jornadaNumero,
+            formacion: plantelActual?.formacion,
+            conPuntos,
+            total: puntajeEnVivo,
+            filas: filas.map(fila => fila.map(aDibujo)),
+            banco: bancoCompleto.map(aDibujo),
+            dt: plantelActual?.dt && {
+                nombreCompleto: plantelActual.dt.nombreCompleto,
+                equipoSigla: plantelActual.dt.equipoSigla,
+                puntos: plantelActual.puntajeDt,
+            },
+        })
+    }
+
     return (
         <div className="max-w-md md:max-w-none mx-auto w-full px-2 lg:px-4 space-y-3 pb-6 min-h-screen pt-4 overflow-x-hidden">
+            {datosCompartir && (
+                <Suspense fallback={null}>
+                    <CanchitaCompartirModal datos={datosCompartir} onCerrar={() => setDatosCompartir(null)} />
+                </Suspense>
+            )}
 
             <div className="flex flex-col md:flex-row gap-4 md:gap-4 lg:gap-8">
                 
@@ -686,9 +726,19 @@ export default function CanchitaPage() {
                         <>
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <h1 className="text-textMain font-bold text-xl truncate max-w-[180px]">
-                                        {plantelActual?.nombreEquipo ?? 'Mi Equipo'}
-                                    </h1>
+                                    <div className="flex items-center gap-2">
+                                        <h1 className="text-textMain font-bold text-xl truncate max-w-[180px]">
+                                            {plantelActual?.nombreEquipo ?? 'Mi Equipo'}
+                                        </h1>
+                                        <button
+                                            onClick={abrirCompartir}
+                                            className="flex items-center gap-1 text-xs font-semibold text-white rounded-lg px-2 py-1
+                                                bg-gradient-to-r from-[#F5862E] to-accent active:scale-95 transition-transform shrink-0"
+                                            aria-label="Compartir mi equipo"
+                                        >
+                                            <Share2 size={13} /> Compartir
+                                        </button>
+                                    </div>
 
                     <div className="flex items-center gap-2 mt-1">
                         {!modoLectura ? (
