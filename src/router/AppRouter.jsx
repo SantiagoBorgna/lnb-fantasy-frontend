@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
+import { guardarRedirectPendiente } from '../utils/redirectPendiente'
 
 import LoginPage from '../pages/LoginPage'
 import AuthCallbackPage from '../pages/AuthCallbackPage'
@@ -31,7 +32,7 @@ function PrivateRoute({ children }) {
 
     if (!token) {
         // Guardamos la URL en la "memoria" antes de patearlo al login
-        localStorage.setItem('redirectUrl', location.pathname + location.search)
+        guardarRedirectPendiente(location.pathname + location.search)
         return <Navigate to="/login" replace />
     }
     return children
@@ -44,10 +45,17 @@ function PrivateRoute({ children }) {
 function OnboardingGuard({ children }) {
     const token = useAuthStore(state => state.token)
     const usuario = useAuthStore(state => state.usuario)
+    const location = useLocation()
 
     if (!token) return <Navigate to="/login" replace />
 
     const estado = usuario?.estadoOnboarding
+
+    // Con sesión pero sin onboarding terminado (ej. abrió un link de invitación):
+    // guardamos a dónde iba para llevarlo ahí al terminar.
+    if ((estado === 'NUEVO' || estado === 'PERFIL_COMPLETO') && location.pathname !== '/') {
+        guardarRedirectPendiente(location.pathname + location.search)
+    }
 
     if (estado === 'NUEVO') return <Navigate to="/onboarding/perfil" replace />
     if (estado === 'PERFIL_COMPLETO') return <Navigate to="/onboarding/canchita" replace />

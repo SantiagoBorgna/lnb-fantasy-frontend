@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { consumirRedirectPendiente } from '../../utils/redirectPendiente'
 
 const REGLAS = [
     {
@@ -53,7 +54,7 @@ export default function OnboardingDraftPage() {
             </div>
 
             <button
-                onClick={() => navigate('/', { replace: true })}
+                onClick={() => navigate(consumirRedirectPendiente() || '/', { replace: true })}
                 className="btn-primary w-full mt-auto"
             >
                 ¡Entendido, a jugar!
