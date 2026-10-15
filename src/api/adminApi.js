@@ -82,6 +82,13 @@ export const recalcularJornadaAdmin = async (jornadaId) => {
     return data;
 };
 
+// Recorre los planteles de GES y carga/actualiza los jugadores (y crea los equipos que falten).
+// El backend lo corre en segundo plano y responde enseguida.
+export const sincronizarJugadoresAdmin = async () => {
+    const { data } = await api.post('/admin/scraper/jugadores/sincronizar');
+    return data;
+};
+
 export const sincronizarFixtureAdmin = async (jornadaId, urlFixture) => {
     const { data } = await api.post('/admin/scraper/fixture/sincronizar', { jornadaId, urlFixture });
     return data;

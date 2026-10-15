@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getConfigLiga } from "../../api/configApi";
-import { correrCronAdmin, recalcularJornadaAdmin, sincronizarFixtureAdmin } from "../../api/adminApi";
+import { correrCronAdmin, recalcularJornadaAdmin, sincronizarFixtureAdmin, sincronizarJugadoresAdmin } from "../../api/adminApi";
 import { getJornadas } from "../../api/jornadaApi";
 import { Play, Loader2 } from "lucide-react";
 import { useUiStore } from "../../store/uiStore";
@@ -51,6 +51,7 @@ const CRONS = [
 
 const RECALCULO_KEY = "recalcular-jornada";
 const FIXTURE_KEY = "sincronizar-fixture";
+const JUGADORES_KEY = "sincronizar-jugadores";
 
 // Las jornadas llegan como "2026-10-12T20:00:00": el día es lo que va antes de la T.
 const diaDeLaJornada = (fechaIso) => (fechaIso ? fechaIso.substring(0, 10) : "");
@@ -122,6 +123,21 @@ export default function AdminUtilidadesPanel() {
         } catch (error) {
             console.error(error);
             showToast(error.response?.data?.mensaje || `Error al sincronizar el fixture de la Jornada ${jornada.numero}`, "error");
+        } finally {
+            setEjecutando(null);
+        }
+    };
+
+    const handleSincronizarJugadores = async () => {
+        if (!window.confirm(`Se van a cargar los jugadores de todos los planteles de la ${configLiga?.ligaNombre ?? "liga"} desde GES. Los que ya están se actualizan, no se duplican. ¿Continuar?`)) return;
+
+        setEjecutando(JUGADORES_KEY);
+        try {
+            await sincronizarJugadoresAdmin();
+            showToast("Sincronización de jugadores iniciada. Tarda unos minutos: después revisalos en la pestaña Jugadores.", "success");
+        } catch (error) {
+            console.error(error);
+            showToast(error.response?.data?.mensaje || "Error al iniciar la sincronización de jugadores", "error");
         } finally {
             setEjecutando(null);
         }
@@ -200,6 +216,29 @@ export default function AdminUtilidadesPanel() {
                             Recalcular
                         </button>
                     </div>
+                </div>
+
+                <div className="bg-surface border border-border rounded-2xl p-5 flex flex-col gap-3 md:col-span-2">
+                    <div>
+                        <h3 className="font-bold text-textMain text-sm">Sincronizar jugadores</h3>
+                        <p className="text-xs text-textMuted mt-1">
+                            Recorre los planteles de todos los equipos en GES y carga los jugadores nuevos (los equipos que
+                            no existen se crean). Los jugadores nuevos quedan sin posición y con valor 5: completá posición,
+                            número y valor antes de abrir el mercado. Corre en segundo plano y tarda unos minutos.
+                        </p>
+                    </div>
+                    <button
+                        onClick={handleSincronizarJugadores}
+                        disabled={ejecutando !== null}
+                        className="mt-auto self-start flex items-center gap-2 bg-primary text-black font-bold text-sm px-4 py-2 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {ejecutando === JUGADORES_KEY ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                            <Play className="w-4 h-4" />
+                        )}
+                        Sincronizar
+                    </button>
                 </div>
 
                 <div className="bg-surface border border-border rounded-2xl p-5 flex flex-col gap-3 md:col-span-2">
