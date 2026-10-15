@@ -4,7 +4,7 @@
 export const linkWhatsApp = (texto) => `https://wa.me/?text=${encodeURIComponent(texto)}`
 
 export const mensajeInvitacionTorneo = (torneo) =>
-    `Sumate a mi liga "${torneo.nombre}" en Sexto Hombre Fantasy, el fantasy de la Liga Nacional 🏀 Es gratis 👉 ${torneo.urlInvitacion}`
+    `Sumate a mi liga "${torneo.nombre}" en Sexto Hombre Fantasy, el fantasy de la Liga Nacional 🏀 Es gratis 👇\n${torneo.urlInvitacion}`
 
 // ¿El navegador puede compartir archivos con el menú nativo? (Android/iOS sí, la mayoría de las compus no)
 export const puedeCompartirArchivos = (archivo) =>
