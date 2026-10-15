@@ -87,3 +87,14 @@ export const sincronizarFixtureAdmin = async (jornadaId, urlFixture) => {
     return data;
 };
 
+
+// ── Comunidad: números de usuarios y notificaciones push ──
+export const getResumenUsuarios = async () => {
+    const { data } = await api.get('/admin/usuarios/resumen');
+    return data;
+};
+
+export const enviarNotificacionAdmin = async ({ titulo, mensaje, url, soloPrueba }) => {
+    const { data } = await api.post('/admin/notificaciones/enviar', { titulo, mensaje, url, soloPrueba });
+    return data;
+};
