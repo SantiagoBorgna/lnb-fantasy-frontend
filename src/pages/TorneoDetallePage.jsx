@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { getTorneo, getTorneoPorCodigo, getTablaTorneo, getFixtureTorneo, salirDeTorneo, unirseTorneo, editarTorneo, expulsarParticipante, eliminarTorneo } from '../api/torneoApi'
 import { getRankingJornada, getRankingJornadaTorneo } from '../api/rankingApi'
@@ -9,6 +9,8 @@ import LoadingSpinner from '../components/ui/LoadingSpinner'
 import JornadaSelector from '../components/ui/JornadaSelector'
 import { createPortal } from 'react-dom'
 import clsx from 'clsx'
+import BotonWhatsApp from '../components/ui/BotonWhatsApp'
+import { mensajeInvitacionTorneo } from '../utils/compartir'
 
 export default function TorneoDetallePage() {
     const { hashId, torneoId: oldTorneoId, codigo } = useParams()
@@ -30,7 +32,10 @@ export default function TorneoDetallePage() {
     const [loading, setLoading] = useState(true)
     const [menuAbierto, setMenuAbierto] = useState(false)
     const [modalSalir, setModalSalir] = useState(false)
-    const [modalInvitar, setModalInvitar] = useState(false)
+    const [searchParams, setSearchParams] = useSearchParams()
+    // Recién creada (viene de TorneosPage con ?invitar=1): arrancamos con el modal de invitar abierto
+    const [ligaRecienCreada, setLigaRecienCreada] = useState(() => searchParams.get('invitar') === '1')
+    const [modalInvitar, setModalInvitar] = useState(ligaRecienCreada)
     const [copiado, setCopiado] = useState(false)
     const [copiadoCodigo, setCopiadoCodigo] = useState(false)
     const [modalAjustes, setModalAjustes] = useState(false)
@@ -244,6 +249,11 @@ export default function TorneoDetallePage() {
         }
     }
 
+    // Sacamos ?invitar=1 de la URL para que no se vuelva a abrir al recargar
+    useEffect(() => {
+        if (searchParams.get('invitar') === '1') setSearchParams({}, { replace: true })
+    }, [searchParams, setSearchParams])
+
     const copiarLink = () => {
         navigator.clipboard.writeText(torneo?.urlInvitacion ?? '')
         setCopiado(true)
@@ -435,6 +445,14 @@ export default function TorneoDetallePage() {
                         )}>
                             {torneo.tipo === 'PRIVADO' ? '🔒 Privado' : '🌐 Público'}
                         </span>
+                        {yaParticipa && (
+                            <button
+                                onClick={() => setModalInvitar(true)}
+                                className="text-xs font-semibold text-[#25D366] border border-[#25D366]/50 rounded-lg px-2 py-0.5 whitespace-nowrap shrink-0 hover:bg-[#25D366]/10 transition-colors"
+                            >
+                                + Invitar amigos
+                            </button>
+                        )}
                         {torneo.modalidad === 'DRAFT' && yaParticipa && (
                             <button
                                 onClick={() => {
@@ -718,16 +736,19 @@ export default function TorneoDetallePage() {
             {modalInvitar && createPortal(
                 <>
                     <div className="fixed inset-0 bg-black/60 z-40"
-                        onClick={() => setModalInvitar(false)} />
+                        onClick={() => { setModalInvitar(false); setLigaRecienCreada(false) }} />
                     <div className="fixed bottom-0 md:top-1/2 md:-translate-y-1/2 md:bottom-auto left-0 right-0 max-w-md mx-auto
                           bg-card border-t border-border rounded-t-3xl md:rounded-3xl
                           z-50 p-6 space-y-4 animate-slide-up md:animate-none"
                         onClick={e => e.stopPropagation()}>
                         <div className="w-10 h-1 bg-border rounded-full mx-auto md:hidden" />
-                        <h3 className="text-textMain font-bold text-lg">Invitar amigos</h3>
+                        <h3 className="text-textMain font-bold text-lg">
+                            {ligaRecienCreada ? '¡Liga creada! Invitá a tus amigos' : 'Invitar amigos'}
+                        </h3>
                         <p className="text-textMuted text-sm">
-                            Compartí este link para que se unan al torneo.
+                            Mandales el link por WhatsApp o copialo para que se unan al torneo.
                         </p>
+                        <BotonWhatsApp texto={mensajeInvitacionTorneo(torneo)} />
                         <div className="bg-surface border border-border rounded-xl
                              px-4 py-3 flex items-center gap-3">
                             <p className="flex-1 text-textMuted text-xs truncate">
@@ -756,7 +777,7 @@ export default function TorneoDetallePage() {
                             </button>
                         </div>
                         <button
-                            onClick={() => setModalInvitar(false)}
+                            onClick={() => { setModalInvitar(false); setLigaRecienCreada(false) }}
                             className="w-full py-2 text-textMuted text-sm"
                         >
                             Cerrar

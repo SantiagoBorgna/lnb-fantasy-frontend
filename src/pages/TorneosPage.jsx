@@ -229,7 +229,7 @@ export default function TorneosPage() {
                         try {
                             const nuevo = await crearTorneo(body)
                             setModalCrear(false)
-                            navigate(`/t/${encodeId(nuevo.id)}`)
+                            navigate(`/t/${encodeId(nuevo.id)}?invitar=1`)
                         } catch (e) {
                             console.error(e)
                             await cargarDatos()
