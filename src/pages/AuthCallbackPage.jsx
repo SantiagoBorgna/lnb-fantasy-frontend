@@ -31,8 +31,13 @@ export default function AuthCallbackPage() {
         // Reset context to global
         setContextoActual(null)
 
+        // Si el efecto se descarta (ej. StrictMode lo corre dos veces en desarrollo),
+        // ignoramos esa respuesta para no consumir dos veces el redirect pendiente
+        let descartado = false
+
         getMe()
             .then(usuario => {
+                if (descartado) return
                 setAuth(token, usuario)
                 queryClient.clear() // Limpiamos la caché de react-query de un usuario anterior
                 
@@ -42,10 +47,13 @@ export default function AuthCallbackPage() {
                 navigate(destino || '/', { replace: true });
             })
             .catch(() => {
+                if (descartado) return
                 // Token inválido o expirado
                 setAuth(null, null)
                 navigate('/login', { replace: true })
             })
+
+        return () => { descartado = true }
     }, [navigate, setAuth, queryClient])
 
     return (
