@@ -46,6 +46,11 @@ export default function PatronEquipo({
                         <rect x="0" y="30" width="100" height="8" fill={colorSecundario} />
                     </g>
                 );
+            case 7:
+                // Banda diagonal desde arriba a la izquierda hacia abajo a la derecha
+                return (
+                    <polygon points="0,0 22,0 100,78 100,100 78,100 0,22" fill={colorSecundario} />
+                );
             default:
                 return null;
         }

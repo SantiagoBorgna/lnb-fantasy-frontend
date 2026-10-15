@@ -2,7 +2,7 @@ import { useId } from 'react';
 import { determinarColorNumero } from './camisetaUtils';
 
 /**
- * Renderiza una camiseta de básquet con el número del jugador y soporte para 5 modelos.
+ * Renderiza una camiseta de básquet con el número del jugador y soporte para 7 modelos.
  * Utiliza clipPath para enmascarar los patrones (rayas/franjas) dentro de la silueta.
  */
 export default function CamisetaSVG({
@@ -77,6 +77,11 @@ export default function CamisetaSVG({
                         <rect x="78" y="0" width="8" height="120" fill={colorSecundario} />
                         <rect x="0" y="36" width="100" height="8" fill={colorSecundario} />
                     </g>
+                );
+            case 7:
+                // Banda diagonal desde el hombro izquierdo hacia abajo a la derecha
+                return (
+                    <polygon points="8,0 28,0 104,120 84,120" fill={colorSecundario} />
                 );
             default:
                 return null;
