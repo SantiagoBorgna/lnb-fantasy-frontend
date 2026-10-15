@@ -1,6 +1,53 @@
 import { useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
+import { Trophy, Users, QrCode, TrendingUp, Crown, Wallet, Ticket } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
+import { verRedirectPendiente } from '../utils/redirectPendiente'
+import Footer from '../components/ui/Footer'
+
+// Naranja de la pelota del logo, para destacar
+const NARANJA = 'text-[#F5862E]'
+
+const PASOS = [
+    {
+        icono: Wallet,
+        titulo: 'Armá tu equipo',
+        texto: 'Tenés 100 créditos para fichar 10 jugadores reales de la Liga Nacional. Máximo 2 por club.',
+    },
+    {
+        icono: Crown,
+        titulo: 'Elegí capitán y sexto hombre',
+        texto: 'El capitán suma x1.5 y el sexto hombre el 75% de sus puntos. Ahí se ganan las jornadas.',
+    },
+    {
+        icono: TrendingUp,
+        titulo: 'Sumá con los partidos reales',
+        texto: 'Puntos, rebotes, asistencias, robos y tapas de cada partido se convierten en puntos para tu equipo.',
+    },
+]
+
+const BENEFICIOS = [
+    {
+        icono: Trophy,
+        titulo: 'Premio todas las jornadas',
+        texto: 'Cada jornada hay premio para el mejor equipo. No hace falta haber arrancado desde el principio.',
+    },
+    {
+        icono: Users,
+        titulo: 'Ligas con amigos',
+        texto: 'Creá tu liga privada y pasales el link. Modo clásico, cara a cara o draft en vivo por turnos.',
+    },
+    {
+        icono: QrCode,
+        titulo: 'Modo Estadio',
+        texto: '¿Vas a la cancha? Escaneá el QR y armá un equipo solo para el partido que estás viendo.',
+    },
+    {
+        icono: TrendingUp,
+        titulo: 'Mercado con precios vivos',
+        texto: 'Los precios suben y bajan según el rendimiento real. Fichá barato antes que los demás.',
+    },
+]
 
 export default function LoginPage() {
     const token = useAuthStore(state => state.token)
@@ -11,64 +58,152 @@ export default function LoginPage() {
         if (token) navigate('/', { replace: true })
     }, [token, navigate])
 
+    // Si llegó desde un link de invitación a un torneo
+    const vieneInvitado = verRedirectPendiente()?.startsWith('/u/')
+
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center
-                    bg-surface px-6">
+        <div className="min-h-screen bg-surface text-textMain">
 
-            {/* Logo / Título */}
-            <div className="mb-12 text-center">
-                <img src="/icons/logo-cuadrado.jpg" alt="Sexto Hombre Fantasy" className="w-40 h-40 md:w-56 md:h-56 mx-auto mb-6 object-cover rounded-[22px] drop-shadow-xl" />
-                <h1 className="text-3xl font-bold text-white tracking-tight">Sexto Hombre Fantasy</h1>
-                <p className="text-textMuted mt-3 text-sm font-medium">
-                    La Liga Nacional de Básquet, a tu manera
-                </p>
-            </div>
+            {/* ── Hero ─────────────────────────────────────────── */}
+            <section className="relative overflow-hidden px-6 pt-10 pb-14 md:pt-16 md:pb-20">
+                <div className="absolute inset-0 bg-gradient-to-b from-primary/40 via-surface to-surface pointer-events-none" />
 
-            {/* Botones de login */}
-            <div className="w-full max-w-sm space-y-3">
+                <div className="relative max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-10 md:gap-16">
+                    <div className="flex-1 text-center md:text-left">
+                        {vieneInvitado && (
+                            <div className="mb-6 inline-flex items-center gap-2 rounded-2xl border border-[#F5862E]/40 bg-[#F5862E]/10 px-4 py-2 text-sm font-semibold">
+                                <Ticket size={18} className={NARANJA} />
+                                Te invitaron a un torneo. Ingresá para sumarte.
+                            </div>
+                        )}
 
-                <a
-                    href={import.meta.env.VITE_OAUTH2_GOOGLE_URL}
-                    className="
-                    flex items-center justify-center gap-3
-                    w-full py-3 px-4 rounded-2xl
-                    bg-white text-gray-800 font-semibold
-                    hover:bg-gray-100 transition-colors
-                    shadow-lg
-                    "
-                >
-                    <GoogleIcon />
-                    Continuar con Google
-                </a>
+                        <img
+                            src="/icons/logo-cuadrado.jpg"
+                            alt="Sexto Hombre Fantasy"
+                            className="w-24 h-24 md:hidden mx-auto mb-6 object-cover rounded-[22px] drop-shadow-xl"
+                        />
 
+                        <p className="text-textMuted text-xs font-bold uppercase tracking-[0.2em] mb-3">
+                            Sexto Hombre Fantasy
+                        </p>
+                        <h1 className="text-4xl md:text-5xl font-black tracking-tight leading-[1.05]">
+                            El fantasy de la <span className={NARANJA}>Liga Nacional</span> de Básquet
+                        </h1>
+                        <p className="text-textMuted mt-4 text-base md:text-lg max-w-md mx-auto md:mx-0">
+                            Armá tu equipo con jugadores reales, sumá puntos con cada partido y competí con tus amigos.
+                        </p>
 
-                <a
-                    href={import.meta.env.VITE_OAUTH2_MICROSOFT_URL}
-                    className="
-                    flex items-center justify-center gap-3
-                    w-full py-3 px-4 rounded-2xl
-                    bg-[#2F2F2F] text-white font-semibold
-                    hover:bg-[#404040] transition-colors
-                    shadow-lg
-                    "
-                >
-                    <MicrosoftIcon />
-                    Continuar con Microsoft
-                </a>
-            </div>
+                        <div className="mt-5 flex flex-wrap justify-center md:justify-start gap-2">
+                            {['Gratis', 'Premio todas las jornadas', 'Ligas con amigos'].map(t => (
+                                <span key={t} className="rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold">
+                                    {t}
+                                </span>
+                            ))}
+                        </div>
 
-            {/* Aviso de T&C */}
-            <div className="mt-8 text-center px-4 max-w-sm">
-                <p className="text-textMuted text-xs">
-                    Al continuar, aceptas nuestros{' '}
-                    <Link to="/terminos" className="text-primary hover:underline font-semibold transition-all">
-                        Términos y Condiciones
-                    </Link>
-                    {' '}y Política de Privacidad.
-                </p>
-            </div>
+                        <div className="mt-8 max-w-sm mx-auto md:mx-0">
+                            <BotonesLogin />
+                        </div>
+                    </div>
 
-        </div >
+                    <img
+                        src="/icons/logo-cuadrado.jpg"
+                        alt=""
+                        className="hidden md:block w-72 h-72 object-cover rounded-[36px] shadow-2xl shadow-black/40"
+                    />
+                </div>
+            </section>
+
+            {/* ── Cómo se juega ────────────────────────────────── */}
+            <section className="px-6 py-12 max-w-5xl mx-auto">
+                <h2 className="text-2xl md:text-3xl font-black text-center mb-8">Cómo se juega</h2>
+                <ol className="grid gap-4 md:grid-cols-3">
+                    {PASOS.map(({ icono: Icono, titulo, texto }, i) => (
+                        <li key={titulo} className="card flex gap-4 md:flex-col">
+                            <div className="flex items-center gap-3 shrink-0">
+                                <span className="w-9 h-9 rounded-full bg-primary flex items-center justify-center font-black">
+                                    {i + 1}
+                                </span>
+                                <Icono size={22} className={`${NARANJA} hidden md:block`} />
+                            </div>
+                            <div>
+                                <p className="font-bold">{titulo}</p>
+                                <p className="text-textMuted text-sm mt-1 leading-relaxed">{texto}</p>
+                            </div>
+                        </li>
+                    ))}
+                </ol>
+            </section>
+
+            {/* ── Por qué jugar ────────────────────────────────── */}
+            <section className="px-6 py-12 max-w-5xl mx-auto">
+                <h2 className="text-2xl md:text-3xl font-black text-center mb-8">Mucho más que armar un quinteto</h2>
+                <div className="grid gap-4 sm:grid-cols-2">
+                    {BENEFICIOS.map(({ icono: Icono, titulo, texto }) => (
+                        <div key={titulo} className="card flex gap-4">
+                            <Icono size={26} className={`${NARANJA} shrink-0 mt-0.5`} />
+                            <div>
+                                <p className="font-bold">{titulo}</p>
+                                <p className="text-textMuted text-sm mt-1 leading-relaxed">{texto}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </section>
+
+            {/* ── CTA final ────────────────────────────────────── */}
+            <section className="px-6 py-14">
+                <div className="max-w-md mx-auto text-center card bg-gradient-to-b from-primary/60 to-card py-8 px-6">
+                    <h2 className="text-2xl font-black">¿Listo para armar tu equipo?</h2>
+                    <p className="text-textMuted text-sm mt-2 mb-6">Es gratis y en 2 minutos estás jugando.</p>
+                    <BotonesLogin />
+                </div>
+            </section>
+
+            <Footer />
+        </div>
+    )
+}
+
+function BotonesLogin() {
+    return (
+        <div className="space-y-3">
+            <a
+                href={import.meta.env.VITE_OAUTH2_GOOGLE_URL}
+                className="
+                flex items-center justify-center gap-3
+                w-full py-3 px-4 rounded-2xl
+                bg-white text-gray-800 font-semibold
+                hover:bg-gray-100 transition-colors
+                shadow-lg
+                "
+            >
+                <GoogleIcon />
+                Continuar con Google
+            </a>
+
+            <a
+                href={import.meta.env.VITE_OAUTH2_MICROSOFT_URL}
+                className="
+                flex items-center justify-center gap-3
+                w-full py-3 px-4 rounded-2xl
+                bg-[#2F2F2F] text-white font-semibold
+                hover:bg-[#404040] transition-colors
+                shadow-lg
+                "
+            >
+                <MicrosoftIcon />
+                Continuar con Microsoft
+            </a>
+
+            <p className="text-textMuted text-xs text-center pt-1">
+                Al continuar, aceptás nuestros{' '}
+                <Link to="/terminos" className="text-textMain hover:underline font-semibold">
+                    Términos y Condiciones
+                </Link>
+                {' '}y Política de Privacidad.
+            </p>
+        </div>
     )
 }
 
