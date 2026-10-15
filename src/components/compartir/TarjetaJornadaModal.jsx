@@ -10,6 +10,12 @@ import { dibujarTarjetaJornada, cargarImagen, cargarFuentes } from './tarjetaJor
 
 const URL_SITIO = 'https://www.sextohombrefantasy.com.ar'
 
+// iPhone/iPad (los iPad nuevos se presentan como Mac con pantalla táctil)
+const esIOS = typeof navigator !== 'undefined' && (
+    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+)
+
 // Arma los datos de la tarjeta a partir de las 3 respuestas del backend
 function armarDatos(resumen, plantel, estadisticas) {
     const puntosPorJugador = new Map(
@@ -36,9 +42,11 @@ function armarDatos(resumen, plantel, estadisticas) {
         posicionGlobal: resumen.posicionGlobal,
         colorClub: resumen.equipoFavoritoColor,
         mvp: mvp && { nombre: mvp.nombre, puntos: mvp.puntos },
-        // Si el capitán fue el MVP no lo repetimos
-        capitan: capitan && capitan.nombre !== mvp?.nombre && capitan.puntos != null
-            ? { nombre: capitan.nombre, puntos: capitan.puntos }
+        // Si el capitán fue el MVP va en una sola fila ("MVP Y CAPITÁN")
+        mvpEsCapitan: !!mvp && mvp.nombre === capitan?.nombre,
+        // El capitán siempre aparece: si no sumó (no jugó o sin estadísticas) va con 0
+        capitan: capitan && capitan.nombre !== mvp?.nombre
+            ? { nombre: capitan.nombre, puntos: capitan.puntos ?? 0 }
             : null,
     }
 }
@@ -147,14 +155,16 @@ export default function TarjetaJornadaModal({ jornadaId, onCerrar }) {
                             className="btn-accent w-full py-3 flex items-center justify-center gap-2 disabled:opacity-60"
                         >
                             {sePuedeCompartir ? <Share2 size={18} /> : <Download size={18} />}
-                            {sePuedeCompartir ? 'Compartir' : 'Descargar imagen'}
+                            {sePuedeCompartir ? 'Compartir' : 'Descargar'}
                         </button>
-                        {sePuedeCompartir && (
+                        {/* En iPhone descargar abre una pantalla del PNG en vez de guardar la foto:
+                            ahí se guarda desde "Compartir" → "Guardar imagen" */}
+                        {sePuedeCompartir && !esIOS && (
                             <button
                                 onClick={() => descargarBlob(imagen.blob, nombreArchivo)}
                                 className="w-full py-2 text-textMuted text-sm flex items-center justify-center gap-2"
                             >
-                                <Download size={16} /> Guardar en el celular
+                                <Download size={16} /> Descargar
                             </button>
                         )}
                     </div>
