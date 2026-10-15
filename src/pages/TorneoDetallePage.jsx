@@ -10,7 +10,8 @@ import JornadaSelector from '../components/ui/JornadaSelector'
 import { createPortal } from 'react-dom'
 import clsx from 'clsx'
 import BotonWhatsApp from '../components/ui/BotonWhatsApp'
-import { mensajeInvitacionTorneo } from '../utils/compartir'
+import { mensajeInvitacionTorneo, linkInvitacion } from '../utils/compartir'
+import { track } from '../utils/analytics'
 
 export default function TorneoDetallePage() {
     const { hashId, torneoId: oldTorneoId, codigo } = useParams()
@@ -35,6 +36,10 @@ export default function TorneoDetallePage() {
     const [searchParams, setSearchParams] = useSearchParams()
     // Recién creada (viene de TorneosPage con ?invitar=1): arrancamos con el modal de invitar abierto
     const [ligaRecienCreada, setLigaRecienCreada] = useState(() => searchParams.get('invitar') === '1')
+    // Para medir cómo llegan a unirse: link de invitación (con UTM), código tipeado o torneo público
+    const viaUnion = codigo
+        ? (searchParams.get('utm_medium') === 'invitacion' ? 'invitacion' : 'codigo')
+        : 'publico'
     const [modalInvitar, setModalInvitar] = useState(ligaRecienCreada)
     const [copiado, setCopiado] = useState(false)
     const [copiadoCodigo, setCopiadoCodigo] = useState(false)
@@ -254,13 +259,17 @@ export default function TorneoDetallePage() {
         if (searchParams.get('invitar') === '1') setSearchParams({}, { replace: true })
     }, [searchParams, setSearchParams])
 
+    const ubicacionInvitar = ligaRecienCreada ? 'liga_nueva' : 'detalle_torneo'
+
     const copiarLink = () => {
-        navigator.clipboard.writeText(torneo?.urlInvitacion ?? '')
+        navigator.clipboard.writeText(torneo ? linkInvitacion(torneo, 'link') : '')
+        track('share', { content_type: 'invitacion_liga', method: 'copiar_link', ubicacion: ubicacionInvitar })
         setCopiado(true)
         setTimeout(() => setCopiado(false), 2500)
     }
 
     const copiarCodigo = () => {
+        track('share', { content_type: 'invitacion_liga', method: 'copiar_codigo', ubicacion: ubicacionInvitar })
         navigator.clipboard.writeText(torneo?.codigoInvitacion || torneo?.codigo || '')
         setCopiadoCodigo(true)
         setTimeout(() => setCopiadoCodigo(false), 2500)
@@ -577,6 +586,7 @@ export default function TorneoDetallePage() {
                             if (!codigo) throw new Error("No se encontró el código del torneo.");
 
                             await unirseTorneo(codigo)
+                            track('join_group', { group_id: String(torneo.id), via: viaUnion, modalidad: torneo.modalidad })
                             navigate(`/t/${encodeId(torneo.id)}`, { replace: true })
                         } catch (e) {
                             setErrorGlobal(e.response?.data?.mensaje ?? e.message ?? 'No se pudo unir al torneo.')
@@ -748,7 +758,10 @@ export default function TorneoDetallePage() {
                         <p className="text-textMuted text-sm">
                             Mandales el link por WhatsApp o copialo para que se unan al torneo.
                         </p>
-                        <BotonWhatsApp texto={mensajeInvitacionTorneo(torneo)} />
+                        <BotonWhatsApp
+                            texto={mensajeInvitacionTorneo(torneo)}
+                            onClick={() => track('share', { content_type: 'invitacion_liga', method: 'whatsapp', ubicacion: ubicacionInvitar })}
+                        />
                         <div className="bg-surface border border-border rounded-xl
                              px-4 py-3 flex items-center gap-3">
                             <p className="flex-1 text-textMuted text-xs truncate">
