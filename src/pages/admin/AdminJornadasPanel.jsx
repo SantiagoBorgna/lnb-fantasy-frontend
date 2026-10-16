@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Plus, Edit2, Trash2 } from 'lucide-react'
+import { Plus, Edit2, Trash2, Users } from 'lucide-react'
 import AdminJornadaModal from './AdminJornadaModal'
+import EquiposQueNoJuegan from './EquiposQueNoJuegan'
 import api from '../../api/axiosClient'
 
 const fetchJornadas = async () => {
@@ -23,6 +24,7 @@ export default function AdminJornadasPanel() {
     const [modalOpen, setModalOpen] = useState(false)
     const [jornadaToEdit, setJornadaToEdit] = useState(null)
     const [jornadaToDelete, setJornadaToDelete] = useState(null)
+    const [jornadaConEquipos, setJornadaConEquipos] = useState(null)
 
     const deleteMutation = useMutation({
         mutationFn: deleteJornada,
@@ -64,7 +66,8 @@ export default function AdminJornadasPanel() {
                         </thead>
                         <tbody>
                             {jornadas?.sort((a, b) => a.numero - b.numero).map((jornada) => (
-                                <tr key={jornada.id} className="border-b border-border hover:bg-card/50 transition-colors">
+                                <Fragment key={jornada.id}>
+                                <tr className="border-b border-border hover:bg-card/50 transition-colors">
                                     <td className="px-6 py-4 font-bold text-white">
                                         Jornada {jornada.numero}
                                     </td>
@@ -86,6 +89,13 @@ export default function AdminJornadasPanel() {
                                     <td className="px-6 py-4 text-right">
                                         <div className="flex items-center justify-end gap-3">
                                             <button
+                                                onClick={() => setJornadaConEquipos(jornadaConEquipos === jornada.id ? null : jornada.id)}
+                                                className={`p-2 transition-colors bg-background rounded-lg ${jornadaConEquipos === jornada.id ? 'text-white' : 'text-textMuted hover:text-white'}`}
+                                                title="Equipos que no juegan"
+                                            >
+                                                <Users size={16} />
+                                            </button>
+                                            <button
                                                 onClick={() => {
                                                     setJornadaToEdit(jornada)
                                                     setModalOpen(true)
@@ -105,6 +115,14 @@ export default function AdminJornadasPanel() {
                                         </div>
                                     </td>
                                 </tr>
+                                {jornadaConEquipos === jornada.id && (
+                                    <tr className="border-b border-border bg-card/40">
+                                        <td colSpan="5" className="px-6 py-4">
+                                            <EquiposQueNoJuegan jornada={jornada} />
+                                        </td>
+                                    </tr>
+                                )}
+                                </Fragment>
                             ))}
                             {jornadas?.length === 0 && (
                                 <tr>
