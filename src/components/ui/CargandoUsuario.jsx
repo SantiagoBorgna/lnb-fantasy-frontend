@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import { getMe } from '../../api/authApi'
@@ -13,8 +14,9 @@ export default function CargandoUsuario() {
         let descartado = false
         getMe()
             .then(usuario => { if (!descartado) setUsuario(usuario) })
-            .catch(() => {
-                if (descartado) return
+            .catch((e) => {
+                // Se cambió de liga mientras tanto: el nuevo CargandoUsuario pide el perfil correcto
+                if (descartado || axios.isCancel(e)) return
                 logoutStore()
                 navigate('/login', { replace: true })
             })

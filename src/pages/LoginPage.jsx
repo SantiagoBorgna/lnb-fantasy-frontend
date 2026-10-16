@@ -13,10 +13,10 @@ import LigaLogo from '../components/liga/LigaLogo'
 // Naranja de la pelota del logo, para destacar
 const NARANJA = 'text-[#F5862E]'
 
-const pasos = (liga) => [
+const PASOS = [
     {
         titulo: 'Armá tu equipo',
-        texto: `Tenés 100 créditos para fichar 10 jugadores reales de la ${liga.nombre}. Máximo 2 por club.`,
+        texto: 'Tenés 100 créditos para fichar 10 jugadores reales de la Liga. Máximo 2 por club.',
     },
     {
         titulo: 'Elegí capitán y sexto hombre',
@@ -85,7 +85,7 @@ export default function LoginPage() {
                             Sexto Hombre Fantasy
                         </p>
                         <h1 className="text-4xl md:text-6xl font-black tracking-tight leading-[1.05]">
-                            El fantasy de la <span className={NARANJA}>{liga.nombre}</span> de Básquet
+                            El fantasy del <span className={NARANJA}>básquet argentino</span>
                         </h1>
                         <p className="text-textMuted mt-4 md:mt-6 text-base md:text-xl max-w-md md:max-w-xl mx-auto md:mx-0">
                             Armá tu equipo con jugadores reales, sumá puntos con cada partido y competí con tus amigos.
@@ -118,7 +118,7 @@ export default function LoginPage() {
                 <h2 className="text-2xl md:text-3xl font-black text-center mb-8">Cómo se juega</h2>
                 <ol className="grid gap-4 md:grid-cols-3">
                     {/* Celular: número a la izquierda de título y texto. PC: número y título en la misma fila, texto abajo */}
-                    {pasos(liga).map(({ titulo, texto }, i) => (
+                    {PASOS.map(({ titulo, texto }, i) => (
                         <li key={titulo} className="card grid grid-cols-[auto_1fr] gap-x-4 md:gap-x-3 md:gap-y-3 items-center">
                             <span className="row-span-2 md:row-span-1 w-9 h-9 rounded-full bg-primary flex items-center justify-center font-black">
                                 {i + 1}
@@ -163,7 +163,7 @@ export default function LoginPage() {
             </section>
 
             <div className="pb-[calc(env(safe-area-inset-bottom)+2rem)] md:pb-0">
-                <Footer />
+                <Footer titulo="Seguinos para enterarte de los premios y las novedades" />
             </div>
         </div>
     )
