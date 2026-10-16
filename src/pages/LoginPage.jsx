@@ -76,9 +76,9 @@ export default function LoginPage() {
                         )}
 
                         <img
-                            src="/icons/logo-cuadrado.jpg"
+                            src="/icons/logo-sin-fondo.png"
                             alt="Sexto Hombre Fantasy"
-                            className="w-36 h-36 md:hidden mx-auto mb-8 object-cover rounded-[28px] drop-shadow-xl"
+                            className="w-36 h-36 md:hidden mx-auto mb-8 object-contain drop-shadow-xl"
                         />
 
                         <p className="text-textMuted text-xs md:text-sm font-bold uppercase tracking-[0.2em] mb-3 md:mb-4">
@@ -106,9 +106,9 @@ export default function LoginPage() {
                     </div>
 
                     <img
-                        src="/icons/logo-cuadrado.jpg"
+                        src="/icons/logo-sin-fondo.png"
                         alt=""
-                        className="hidden md:block w-80 h-80 lg:w-96 lg:h-96 object-cover rounded-[40px] shadow-2xl shadow-black/40"
+                        className="hidden md:block w-80 h-80 lg:w-96 lg:h-96 object-contain drop-shadow-2xl"
                     />
                 </div>
             </section>
