@@ -19,7 +19,7 @@ const SponsorsBanner = ({ className = '' }) => {
                             src={s.logoUrl}
                             alt={s.name}
                             title={s.name}
-                            className="h-14 md:h-16 rounded-lg object-contain transition-transform hover:scale-105"
+                            className="h-14 md:h-16 object-contain transition-transform hover:scale-105"
                         />
                     );
                     return s.url ? (
