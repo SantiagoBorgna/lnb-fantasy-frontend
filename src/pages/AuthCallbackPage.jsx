@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { getMe } from '../api/authApi'
@@ -60,8 +61,8 @@ export default function AuthCallbackPage() {
                 const destino = usuario?.estadoOnboarding === 'ACTIVO' ? consumirRedirectPendiente() : null
                 navigate(destino || '/', { replace: true });
             })
-            .catch(() => {
-                if (descartado) return
+            .catch((e) => {
+                if (descartado || axios.isCancel(e)) return
                 // Token inválido o expirado
                 setAuth(null, null)
                 navigate('/login', { replace: true })

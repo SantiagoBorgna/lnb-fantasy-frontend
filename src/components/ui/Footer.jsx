@@ -1,6 +1,7 @@
-export default function Footer() {
+export default function Footer({ titulo }) {
     return (
         <footer className="w-full mt-4 py-2 border-t border-border flex flex-col items-center justify-center gap-2 text-textMuted">
+            {titulo && <p className="text-sm font-semibold text-textMain text-center px-4 pt-2">{titulo}</p>}
             <div className="flex items-center gap-6">
                 <a
                     href="https://www.instagram.com/sexto.hombre.fantasy"

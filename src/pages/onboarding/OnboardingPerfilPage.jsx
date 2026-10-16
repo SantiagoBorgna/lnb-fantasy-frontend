@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useLigaActual } from '../../store/ligaStore'
+import AvisoOtraLiga from '../../components/liga/AvisoOtraLiga'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import { getEquiposParaOnboarding, completarPerfil } from '../../api/authApi'
@@ -74,9 +75,10 @@ export default function OnboardingPerfilPage() {
             <h1 className="text-textMain font-black text-2xl mb-1">
                 ¡Bienvenido/a, {usuario?.nombreDisplay?.split(' ')[0]}!
             </h1>
-            <p className="text-textMuted text-sm mb-8">
+            <p className="text-textMuted text-sm mb-4">
                 Configurá tu perfil para arrancar.
             </p>
+            <AvisoOtraLiga className="mb-6" />
 
             {/* Nombre del equipo */}
             <div className="space-y-2 mb-6">

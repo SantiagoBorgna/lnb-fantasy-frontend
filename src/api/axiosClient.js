@@ -15,7 +15,12 @@ const axiosClient = axios.create({
 // ── Interceptor de request: inyecta el JWT en cada llamada ──────────────────
 axiosClient.interceptors.request.use(
     (config) => {
-        config.baseURL ??= ligaActual().apiUrl
+        if (!config.baseURL) {
+            const liga = ligaActual()
+            config.baseURL = liga.apiUrl
+            // Para descartar la respuesta si mientras viaja se cambia de liga (ver abajo)
+            config.ligaDelPedido = liga.id
+        }
 
         // Leemos el token directamente del store de Zustand
         // sin necesidad de pasar props — acceso global
@@ -30,9 +35,16 @@ axiosClient.interceptors.request.use(
 )
 
 // ── Interceptor de response: manejo global de errores ───────────────────────
+// Una respuesta que llega después de cambiar de liga es de la liga anterior: si se usara,
+// pisaría datos de la liga actual (ej. el perfil, que en la otra liga puede estar sin onboarding)
+const esDeOtraLiga = (config) => !!config?.ligaDelPedido && config.ligaDelPedido !== ligaActual().id
+const respuestaDescartada = () => new axios.CanceledError('Respuesta de otra liga: se descarta')
+
 axiosClient.interceptors.response.use(
-    (response) => response,
+    (response) => esDeOtraLiga(response.config) ? Promise.reject(respuestaDescartada()) : response,
     (error) => {
+        if (esDeOtraLiga(error.config)) return Promise.reject(respuestaDescartada())
+
         if (error.response?.status === 401) {
             // Token expirado o inválido — limpiar sesión y redirigir al login
             useAuthStore.getState().logout()
