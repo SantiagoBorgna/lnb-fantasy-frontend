@@ -20,7 +20,7 @@ import { AYUDA } from '../components/ui/ayudaContenido'
 import DashboardClasicoGlobal from '../components/dashboard/DashboardClasicoGlobal'
 import DashboardDraftClasico from '../components/dashboard/DashboardDraftClasico'
 import DashboardDraftH2H from '../components/dashboard/DashboardDraftH2H'
-// import SponsorsBanner from '../components/ui/SponsorsBanner' // oculto temporalmente
+import SponsorsBanner from '../components/ui/SponsorsBanner'
 
 export default function DashboardPage() {
     const usuario = useAuthStore(state => state.usuario)
@@ -118,11 +118,10 @@ export default function DashboardPage() {
 
     return (
         <div className="space-y-4">
-            {/* Banner Sponsors: Móvil (Arriba del perfil) — oculto temporalmente
+            {/* Banner Sponsors: Móvil (Arriba del perfil) */}
             <div className="md:hidden">
                 <SponsorsBanner />
             </div>
-            */}
 
             {/* ── Header ── */}
             <div className="flex items-center gap-3 !mt-0 md:!mt-2 cursor-pointer md:hover:opacity-80" onClick={() => setModalPerfilAbierto(true)}>
@@ -216,11 +215,10 @@ export default function DashboardPage() {
                 />
             )}
 
-            {/* Banner Sponsors: PC (Al fondo del dashboard) — oculto temporalmente
+            {/* Banner Sponsors: PC (Al fondo del dashboard) */}
             <div className="hidden md:block">
                 <SponsorsBanner />
             </div>
-            */}
 
             <ModalAyuda
                 pagina="dashboard"
