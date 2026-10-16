@@ -30,7 +30,7 @@ export default function PremiumSuccess() {
             </div>
             <h1 className="text-3xl font-bold mb-4 text-textMain">¡Felicidades, sos Premium!</h1>
             <p className="text-textMuted max-w-md mx-auto mb-8">
-                El pago se procesó correctamente. Ya tenés acceso al Analista LNB, transferencias ilimitadas y mucho más.
+                El pago se procesó correctamente. Ya tenés acceso al Analista Consejero, transferencias ilimitadas y mucho más.
             </p>
             <button 
                 onClick={() => navigate('/canchita')}

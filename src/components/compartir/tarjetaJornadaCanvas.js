@@ -2,7 +2,7 @@
 // en WhatsApp / Instagram. Separado del modal para poder probarlo solo.
 import {
     ANCHO, NARANJA, BLANCO, GRIS, fuente, formatoPuntos, textoAjustado, caja,
-    iniciarLienzo, dibujarLogo, dibujarPie,
+    iniciarLienzo, dibujarLogo, dibujarLogoLiga, dibujarPie,
 } from './canvasUtils'
 
 /**
@@ -11,7 +11,7 @@ import {
  *   totalParticipantesFecha, posicionGlobal, colorClub, mvp {nombre, puntos}, capitan {nombre, puntos}
  * @param {HTMLImageElement} logo
  */
-export function dibujarTarjetaJornada(canvas, d, logo) {
+export function dibujarTarjetaJornada(canvas, d, logo, logoLiga) {
     // Fondo con brillo del color del club favorito
     const ctx = iniciarLienzo(canvas, d.colorClub)
     const cx = ANCHO / 2
@@ -19,6 +19,7 @@ export function dibujarTarjetaJornada(canvas, d, logo) {
     // ── Logo y marca ──
     const L = 260
     dibujarLogo(ctx, logo, cx - L / 2, 90, L, 60)
+    dibujarLogoLiga(ctx, logoLiga, ANCHO - 60, 60, 80)
     ctx.fillStyle = GRIS
     ctx.font = fuente(34)
     ctx.letterSpacing = '8px'

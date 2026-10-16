@@ -32,17 +32,27 @@ brillo.addColorStop(1, 'rgba(19, 36, 66, 0)')
 ctx.fillStyle = brillo
 ctx.fillRect(0, 0, W, H)
 
-// Logo a la derecha
+// Logo a la derecha, con los logos de las ligas abajo
 const logo = await loadImage('public/icons/logo-cuadrado.jpg')
-const L = 430
+const L = 360
 const lx = W - L - 70
-const ly = (H - L) / 2
+const ly = 50
 ctx.save()
 ctx.beginPath()
 ctx.roundRect(lx, ly, L, L, 48)
 ctx.clip()
 ctx.drawImage(logo, lx, ly, L, L)
 ctx.restore()
+
+const ligas = await Promise.all(['public/ligas/liga-nacional.png', 'public/ligas/liga-argentina.png'].map(f => loadImage(f)))
+const altoLiga = 78
+const separacion = 40
+const anchos = ligas.map(img => img.width * altoLiga / img.height)
+let ligaX = lx + L / 2 - (anchos[0] + separacion + anchos[1]) / 2
+ligas.forEach((img, i) => {
+    ctx.drawImage(img, ligaX, ly + L + 40, anchos[i], altoLiga)
+    ligaX += anchos[i] + separacion
+})
 
 // Textos a la izquierda
 const x = 80
@@ -54,11 +64,11 @@ ctx.fillText('SEXTO HOMBRE FANTASY', x, 150)
 
 ctx.fillStyle = BLANCO
 ctx.font = fuente(900, 72)
-ctx.fillText('El fantasy de la', x, 245)
+ctx.fillText('El fantasy del', x, 245)
 ctx.fillStyle = NARANJA
-ctx.fillText('Liga Nacional', x, 325)
+ctx.fillText('básquet', x, 325)
 ctx.fillStyle = BLANCO
-ctx.fillText('de Básquet', x, 405)
+ctx.fillText('argentino', x, 405)
 
 // Píldoras
 let px = x

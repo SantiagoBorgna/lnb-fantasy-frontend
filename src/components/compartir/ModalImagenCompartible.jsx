@@ -5,6 +5,7 @@ import { useUiStore } from '../../store/uiStore'
 import { compartirImagen, puedeCompartirArchivos, descargarBlob } from '../../utils/compartir'
 import { track } from '../../utils/analytics'
 import { cargarImagen, cargarFuentes } from './canvasUtils'
+import { ligaActual } from '../../store/ligaStore'
 
 // iPhone/iPad (los iPad nuevos se presentan como Mac con pantalla táctil)
 const esIOS = typeof navigator !== 'undefined' && (
@@ -17,7 +18,7 @@ const esIOS = typeof navigator !== 'undefined' && (
  * Lo usan la tarjeta de la jornada y la canchita.
  *
  * - datos: lo que necesita `dibujar`; mientras sea null no se dibuja (cargando o sin datos).
- * - dibujar: async (canvas, datos, logo) => void
+ * - dibujar: async (canvas, datos, logo, logoLiga) => void
  * - contentType: para el evento `share` de GA (ej. 'tarjeta_jornada', 'canchita').
  */
 export default function ModalImagenCompartible({
@@ -36,10 +37,13 @@ export default function ModalImagenCompartible({
 
         ;(async () => {
             await cargarFuentes()
-            const logo = await cargarImagen('/icons/logo-cuadrado.jpg')
+            const [logo, logoLiga] = await Promise.all([
+                cargarImagen('/icons/logo-cuadrado.jpg'),
+                cargarImagen(ligaActual().logo),
+            ])
             if (cancelado) return
             const canvas = canvasRef.current
-            await dibujar(canvas, datos, logo)
+            await dibujar(canvas, datos, logo, logoLiga)
             if (cancelado) return
             canvas.toBlob(blob => {
                 if (cancelado || !blob) return

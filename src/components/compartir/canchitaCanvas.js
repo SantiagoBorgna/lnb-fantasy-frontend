@@ -6,7 +6,7 @@ import CamisetaSVG from '../jugador/CamisetaSVG'
 import { determinarColorNumero } from '../jugador/camisetaUtils'
 import {
     ANCHO, NARANJA, BLANCO, GRIS, fuente, formatoPuntos, textoAjustado, caja,
-    iniciarLienzo, dibujarLogo, dibujarPie, cargarImagen,
+    iniciarLienzo, dibujarLogo, dibujarLogoLiga, dibujarPie, cargarImagen,
 } from './canvasUtils'
 
 // Cancha: mismo piso de madera y líneas que la canchita de la app (aro abajo)
@@ -202,18 +202,19 @@ async function dibujarJugador(ctx, j, cx, top, { ancho, conPuntos, tamTexto, anc
  *   filas [[jugador]], banco [jugador], dt { nombreCompleto, equipoSigla, puntos }
  *   jugador: { nombre, numero, colorPrincipal, colorSecundario, modelo, rol, puntos }
  */
-export async function dibujarCanchita(canvas, d, logo) {
+export async function dibujarCanchita(canvas, d, logo, logoLiga) {
     const ctx = iniciarLienzo(canvas, null)
 
     // ── Encabezado: logo + equipo ──
     dibujarLogo(ctx, logo, 70, 60, 150, 36)
+    const anchoLiga = dibujarLogoLiga(ctx, logoLiga, ANCHO - 70, 62, 64)
     ctx.textAlign = 'left'
     ctx.fillStyle = NARANJA
     ctx.font = fuente(34, 700)
     const etiquetaJornada = d.jornadaNumero ? `JORNADA ${d.jornadaNumero}` : ''
     ctx.fillText(d.conPuntos ? etiquetaJornada : ['MI EQUIPO', etiquetaJornada].filter(Boolean).join(' · '), 250, 100)
     ctx.fillStyle = BLANCO
-    textoAjustado(ctx, d.nombreEquipo || 'Mi equipo', 250, 168, ANCHO - 250 - 70, 60, 700, 40)
+    textoAjustado(ctx, d.nombreEquipo || 'Mi equipo', 250, 168, ANCHO - 250 - 70 - (anchoLiga ? anchoLiga + 24 : 0), 60, 700, 40)
     if (d.conPuntos) {
         ctx.fillStyle = BLANCO
         ctx.font = fuente(46, 700)

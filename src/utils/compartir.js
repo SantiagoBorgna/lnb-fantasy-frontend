@@ -23,9 +23,10 @@ export const conUtm = (url, { source, medium, campaign }) => {
 export const linkInvitacion = (torneo, source) =>
     conUtm(torneo.urlInvitacion ?? '', { source, medium: 'invitacion', campaign: 'liga' })
 
-// Link al sitio para las imágenes que se comparten (tarjeta de jornada, canchita)
+// Link al sitio para las imágenes que se comparten (tarjeta de jornada, canchita).
+// Lleva la liga para que quien lo abra caiga en la misma liga
 export const linkSitioCompartido = (contenido) =>
-    conUtm(URL_SITIO, { source: 'compartir', medium: contenido })
+    conUtm(`${URL_SITIO}?liga=${ligaActual().id}`, { source: 'compartir', medium: contenido })
 
 // Celular/tablet (los iPad nuevos se presentan como Mac con pantalla táctil)
 const esCelular = () => typeof navigator !== 'undefined' && (
