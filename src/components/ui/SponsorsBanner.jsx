@@ -3,7 +3,7 @@ import React from 'react';
 // Para agregar un sponsor: subir el logo a public/sponsors/ y sumar una entrada acá.
 // `url` es opcional: si está, el logo linkea a la web/redes del sponsor.
 const sponsors = [
-    { id: 'balon-al-aire', name: 'Balón al Aire', logoUrl: '/sponsors/balon-al-aire.jpg', url: null },
+    { id: 'balon-al-aire', name: 'Balón al Aire', logoUrl: '/sponsors/balon-al-aire.png', url: null },
 ];
 
 const SponsorsBanner = ({ className = '' }) => {
