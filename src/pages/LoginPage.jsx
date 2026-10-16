@@ -189,13 +189,13 @@ function SelectorLiga({ ligaId }) {
                             type="button"
                             onClick={() => elegir(l.id)}
                             aria-pressed={elegida}
-                            className={`flex flex-col items-center gap-2 rounded-2xl border-2 px-3 py-4 transition-colors ${
+                            className={`flex flex-col items-center gap-3 rounded-2xl border-2 px-3 py-4 transition-colors ${
                                 elegida
                                     ? 'border-[#F5862E] bg-[#F5862E]/10'
                                     : 'border-border bg-card hover:border-textMuted'
                             }`}
                         >
-                            <LigaLogo liga={l} className="w-14 h-14 md:w-16 md:h-16" textoIniciales="text-base" />
+                            <LigaLogo liga={l} className="h-12 md:h-14 max-w-full" />
                             <span className={`text-sm md:text-base font-bold leading-tight ${elegida ? '' : 'text-textMuted'}`}>
                                 {l.nombre}
                             </span>

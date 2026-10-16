@@ -8,8 +8,7 @@ const TODAS = [
         id: 'liga-nacional',
         nombre: 'Liga Nacional',
         nombreCompleto: 'Liga Nacional de Básquet',
-        etiqueta: 'LNB',      // chip del encabezado
-        iniciales: 'LNB',     // si no está el logo
+        sigla: 'LNB',
         deLaLiga: 'de la LNB', // "jugadores de la LNB"
         logo: '/ligas/liga-nacional.png',
         apiUrl: import.meta.env.VITE_API_URL,
@@ -18,8 +17,7 @@ const TODAS = [
         id: 'liga-argentina',
         nombre: 'Liga Argentina',
         nombreCompleto: 'Liga Argentina de Básquet',
-        etiqueta: 'Liga Arg.',
-        iniciales: 'LA',
+        sigla: 'LAB',
         deLaLiga: 'de la Liga Argentina',
         logo: '/ligas/liga-argentina.png',
         apiUrl: import.meta.env.VITE_API_URL_LIGA_ARGENTINA,

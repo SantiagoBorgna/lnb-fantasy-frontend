@@ -39,10 +39,9 @@ export default function LigaSwitcher() {
             <button
                 onClick={() => setAbierto(!abierto)}
                 aria-label={`Liga: ${liga.nombre}. Cambiar de liga`}
-                className="flex items-center gap-1.5 pl-1.5 pr-2 py-1 rounded-xl border border-border bg-surface text-textMain text-sm font-semibold"
+                className="flex items-center gap-1.5 pl-2 pr-1.5 py-1.5 rounded-xl border border-border bg-surface text-textMain text-sm font-semibold"
             >
-                <LigaLogo liga={liga} className="w-6 h-6" />
-                <span className="max-w-[90px] truncate">{liga.etiqueta}</span>
+                <LigaLogo liga={liga} className="h-6" />
                 <svg className={clsx('w-4 h-4 transition-transform', abierto && 'rotate-180')} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
@@ -59,7 +58,7 @@ export default function LigaSwitcher() {
                                 l.id === liga.id ? 'text-accent' : 'text-textMain'
                             )}
                         >
-                            <LigaLogo liga={l} className="w-7 h-7" textoIniciales="text-[10px]" />
+                            <span className="w-12 flex justify-center"><LigaLogo liga={l} className="h-6" /></span>
                             {l.nombre}
                         </button>
                     ))}
