@@ -85,6 +85,14 @@ export function dibujarLogo(ctx, logo, x, y, lado, radio) {
     ctx.restore()
 }
 
+// Logo de la liga (apaisado) con el borde derecho en xDerecha. Devuelve el ancho que ocupó
+export function dibujarLogoLiga(ctx, logoLiga, xDerecha, y, alto) {
+    if (!logoLiga) return 0
+    const ancho = logoLiga.width * alto / logoLiga.height
+    ctx.drawImage(logoLiga, xDerecha - ancho, y, ancho, alto)
+    return ancho
+}
+
 // Cierre común: invitación a jugar + URL
 export function dibujarPie(ctx) {
     const cx = ANCHO / 2

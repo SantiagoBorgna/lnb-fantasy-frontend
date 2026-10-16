@@ -1,7 +1,7 @@
 {
     "name": "Sexto Hombre Fantasy",
     "short_name": "Sexto Hombre",
-    "description": "La Liga Nacional de Básquet, a tu manera",
+    "description": "El básquet argentino, a tu manera",
     "start_url": "/",
     "display": "standalone",
     "orientation": "portrait",
@@ -26,7 +26,7 @@
             "src": "/screenshots/dashboard.png",
             "sizes": "390x844",
             "type": "image/png",
-            "label": "Dashboard de LNB Fantasy"
+            "label": "Dashboard de Sexto Hombre Fantasy"
         }
     ],
     "categories": [

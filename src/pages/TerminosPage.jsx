@@ -37,7 +37,7 @@ export default function TerminosPage() {
 
                         <h2 className="text-lg font-bold text-accent mt-6">2. Propiedad Intelectual y Exención de Asociación</h2>
                         <p>
-                            Sexto Hombre Fantasy es un proyecto independiente. <strong>No estamos afiliados, asociados, autorizados, respaldados ni conectados oficialmente de ninguna manera con la Liga Nacional de Básquet (LNB), la Asociación de Clubes (AdC)</strong>, ni con ninguno de sus clubes miembros.
+                            Sexto Hombre Fantasy es un proyecto independiente. <strong>No estamos afiliados, asociados, autorizados, respaldados ni conectados oficialmente de ninguna manera con la Liga Nacional de Básquet (LNB), la Liga Argentina de Básquet, la Asociación de Clubes (AdC)</strong>, ni con ninguno de sus clubes miembros.
                         </p>
                         <p>
                             Los nombres de los equipos y jugadores reales se utilizan de manera nominal y descriptiva con el único fin de reflejar datos estadísticos de dominio público. Todos los nombres, marcas registradas y logos de terceros pertenecen a sus respectivos dueños.
