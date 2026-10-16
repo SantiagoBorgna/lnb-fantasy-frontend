@@ -21,6 +21,7 @@ import TorneoDetallePage from '../pages/TorneoDetallePage'
 import CanchitaAjenaPage from '../pages/CanchitaAjenaPage'
 import SalaDraftPage from '../pages/SalaDraftPage'
 import TerminosPage from '../pages/TerminosPage'
+import ArrepentimientoPage from '../pages/ArrepentimientoPage'
 import RedirectTorneo from '../components/ui/RedirectTorneo'
 import AdminPage from '../pages/admin/AdminPage'
 import ShowdownPage from '../pages/showdown/ShowdownPage'
@@ -76,6 +77,7 @@ export default function AppRouter() {
             <BrowserRouter>
                 <Routes>
                     <Route path="/terminos" element={<TerminosPage />} />
+                    <Route path="/arrepentimiento" element={<ArrepentimientoPage />} />
                     <Route path="*" element={<PreLaunchPage />} />
                 </Routes>
             </BrowserRouter>
@@ -87,6 +89,7 @@ export default function AppRouter() {
             <BrowserRouter>
                 <Routes>
                     <Route path="/terminos" element={<TerminosPage />} />
+                    <Route path="/arrepentimiento" element={<ArrepentimientoPage />} />
                     <Route path="*" element={<MaintenancePage />} />
                 </Routes>
             </BrowserRouter>
@@ -102,6 +105,7 @@ export default function AppRouter() {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/auth/callback" element={<AuthCallbackPage />} />
                 <Route path="/terminos" element={<TerminosPage />} />
+                <Route path="/arrepentimiento" element={<ArrepentimientoPage />} />
 
                 {/* ── Onboarding ─────────────────────────────────────────── */}
                 <Route path="/onboarding/perfil" element={

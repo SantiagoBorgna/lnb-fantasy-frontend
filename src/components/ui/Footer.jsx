@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 export default function Footer({ titulo }) {
     return (
         <footer className="w-full mt-4 py-2 border-t border-border flex flex-col items-center justify-center gap-2 text-textMuted">
@@ -47,6 +49,9 @@ export default function Footer({ titulo }) {
                     </svg>
                 </a>
             </div>
+            <Link to="/arrepentimiento" className="text-[11px] md:text-xs font-semibold underline underline-offset-2 hover:text-textMain">
+                Botón de arrepentimiento
+            </Link>
             <p className="text-[10px] md:text-xs font-medium text-center px-2">
                 &copy; {new Date().getFullYear()} Sexto Hombre Fantasy. Todos los derechos reservados.
             </p>

@@ -4,6 +4,7 @@ import { Loader2, Send, BellRing, RefreshCw } from "lucide-react";
 import { getResumenUsuarios, enviarNotificacionAdmin } from "../../api/adminApi";
 import { useUiStore } from "../../store/uiStore";
 import ConfirmModal from "../../components/ui/ConfirmModal";
+import AdminArrepentimientos from "./AdminArrepentimientos";
 
 const MAX_TITULO = 60;
 const MAX_MENSAJE = 200;
@@ -164,6 +165,8 @@ export default function AdminComunidadPanel() {
                     </button>
                 </div>
             </section>
+
+            <AdminArrepentimientos />
 
             <ConfirmModal
                 isOpen={confirmar}

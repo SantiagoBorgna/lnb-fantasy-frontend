@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function TerminosPage() {
     const navigate = useNavigate();
@@ -81,7 +81,7 @@ export default function TerminosPage() {
                             <li>Cuesta $5.000 (pesos argentinos) por mes y se cobra a través de Mercado Pago. El precio puede cambiar; si cambia, lo avisaremos antes del siguiente cobro.</li>
                             <li>Se renueva automáticamente cada mes hasta que la canceles.</li>
                             <li>Podés cancelarla en cualquier momento dando de baja la suscripción desde tu cuenta de Mercado Pago. Al cancelarla no se hacen nuevos cobros y mantenés los beneficios hasta el final del período ya pagado.</li>
-                            <li>No se reintegran los períodos ya pagados. Esto no afecta tu derecho a revocar la contratación dentro de los 10 días corridos de haberla hecho (Ley 24.240 de Defensa del Consumidor), escribiéndonos al correo de contacto.</li>
+                            <li>No se reintegran los períodos ya pagados. Esto no afecta tu derecho a revocar la contratación dentro de los 10 días corridos de haberla hecho (Ley 24.240 de Defensa del Consumidor) desde el <Link to="/arrepentimiento" className="underline text-textMain">Botón de arrepentimiento</Link>, que está al pie de todas las páginas.</li>
                         </ul>
                     </div>
 
