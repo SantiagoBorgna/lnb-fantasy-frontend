@@ -23,7 +23,7 @@ export default function TerminosPage() {
 
                 <div className="bg-card border border-border rounded-2xl p-6 md:p-8 space-y-6">
                     <h1 className="text-2xl font-black text-textMain">Términos y Condiciones</h1>
-                    <p className="text-textMuted text-sm">Última actualización: Septiembre 2026</p>
+                    <p className="text-textMuted text-sm">Última actualización: Octubre 2026</p>
 
                     <div className="space-y-4 text-textMain text-sm leading-relaxed">
                         <p>
@@ -32,7 +32,7 @@ export default function TerminosPage() {
 
                         <h2 className="text-lg font-bold text-accent mt-6">1. Naturaleza del Servicio</h2>
                         <p>
-                            La Aplicación es un juego de fantasía deportivo ("Fantasy Sports") no oficial, de carácter lúdico y de entretenimiento, basado en los rendimientos estadísticos reales de jugadores de básquet. <strong>La Aplicación NO es una plataforma de apuestas.</strong> No se exige dinero real para participar, ni se entregan premios en dinero real por parte de los desarrolladores derivados del rendimiento en el juego.
+                            La Aplicación es un juego de fantasía deportivo ("Fantasy Sports") no oficial, de carácter lúdico y de entretenimiento, basado en los rendimientos estadísticos reales de jugadores de básquet. <strong>La Aplicación NO es una plataforma de apuestas.</strong> Participar es gratuito y no requiere ninguna compra. Los premios que se entregan se rigen por la sección 5.
                         </p>
 
                         <h2 className="text-lg font-bold text-accent mt-6">2. Propiedad Intelectual y Exención de Asociación</h2>
@@ -60,6 +60,29 @@ export default function TerminosPage() {
                             <li>No garantizamos que la plataforma esté libre de errores, demoras o interrupciones.</li>
                             <li>Los puntajes y estadísticas proporcionados en el juego se consideran finales una vez procesados, pero nos reservamos el derecho de corregir errores estadísticos evidentes si fuera necesario, sin que esto genere derecho a reclamo por parte de los usuarios.</li>
                         </ul>
+
+                        <h2 className="text-lg font-bold text-accent mt-6">5. Premios</h2>
+                        <p>
+                            Los premios son aportados por los organizadores de Sexto Hombre Fantasy y por sus sponsors, y pueden consistir en dinero o en productos. Los premios vigentes se anuncian en la Aplicación y en nuestras redes sociales. Por el momento, solo hay premios en el juego de la Liga Nacional.
+                        </p>
+                        <ul className="list-disc pl-5 space-y-2 text-textMuted">
+                            <li>En cada jornada ganan: el usuario con más puntos en esa jornada y el usuario que encabeza la tabla general al cierre de esa jornada.</li>
+                            <li>Si hay empate en el primer puesto, el ganador se define por sorteo entre los empatados.</li>
+                            <li>Los ganadores se publican en nuestras redes sociales y se les avisa por el correo electrónico asociado a su cuenta. El ganador tiene 15 días corridos desde el aviso para responder y coordinar la entrega; si no lo hace, pierde el premio.</li>
+                            <li>Los premios son personales e intransferibles, y los premios en productos no se pueden cambiar por dinero.</li>
+                            <li>Podemos pedir datos para verificar la identidad del ganador y descalificar a quien haya incumplido estos términos (por ejemplo, por usar más de una cuenta).</li>
+                        </ul>
+
+                        <h2 className="text-lg font-bold text-accent mt-6">6. Suscripción Premium</h2>
+                        <p>
+                            La suscripción Premium es opcional y da acceso a funciones adicionales dentro de la Aplicación. Es una sola suscripción para todas las ligas.
+                        </p>
+                        <ul className="list-disc pl-5 space-y-2 text-textMuted">
+                            <li>Cuesta $5.000 (pesos argentinos) por mes y se cobra a través de Mercado Pago. El precio puede cambiar; si cambia, lo avisaremos antes del siguiente cobro.</li>
+                            <li>Se renueva automáticamente cada mes hasta que la canceles.</li>
+                            <li>Podés cancelarla en cualquier momento dando de baja la suscripción desde tu cuenta de Mercado Pago. Al cancelarla no se hacen nuevos cobros y mantenés los beneficios hasta el final del período ya pagado.</li>
+                            <li>No se reintegran los períodos ya pagados. Esto no afecta tu derecho a revocar la contratación dentro de los 10 días corridos de haberla hecho (Ley 24.240 de Defensa del Consumidor), escribiéndonos al correo de contacto.</li>
+                        </ul>
                     </div>
 
                     <hr className="border-border my-8" />
@@ -74,6 +97,9 @@ export default function TerminosPage() {
                             <li>Nombre de usuario y nombre del equipo virtual que usted crea dentro de la Aplicación.</li>
                             <li>Datos de uso y navegación dentro de la Aplicación (estadísticas de juego, equipos armados, puntajes).</li>
                             <li>Datos de analítica de uso del sitio (páginas visitadas, dispositivo, ubicación aproximada) recolectados de forma automática a través de Google Analytics.</li>
+                            <li>Si activás las notificaciones, los datos técnicos que tu navegador genera para poder enviártelas.</li>
+                            <li>En el Modo Estadio (que se usa sin iniciar sesión), un identificador anónimo del dispositivo para guardar tu equipo y tu puesto.</li>
+                            <li>Si contratás Premium, el estado de tu suscripción. Los datos de pago los procesa Mercado Pago: nosotros no vemos ni guardamos tu tarjeta.</li>
                         </ul>
 
                         <h2 className="text-lg font-bold text-accent mt-6">2. Uso de la Información</h2>
@@ -89,6 +115,7 @@ export default function TerminosPage() {
                             <li><strong>Google / Microsoft:</strong> para el inicio de sesión (OAuth).</li>
                             <li><strong>Google Analytics:</strong> para estadísticas de uso del sitio.</li>
                             <li><strong>Vercel y Railway:</strong> como proveedores de hosting e infraestructura donde se almacenan los datos.</li>
+                            <li><strong>Mercado Pago:</strong> para el cobro de la suscripción Premium.</li>
                         </ul>
                         <p>
                             Usted puede revocar el acceso otorgado a la Aplicación en cualquier momento desde la configuración de su cuenta de Google (<span className="break-all">myaccount.google.com/permissions</span>) o Microsoft.
@@ -101,7 +128,7 @@ export default function TerminosPage() {
 
                         <h2 className="text-lg font-bold text-accent mt-6">5. Sus Derechos</h2>
                         <p>
-                            Usted puede solicitarnos en cualquier momento: acceder a los datos personales que tenemos sobre usted, corregirlos si están desactualizados, o eliminarlos junto con su cuenta.
+                            Usted puede solicitarnos en cualquier momento: acceder a los datos personales que tenemos sobre usted, corregirlos si están desactualizados, o eliminarlos junto con su cuenta, conforme a la Ley 25.326 de Protección de los Datos Personales. La Agencia de Acceso a la Información Pública, como órgano de control de esa ley, atiende las denuncias y reclamos por incumplimientos.
                         </p>
 
                         <h2 className="text-lg font-bold text-accent mt-6">6. Seguridad</h2>
@@ -111,7 +138,7 @@ export default function TerminosPage() {
 
                         <h2 className="text-lg font-bold text-accent mt-6">7. Contacto</h2>
                         <p>
-                            Ante cualquier consulta sobre esta Política de Privacidad o para ejercer sus derechos sobre sus datos, puede escribirnos a <strong>santiborgna5@gmail.com</strong>.
+                            Ante cualquier consulta sobre esta Política de Privacidad o para ejercer sus derechos sobre sus datos, puede escribirnos a <strong>sextohombrefantasy@gmail.com</strong>.
                         </p>
 
                         <h2 className="text-lg font-bold text-accent mt-6">8. Cambios a esta Política</h2>
