@@ -1,25 +1,33 @@
 import React from 'react';
 
+// Para agregar un sponsor: subir el logo a public/sponsors/ y sumar una entrada acá.
+// `url` es opcional: si está, el logo linkea a la web/redes del sponsor.
+const sponsors = [
+    { id: 'balon-al-aire', name: 'Balón al Aire', logoUrl: '/sponsors/balon-al-aire.png', url: null },
+];
+
 const SponsorsBanner = ({ className = '' }) => {
-    // Placeholder sponsors for now until real ones arrive
-    const sponsors = [
-        { id: 1, name: 'Sponsor 1', logoUrl: 'https://placehold.co/150x50/333333/FFFFFF?text=Sponsor+1' },
-        { id: 2, name: 'Sponsor 2', logoUrl: 'https://placehold.co/150x50/333333/FFFFFF?text=Sponsor+2' },
-        { id: 3, name: 'Sponsor 3', logoUrl: 'https://placehold.co/150x50/333333/FFFFFF?text=Sponsor+3' }
-    ];
+    if (sponsors.length === 0) return null;
 
     return (
         <div className={`w-full bg-background py-4 flex flex-col items-center justify-center gap-3 ${className}`}>
             <p className="text-[10px] text-textMuted uppercase tracking-widest font-bold">Nos acompañan</p>
             <div className="flex flex-row flex-wrap items-center justify-center gap-6 md:gap-12 px-4">
-                {sponsors.map(s => (
-                    <img 
-                        key={s.id} 
-                        src={s.logoUrl} 
-                        alt={s.name} 
-                        className="h-8 md:h-10 opacity-60 hover:opacity-100 transition-opacity grayscale hover:grayscale-0 cursor-pointer object-contain" 
-                    />
-                ))}
+                {sponsors.map(s => {
+                    const logo = (
+                        <img
+                            src={s.logoUrl}
+                            alt={s.name}
+                            title={s.name}
+                            className="h-14 md:h-16 object-contain transition-transform hover:scale-105"
+                        />
+                    );
+                    return s.url ? (
+                        <a key={s.id} href={s.url} target="_blank" rel="noopener noreferrer">{logo}</a>
+                    ) : (
+                        <div key={s.id}>{logo}</div>
+                    );
+                })}
             </div>
         </div>
     );
