@@ -66,7 +66,7 @@ export default function TerminosPage() {
                             Los premios son aportados por los organizadores de Sexto Hombre Fantasy y por sus sponsors, y pueden consistir en dinero o en productos. Los premios vigentes se anuncian en la Aplicación y en nuestras redes sociales. Por el momento, solo hay premios en el juego de la Liga Nacional.
                         </p>
                         <ul className="list-disc pl-5 space-y-2 text-textMuted">
-                            <li>En cada jornada ganan: el usuario con más puntos en esa jornada y el usuario que encabeza la tabla general al cierre de esa jornada.</li>
+                            <li>En cada jornada gana el usuario con más puntos en esa jornada. Al terminar la temporada gana el usuario que encabeza la tabla general.</li>
                             <li>Si hay empate en el primer puesto, el ganador se define por sorteo entre los empatados.</li>
                             <li>Los ganadores se publican en nuestras redes sociales y se les avisa por el correo electrónico asociado a su cuenta. El ganador tiene 15 días corridos desde el aviso para responder y coordinar la entrega; si no lo hace, pierde el premio.</li>
                             <li>Los premios son personales e intransferibles, y los premios en productos no se pueden cambiar por dinero.</li>
