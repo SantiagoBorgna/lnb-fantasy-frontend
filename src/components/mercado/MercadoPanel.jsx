@@ -160,6 +160,27 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
         return false
     }, [activaData, plantelActivo])
 
+    const { data: proximaData } = useQuery({
+        queryKey: ['jornadaProxima'],
+        queryFn: () => import('../../api/jornadaApi').then(m => m.getJornadaProxima())
+    })
+
+    const esPlantelAdelantado = !!plantelActivo && !!activaData && plantelActivo.jornadaNumero > activaData.numero
+    const jornadaFixtureId = esPlantelAdelantado ? proximaData?.id : (activaData?.id ?? proximaData?.id)
+
+    const { data: partidosFixture = [] } = useQuery({
+        queryKey: ['partidosJornada', jornadaFixtureId],
+        queryFn: () => import('../../api/jornadaApi').then(m => m.getPartidosJornada(jornadaFixtureId)),
+        enabled: !!jornadaFixtureId
+    })
+
+    const equiposConPartido = useMemo(
+        () => new Set(partidosFixture.flatMap(p => [p.siglaLocal, p.siglaVisitante]).filter(Boolean)),
+        [partidosFixture]
+    )
+    const jugadorDescansa = (jugador) =>
+        partidosFixture.length > 0 && !!jugador.equipoSigla && !equiposConPartido.has(jugador.equipoSigla)
+
     useEffect(() => {
         const fetchDatos = async () => {
             try {
@@ -1272,6 +1293,7 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
                                 modoAsignacion={modoAsignacion}
                                 limitesEquipo={limitesEquipo}
                                 contextoActual={contextoActual}
+                                descansa={jugadorDescansa(jugador)}
                                 onElegir={
                                     modoAsignacion ? (j) => {
                                         asignarJugador({ ...j, jugadorRealId: j.id || j.jugadorRealId })
@@ -1499,7 +1521,7 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
     )
 }
 
-function TarjetaJugador({ jugador, onElegir, onVerDetalles, presupuestoMaximo, modoTransferencia, modoAsignacion, limitesEquipo, contextoActual }) {
+function TarjetaJugador({ jugador, onElegir, onVerDetalles, presupuestoMaximo, modoTransferencia, modoAsignacion, limitesEquipo, contextoActual, descansa = false }) {
     const estado = ESTADO_CONFIG[jugador.estado] ?? ESTADO_CONFIG.DISPONIBLE
 
     // Bloqueamos si supera el presupuesto tanto armando el equipo como haciendo un cambio
@@ -1535,12 +1557,15 @@ function TarjetaJugador({ jugador, onElegir, onVerDetalles, presupuestoMaximo, m
                 <p className="text-textMain font-semibold text-sm truncate">
                     {jugador.nombreCompleto}
                 </p>
-                <div className="flex items-center gap-2 mt-0.5">
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-0.5">
                     <span className="text-textMuted text-xs">{jugador.equipoSigla}</span>
                     <span className="text-textMuted text-xs">{jugador.posicion}</span>
                     <span className={`text-xs font-medium ${estado.color} ml-1`}>
                         {estado.label}
                     </span>
+                    {descansa && (
+                        <span className="bg-slate-600 text-white text-[9px] font-black leading-none rounded px-1.5 py-0.5">DESCANSA</span>
+                    )}
                 </div>
                 {(jugador.promedioPuntosUltimas3 > 0 || jugador.promedioFantasy > 0) && (
                     <p className="text-textMuted text-xs mt-0.5">
