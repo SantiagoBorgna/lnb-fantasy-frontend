@@ -14,8 +14,9 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MiB
         // Cachear assets estáticos
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
-        // La imagen de preview de links solo la piden WhatsApp/redes, no hace falta en el celular
-        globIgnores: ['og-image.png'],
+        // La imagen de preview de links solo la piden WhatsApp/redes, no hace falta en el celular.
+        // Los escudos solo se usan en las placas del admin: tampoco se precargan.
+        globIgnores: ['og-image.png', 'escudos/**'],
 
         // Estrategia de cache para la API — Network First
         // (siempre intenta red, fallback a cache si no hay conexión)
