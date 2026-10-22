@@ -3,6 +3,7 @@
 // Si la jornada tiene muchos partidos se reparte en varias imágenes (ver paginarFixture).
 import { BLANCO, fuente, cargarImagen } from './canvasUtils'
 import { ANCHO_POST, ALTO_POST } from './quintetoCanvas'
+import { archivoEscudo } from '../../utils/escudos'
 
 const GRIS_AZUL = '#8EA3C0'
 export const MAX_PARTIDOS_POR_IMAGEN = 12
@@ -11,10 +12,6 @@ const DIAS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', '
 const dosDigitos = (n) => String(n).padStart(2, '0')
 const claveDia = (f) => `${f.getFullYear()}-${dosDigitos(f.getMonth() + 1)}-${dosDigitos(f.getDate())}`
 const tituloDia = (f) => `${DIAS[f.getDay()]} ${dosDigitos(f.getDate())}-${dosDigitos(f.getMonth() + 1)}-${f.getFullYear()}`
-
-// Archivo del escudo: /escudos/<liga>/<nombre del equipo sin tildes ni símbolos>.png
-export const archivoEscudo = (ligaId, nombre = '') =>
-    `/escudos/${ligaId}/${nombre.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}.png`
 
 /**
  * Agrupa los partidos por día y los reparte en la menor cantidad de imágenes posible

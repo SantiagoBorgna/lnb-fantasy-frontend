@@ -6,7 +6,7 @@ import { useAuthStore } from '../../store/authStore'
 import { getEquiposParaOnboarding, completarPerfil } from '../../api/authApi'
 import { getMe } from '../../api/authApi'
 import { useUiStore } from '../../store/uiStore'
-import PatronEquipo from '../../components/ui/PatronEquipo'
+import EscudoEquipo from '../../components/ui/EscudoEquipo'
 
 export default function OnboardingPerfilPage() {
     const navigate = useNavigate()
@@ -118,16 +118,7 @@ export default function OnboardingPerfilPage() {
                                     : 'border-border bg-card hover:border-primary'}
               `}
                         >
-                            {/* Rectángulo con el patrón de la camiseta */}
-                            <div className="w-6 h-6 rounded-md shrink-0 relative overflow-hidden shadow-[inset_0_1px_3px_rgba(255,255,255,0.3)] border border-white/10">
-                                <PatronEquipo 
-                                    colorPrincipal={equipo.colorPrincipal} 
-                                    colorSecundario={equipo.colorSecundario} 
-                                    modelo={equipo.modeloCamiseta} 
-                                    className="w-full h-full absolute inset-0 z-0" 
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-br from-white/30 to-transparent mix-blend-overlay z-10"></div>
-                            </div>
+                            <EscudoEquipo ligaId={liga.id} equipo={equipo} />
                             <div className="min-w-0">
                                 <p className="text-textMain text-xs font-semibold truncate">
                                     {equipo.sigla}
