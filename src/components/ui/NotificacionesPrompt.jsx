@@ -1,68 +1,33 @@
 import { useState, useEffect } from 'react'
-import axiosClient from '../../api/axiosClient'
-
-const VAPID_PUBLIC_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY
-
-function urlBase64ToUint8Array(base64String) {
-    const padding = '='.repeat((4 - base64String.length % 4) % 4)
-    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
-    const rawData = window.atob(base64)
-    const outputArray = new Uint8Array(rawData.length)
-    for (let i = 0; i < rawData.length; ++i) {
-        outputArray[i] = rawData.charCodeAt(i)
-    }
-    return outputArray
-}
+import { useLigaStore } from '../../store/ligaStore'
+import { pushSoportado, activarPush, registrarSiYaHayPermiso } from '../../utils/push'
 
 export default function NotificacionesPrompt() {
     const [mostrar, setMostrar] = useState(false)
     const [cargando, setCargando] = useState(false)
+    const ligaId = useLigaStore(state => state.ligaId)
 
     useEffect(() => {
-        if ('serviceWorker' in navigator && 'PushManager' in window) {
-            if (Notification.permission === 'default') {
-                setTimeout(() => setMostrar(true), 3000)
-            }
+        if (!pushSoportado()) return
+        if (Notification.permission === 'default') {
+            const t = setTimeout(() => setMostrar(true), 3000)
+            return () => clearTimeout(t)
         }
-    }, [])
+        // Ya aceptó (quizás en la otra liga): registramos el dispositivo en esta liga sin preguntar
+        registrarSiYaHayPermiso()
+    }, [ligaId])
 
     const suscribir = async () => {
         setCargando(true)
-        console.log('[DEBUG] 1. Iniciando proceso de suscripción...')
         try {
-            const permission = await Notification.requestPermission()
-            console.log('[DEBUG] 2. Permiso Notification:', permission)
-            
-            if (permission === 'granted') {
-                if (!VAPID_PUBLIC_KEY) {
-                    throw new Error('VITE_VAPID_PUBLIC_KEY no está configurada en las variables de entorno.')
-                }
-
-                const registration = await navigator.serviceWorker.ready
-                console.log('[DEBUG] 3. Service Worker Listo. Scope:', registration.scope)
-                
-                const subscription = await registration.pushManager.subscribe({
-                    userVisibleOnly: true,
-                    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
-                })
-                console.log('[DEBUG] 4. Suscripción generada:', subscription.toJSON())
-
-                console.log('[DEBUG] 5. Enviando al backend...')
-                const response = await axiosClient.post('/notificaciones/suscribir', subscription.toJSON())
-                console.log('[DEBUG] 6. Respuesta del backend:', response.status)
-                
-                setMostrar(false)
-            } else {
-                console.log('[DEBUG] 2b. El usuario no dio permiso o lo bloqueó')
-                setMostrar(false)
-            }
+            await activarPush()
+            setMostrar(false)
         } catch (error) {
             console.error('Error suscribiendo:', error)
             const errorMsg = error.response?.data?.error || error.response?.data?.message || error.message || error.toString()
             const { useUiStore } = await import('../../store/uiStore')
             useUiStore.getState().showToast('Hubo un error al suscribirte: ' + errorMsg, 'error')
         } finally {
-            console.log('[DEBUG] 7. Finalizando carga')
             setCargando(false)
         }
     }
@@ -82,10 +47,10 @@ export default function NotificacionesPrompt() {
                     <p className="text-textMuted text-sm mt-3 leading-relaxed">
                         Activá las notificaciones para enterarte al instante cómo le fue a tu equipo en la jornada y recibir alertas antes del cierre del mercado.
                     </p>
-                    
+
                     <div className="flex flex-col gap-3 mt-8">
-                        <button 
-                            onClick={suscribir} 
+                        <button
+                            onClick={suscribir}
                             disabled={cargando}
                             className="bg-primary hover:bg-primary/90 transition-colors text-white text-sm font-bold py-3 px-4 rounded-xl active:scale-95 flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
                         >
@@ -98,8 +63,8 @@ export default function NotificacionesPrompt() {
                                 'Activar Notificaciones'
                             )}
                         </button>
-                        <button 
-                            onClick={() => setMostrar(false)} 
+                        <button
+                            onClick={() => setMostrar(false)}
                             className="text-textMuted hover:text-textMain transition-colors text-sm font-semibold py-2 px-4 rounded-xl active:scale-95"
                         >
                             Quizás más tarde

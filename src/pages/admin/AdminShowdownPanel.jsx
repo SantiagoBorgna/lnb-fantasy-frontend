@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
 import { ligaActual } from '../../store/ligaStore'
 import { getTodosLosShowdowns, getPartidosDisponiblesParaShowdown, crearShowdownManual, eliminarShowdown } from '../../api/adminApi'
-import { Loader2, Copy, CheckCircle, Trash2, ShieldAlert } from 'lucide-react'
+import { Loader2, Copy, CheckCircle, Trash2, ShieldAlert, QrCode } from 'lucide-react'
 import { useAuthStore } from '../../store/authStore'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { useUiStore } from '../../store/uiStore'
 import ConfirmModal from '../../components/ui/ConfirmModal'
+import ModalQrShowdown from './ModalQrShowdown'
 
 export default function AdminShowdownPanel() {
     const usuario = useAuthStore(state => state.usuario)
@@ -18,6 +19,7 @@ export default function AdminShowdownPanel() {
     const [copiadoId, setCopiadoId] = useState(null)
     const [creandoId, setCreandoId] = useState(null)
     const [confirmModal, setConfirmModal] = useState({ isOpen: false, id: null })
+    const [qrDe, setQrDe] = useState(null)
 
     useEffect(() => {
         if (usuario?.rol !== 'ADMIN') return;
@@ -54,10 +56,11 @@ export default function AdminShowdownPanel() {
         }
     }
 
+    // Con la liga en el link: el QR abre el Modo Estadio de esta liga aunque el celular tenga otra elegida
+    const linkDe = (codigo) => `${window.location.origin}/showdown/${codigo}?liga=${ligaActual().id}`
+
     const handleCopiar = (codigo, id) => {
-        // Con la liga en el link: el QR abre el Modo Estadio de esta liga aunque el celular tenga otra elegida
-        const link = `${window.location.origin}/showdown/${codigo}?liga=${ligaActual().id}`
-        navigator.clipboard.writeText(link)
+        navigator.clipboard.writeText(linkDe(codigo))
         setCopiadoId(id)
         setTimeout(() => setCopiadoId(null), 2000)
     }
@@ -104,6 +107,14 @@ export default function AdminShowdownPanel() {
 
     return (
         <div className="flex flex-col animate-fade-in">
+            {qrDe && (
+                <ModalQrShowdown
+                    link={linkDe(qrDe.codigoInscripcion)}
+                    titulo={`${qrDe.localSigla} vs ${qrDe.visitanteSigla}`}
+                    onCerrar={() => setQrDe(null)}
+                />
+            )}
+
             <ConfirmModal
                 isOpen={confirmModal.isOpen}
                 onClose={() => setConfirmModal({ isOpen: false, id: null })}
@@ -197,7 +208,15 @@ export default function AdminShowdownPanel() {
                                                 {copiadoId === s.id ? <CheckCircle className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
                                                 {copiadoId === s.id ? '¡Copiado!' : 'Copiar Link'}
                                             </button>
-                                            
+
+                                            <button
+                                                onClick={() => setQrDe(s)}
+                                                className="flex items-center justify-center gap-2 px-3 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-sm font-semibold text-textMain transition-colors"
+                                                title="Ver QR"
+                                            >
+                                                <QrCode className="w-4 h-4" /> QR
+                                            </button>
+
                                             <button
                                                 onClick={() => handleEliminar(s.id)}
                                                 className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg transition-colors"

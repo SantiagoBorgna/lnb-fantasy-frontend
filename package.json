@@ -21,6 +21,7 @@
     "hashids": "^2.3.0",
     "lucide-react": "^1.30.0",
     "mysql2": "^3.23.1",
+    "qrcode": "^1.5.4",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-router-dom": "^7.14.2",

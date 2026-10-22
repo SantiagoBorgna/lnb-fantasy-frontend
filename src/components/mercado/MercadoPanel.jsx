@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom'
 import clsx from 'clsx'
 import { createPortal } from 'react-dom'
 import { useAyuda } from '../../hooks/useAyuda'
+import { useEquipoDescansa } from '../../hooks/useEquipoDescansa'
 import ModalAyuda from '../ui/ModalAyuda'
 import BotonAyuda from '../ui/BotonAyuda'
 import { AYUDA } from '../ui/ayudaContenido'
@@ -168,18 +169,8 @@ export default function MercadoPanel({ onActionComplete, layout = 'full' }) {
     const esPlantelAdelantado = !!plantelActivo && !!activaData && plantelActivo.jornadaNumero > activaData.numero
     const jornadaFixtureId = esPlantelAdelantado ? proximaData?.id : (activaData?.id ?? proximaData?.id)
 
-    const { data: partidosFixture = [] } = useQuery({
-        queryKey: ['partidosJornada', jornadaFixtureId],
-        queryFn: () => import('../../api/jornadaApi').then(m => m.getPartidosJornada(jornadaFixtureId)),
-        enabled: !!jornadaFixtureId
-    })
-
-    const equiposConPartido = useMemo(
-        () => new Set(partidosFixture.flatMap(p => [p.siglaLocal, p.siglaVisitante]).filter(Boolean)),
-        [partidosFixture]
-    )
-    const jugadorDescansa = (jugador) =>
-        partidosFixture.length > 0 && !!jugador.equipoSigla && !equiposConPartido.has(jugador.equipoSigla)
+    const equipoDescansa = useEquipoDescansa(jornadaFixtureId)
+    const jugadorDescansa = (jugador) => equipoDescansa(jugador.equipoSigla)
 
     useEffect(() => {
         const fetchDatos = async () => {
