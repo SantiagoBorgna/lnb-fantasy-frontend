@@ -23,7 +23,7 @@ const esIOS = typeof navigator !== 'undefined' && (
  */
 export default function ModalImagenCompartible({
     titulo, cargando = false, mensajeSinDatos, datos, dibujar,
-    nombreArchivo, texto, contentType, altImagen, onCerrar,
+    nombreArchivo, texto, contentType, altImagen, onCerrar, children,
 }) {
     const showToast = useUiStore(state => state.showToast)
     const canvasRef = useRef(null)
@@ -87,6 +87,7 @@ export default function ModalImagenCompartible({
             >
                 <div className="w-10 h-1 bg-border rounded-full mx-auto md:hidden" />
                 <h3 className="text-textMain font-bold text-lg">{titulo}</h3>
+                {children}
 
                 {/* El canvas se dibuja oculto y se muestra la imagen resultante */}
                 <canvas ref={canvasRef} className="hidden" />
