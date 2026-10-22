@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { getJornadas } from '../../api/jornadaApi'
 import { getQuintetosPorJornada } from '../../api/adminApi'
-import { Loader2, Star, ShieldAlert } from 'lucide-react'
+import { Loader2, Star, ShieldAlert, ImageDown } from 'lucide-react'
 import CamisetaSVG from '../../components/jugador/CamisetaSVG'
+import ModalImagenCompartible from '../../components/compartir/ModalImagenCompartible'
+import { dibujarGanadorJornada, dibujarQuintetoIdeal } from '../../components/compartir/quintetoCanvas'
 
 export default function AdminQuintetosPanel() {
     const [jornadas, setJornadas] = useState([])
@@ -10,6 +12,7 @@ export default function AdminQuintetosPanel() {
     const [data, setData] = useState(null)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
+    const [imagen, setImagen] = useState(null) // 'ganador' | 'ideal'
 
     useEffect(() => {
         cargarJornadas()
@@ -90,6 +93,27 @@ export default function AdminQuintetosPanel() {
         </div>
     )
 
+    const numeroJornada = jornadas.find(j => String(j.id) === String(jornadaSeleccionada))?.numero
+    const datosGanador = useMemo(() => data && data.mejorQuintetoUsuario.length > 0 ? {
+        nombreEquipo: data.nombreUsuarioGanador,
+        jornadaNumero: numeroJornada,
+        puntaje: data.puntajeUsuarioGanador,
+        jugadores: data.mejorQuintetoUsuario,
+    } : null, [data, numeroJornada])
+    const datosIdeal = useMemo(() => data && data.quintetoIdealTeorico.length > 0 ? {
+        jornadaNumero: numeroJornada,
+        jugadores: data.quintetoIdealTeorico,
+    } : null, [data, numeroJornada])
+
+    const botonImagen = (tipo) => (
+        <button
+            onClick={() => setImagen(tipo)}
+            className="mt-4 ml-2 inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-border px-3 py-1.5 rounded-lg text-sm font-semibold text-textMain relative z-10 transition-colors"
+        >
+            <ImageDown className="w-4 h-4" /> Imagen para Instagram
+        </button>
+    )
+
     if (error) {
         return (
             <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-6 text-center">
@@ -144,6 +168,7 @@ export default function AdminQuintetosPanel() {
                                 <span className="text-sm font-medium text-textMuted">Puntaje Total:</span>
                                 <span className="text-primary font-black">{data.puntajeUsuarioGanador.toFixed(1)}</span>
                             </div>
+                            {datosGanador && botonImagen('ganador')}
                         </div>
 
                         <div className="flex flex-col gap-3">
@@ -167,6 +192,7 @@ export default function AdminQuintetosPanel() {
                                 <span className="text-sm font-medium text-textMuted">Puntaje Teórico:</span>
                                 <span className="text-yellow-500 font-black">{data.puntajeQuintetoIdeal.toFixed(1)}</span>
                             </div>
+                            {datosIdeal && botonImagen('ideal')}
                         </div>
 
                         <div className="flex flex-col gap-3">
@@ -178,6 +204,18 @@ export default function AdminQuintetosPanel() {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {imagen && (
+                <ModalImagenCompartible
+                    titulo={imagen === 'ganador' ? `Ganador de la jornada ${numeroJornada}` : `Quinteto ideal de la jornada ${numeroJornada}`}
+                    datos={imagen === 'ganador' ? datosGanador : datosIdeal}
+                    dibujar={imagen === 'ganador' ? dibujarGanadorJornada : dibujarQuintetoIdeal}
+                    nombreArchivo={imagen === 'ganador' ? `ganador-jornada-${numeroJornada}.png` : `quinteto-ideal-jornada-${numeroJornada}.png`}
+                    contentType={imagen === 'ganador' ? 'placa_ganador' : 'placa_quinteto_ideal'}
+                    altImagen={imagen === 'ganador' ? 'Equipo ganador de la jornada' : 'Quinteto ideal de la jornada'}
+                    onCerrar={() => setImagen(null)}
+                />
             )}
         </div>
     )

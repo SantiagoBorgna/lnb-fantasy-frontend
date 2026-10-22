@@ -27,7 +27,7 @@ export const apellido = (nombreCompleto = '') => {
 // y se convierte en imagen. El número va aparte, dibujado en el canvas con Inter,
 // porque dentro de un SVG usado como imagen no cargan las fuentes web.
 const cacheCamisetas = new Map()
-async function imagenCamiseta({ colorPrincipal, colorSecundario, modelo }) {
+export async function imagenCamiseta({ colorPrincipal, colorSecundario, modelo }) {
     const clave = `${colorPrincipal}|${colorSecundario}|${modelo}`
     if (cacheCamisetas.has(clave)) return cacheCamisetas.get(clave)
 
@@ -48,22 +48,24 @@ async function imagenCamiseta({ colorPrincipal, colorSecundario, modelo }) {
     return img
 }
 
-function dibujarCancha(ctx) {
-    const { x, y, w, h } = CANCHA
+// Las medidas están pensadas para la cancha de 960 de ancho; con otra cancha se escalan
+export function dibujarCancha(ctx, cancha = CANCHA) {
+    const { x, y, w, h } = cancha
+    const k = w / CANCHA.w
     ctx.save()
     ctx.beginPath()
-    ctx.roundRect(x, y, w, h, 40)
+    ctx.roundRect(x, y, w, h, 40 * k)
     ctx.clip()
 
     // Piso de madera con tablas
     ctx.fillStyle = MADERA
     ctx.fillRect(x, y, w, h)
     ctx.fillStyle = 'rgba(0,0,0,0.06)'
-    for (let tx = x + 60; tx < x + w; tx += 120) ctx.fillRect(tx, y, 60, h)
+    for (let tx = x + 60 * k; tx < x + w; tx += 120 * k) ctx.fillRect(tx, y, 60 * k, h)
 
     ctx.strokeStyle = LINEA
-    ctx.lineWidth = 5
-    const m = 18 // margen de las líneas
+    ctx.lineWidth = 5 * k
+    const m = 18 * k // margen de las líneas
     ctx.strokeRect(x + m, y + m, w - m * 2, h - m * 2)
 
     const cx = x + w / 2
@@ -80,33 +82,33 @@ function dibujarCancha(ctx) {
     ctx.stroke()
 
     // Pintura
-    const anchoPintura = 290
-    const altoPintura = 400
+    const anchoPintura = 290 * k
+    const altoPintura = 400 * k
     ctx.fillStyle = 'rgba(0,0,0,0.05)'
     ctx.fillRect(cx - anchoPintura / 2, base - altoPintura, anchoPintura, altoPintura)
     ctx.strokeRect(cx - anchoPintura / 2, base - altoPintura, anchoPintura, altoPintura)
 
     // Círculo de libres
     ctx.beginPath()
-    ctx.arc(cx, base - altoPintura, 130, 0, Math.PI * 2)
+    ctx.arc(cx, base - altoPintura, 130 * k, 0, Math.PI * 2)
     ctx.stroke()
 
     // Tablero y aro
     ctx.strokeStyle = 'rgba(0,0,0,0.6)'
-    ctx.lineWidth = 8
+    ctx.lineWidth = 8 * k
     ctx.beginPath()
-    ctx.moveTo(cx - 65, base - 40)
-    ctx.lineTo(cx + 65, base - 40)
+    ctx.moveTo(cx - 65 * k, base - 40 * k)
+    ctx.lineTo(cx + 65 * k, base - 40 * k)
     ctx.stroke()
-    ctx.lineWidth = 5
+    ctx.lineWidth = 5 * k
     ctx.beginPath()
-    ctx.arc(cx, base - 64, 22, 0, Math.PI * 2)
+    ctx.arc(cx, base - 64 * k, 22 * k, 0, Math.PI * 2)
     ctx.stroke()
 
     // Semicírculo de mitad de cancha (arriba)
     ctx.strokeStyle = LINEA
     ctx.beginPath()
-    ctx.arc(cx, y + m, 160, 0, Math.PI)
+    ctx.arc(cx, y + m, 160 * k, 0, Math.PI)
     ctx.stroke()
 
     ctx.restore()
