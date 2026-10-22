@@ -128,19 +128,21 @@ export async function dibujarFixture(canvas, d, _logo, logoLiga) {
     const imagenes = Object.fromEntries(await Promise.all(
         nombres.map(async n => [n, await cargarImagen(archivoEscudo(d.ligaId, n))])))
 
-    // Tamaños: entran hasta 6 partidos por columna; con menos, se agrandan un poco
+    // Tamaño de las filas: el más grande con el que las dos columnas entran en el espacio
+    // (se reparte de nuevo con cada tamaño, porque el corte entre columnas depende de él)
     const arriba = 210, abajo = 1200
     const altoTitulo = 72
-    const columnasPrueba = enColumnas(d.dias, altoTitulo, 1)
-    const filasMax = Math.max(...columnasPrueba.map(c => c.filter(it => it.tipo === 'partido').length), 1)
-    const titulosMax = Math.max(...columnasPrueba.map(c => c.filter(it => it.tipo === 'dia').length), 0)
-    const altoFila = Math.min(175, (abajo - arriba - titulosMax * altoTitulo) / filasMax)
+    const altoColumna = (items, fila) => items.reduce((t, it) => t + (it.tipo === 'dia' ? altoTitulo : fila), 0)
+    let altoFila = 175
+    let columnas = enColumnas(d.dias, altoTitulo, altoFila)
+    while (altoFila > 80 && Math.max(...columnas.map(c => altoColumna(c, altoFila))) > abajo - arriba) {
+        altoFila -= 5
+        columnas = enColumnas(d.dias, altoTitulo, altoFila)
+    }
     const lado = Math.min(135, altoFila - 22)
-    const columnas = enColumnas(d.dias, altoTitulo, altoFila)
 
     const centros = [ANCHO_POST * 0.285, ANCHO_POST * 0.735]
-    const altoColumna = (items) => items.reduce((t, it) => t + (it.tipo === 'dia' ? altoTitulo : altoFila), 0)
-    const sobra = abajo - arriba - Math.max(...columnas.map(altoColumna))
+    const sobra = abajo - arriba - Math.max(...columnas.map(c => altoColumna(c, altoFila)))
     const inicio = arriba + Math.max(0, sobra) / 2 // con pocos partidos, el bloque queda centrado
     columnas.forEach((items, c) => {
         let y = inicio
