@@ -7,12 +7,15 @@ import { useAuthStore } from '../../store/authStore'
 import { useNavigate } from 'react-router-dom'
 import CamisetaSVG from '../jugador/CamisetaSVG'
 import { useQueryClient } from '@tanstack/react-query'
+import { pushSoportado, pushActivoEnEstaLiga, activarPush, desactivarPush } from '../../utils/push'
 
 export default function PerfilModal({ isOpen, onClose }) {
     const { usuario, setAuth, setUsuario, setToken } = useAuthStore()
     const navigate = useNavigate()
     const queryClient = useQueryClient()
     const liga = useLigaActual()
+    const [notifActivas, setNotifActivas] = useState(() => pushActivoEnEstaLiga())
+    const [cambiandoNotif, setCambiandoNotif] = useState(false)
 
     const [equipos, setEquipos] = useState([])
     const [cargandoEquipos, setCargandoEquipos] = useState(false)
@@ -75,6 +78,25 @@ export default function PerfilModal({ isOpen, onClose }) {
             setError(err.response?.data?.mensaje || 'Error al actualizar perfil')
         } finally {
             setGuardando(false)
+        }
+    }
+
+    const toggleNotificaciones = async () => {
+        setError('')
+        setCambiandoNotif(true)
+        try {
+            if (notifActivas) {
+                await desactivarPush()
+                setNotifActivas(false)
+            } else if (await activarPush()) {
+                setNotifActivas(true)
+            } else {
+                setError('Las notificaciones están bloqueadas en este navegador. Habilitalas desde la configuración del sitio.')
+            }
+        } catch {
+            setError('No se pudieron cambiar las notificaciones. Probá de nuevo.')
+        } finally {
+            setCambiandoNotif(false)
         }
     }
 
@@ -199,6 +221,32 @@ export default function PerfilModal({ isOpen, onClose }) {
                 </form>
 
 
+
+                {pushSoportado() && (
+                    <div className="flex items-center justify-between gap-3 pt-2 border-t border-border">
+                        <div className="min-w-0">
+                            <p className="text-textMain text-sm font-semibold">Notificaciones</p>
+                            <p className="text-textMuted text-xs">Avisos de tu equipo {liga.deLaLiga}</p>
+                        </div>
+                        <button
+                            type="button"
+                            role="switch"
+                            aria-checked={notifActivas}
+                            aria-label="Notificaciones"
+                            onClick={toggleNotificaciones}
+                            disabled={cambiandoNotif}
+                            className={clsx(
+                                "relative w-11 h-6 rounded-full transition-colors shrink-0 disabled:opacity-50",
+                                notifActivas ? "bg-primary" : "bg-border"
+                            )}
+                        >
+                            <span className={clsx(
+                                "absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white transition-transform",
+                                notifActivas && "translate-x-5"
+                            )} />
+                        </button>
+                    </div>
+                )}
 
                 <div className="pt-2 border-t border-border">
                     <a

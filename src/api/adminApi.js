@@ -38,6 +38,10 @@ export const updatePartido = async (id, data) => {
     return response.data
 }
 
+export const eliminarPartido = async (id) => {
+    await api.delete(`/admin/partidos/${id}`)
+}
+
 export const scrapePartido = async (id) => {
     const response = await api.post(`/admin/partidos/${id}/scrape`)
     return response.data

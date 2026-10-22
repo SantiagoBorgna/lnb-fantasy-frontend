@@ -260,6 +260,8 @@ export default function TorneoDetallePage() {
     }, [searchParams, setSearchParams])
 
     const ubicacionInvitar = ligaRecienCreada ? 'liga_nueva' : 'detalle_torneo'
+    // En los torneos privados solo el admin invita; en los públicos, cualquier participante
+    const puedeInvitar = !!torneo && (torneo.tipo !== 'PRIVADO' || torneo.esAdmin)
 
     const copiarLink = () => {
         navigator.clipboard.writeText(torneo ? linkInvitacion(torneo, 'link') : '')
@@ -454,7 +456,7 @@ export default function TorneoDetallePage() {
                         )}>
                             {torneo.tipo === 'PRIVADO' ? '🔒 Privado' : '🌐 Público'}
                         </span>
-                        {yaParticipa && (
+                        {yaParticipa && puedeInvitar && (
                             <button
                                 onClick={() => setModalInvitar(true)}
                                 className="text-xs font-semibold text-[#25D366] border border-[#25D366]/50 rounded-lg px-2 py-0.5 whitespace-nowrap shrink-0 hover:bg-[#25D366]/10 transition-colors"
@@ -539,17 +541,19 @@ export default function TorneoDetallePage() {
                                         </>
                                     )}
 
-                                    {/* Invitar amigos */}
-                                    <button
-                                        onClick={() => {
-                                            setMenuAbierto(false)
-                                            setModalInvitar(true)
-                                        }}
-                                        className="w-full flex items-center gap-3 px-4 py-3
-                                 text-textMain text-sm hover:bg-surface
-                                 transition-colors text-left"
-                                    > Invitar amigos
-                                    </button>
+                                    {/* Invitar amigos — en los privados, solo el admin */}
+                                    {puedeInvitar && (
+                                        <button
+                                            onClick={() => {
+                                                setMenuAbierto(false)
+                                                setModalInvitar(true)
+                                            }}
+                                            className="w-full flex items-center gap-3 px-4 py-3
+                                     text-textMain text-sm hover:bg-surface
+                                     transition-colors text-left"
+                                        > Invitar amigos
+                                        </button>
+                                    )}
 
                                     {/* Salir — no disponible para el creador */}
                                     {!torneo.esAdmin && (
@@ -743,7 +747,7 @@ export default function TorneoDetallePage() {
             )}
 
             {/* ── Modal: Invitar amigos ────────────────────────────────── */}
-            {modalInvitar && createPortal(
+            {modalInvitar && puedeInvitar && createPortal(
                 <>
                     <div className="fixed inset-0 bg-black/60 z-40"
                         onClick={() => { setModalInvitar(false); setLigaRecienCreada(false) }} />

@@ -366,10 +366,12 @@ function SlotLleno({ slot, onTap }) {
 
 import { useEffect, useState as useStateLocal } from 'react'
 import { getDts } from '../../api/dtApi'
+import { useEquipoDescansa } from '../../hooks/useEquipoDescansa'
 
 function ModalDt({ onElegir, onCerrar }) {
     const [dts, setDts] = useStateLocal([])
     const [loading, setLoading] = useStateLocal(true)
+    const descansa = useEquipoDescansa()
 
     useEffect(() => {
         getDts().then(setDts).finally(() => setLoading(false))
@@ -387,7 +389,12 @@ function ModalDt({ onElegir, onCerrar }) {
                             <button key={dt.id} onClick={() => onElegir(dt)} className="w-full flex items-center gap-3 p-3 rounded-2xl bg-surface border border-border hover:border-primary transition-colors text-left active:scale-[0.98]">
                                 <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold text-xs shrink-0">DT</div>
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-textMain font-semibold text-sm truncate">{dt.nombreCompleto}</p>
+                                    <div className="flex items-center gap-1.5 min-w-0">
+                                        <p className="text-textMain font-semibold text-sm truncate">{dt.nombreCompleto}</p>
+                                        {descansa(dt.equipoSigla) && (
+                                        <span className="bg-slate-600 text-white text-[9px] font-black leading-none rounded px-1.5 py-0.5 shrink-0">DESCANSA</span>
+                                    )}
+                                    </div>
                                     <p className="text-textMuted text-xs">{dt.equipoNombre} · {dt.nacionalidad}</p>
                                 </div>
                                 <span className="text-accent text-sm font-semibold">Elegir</span>

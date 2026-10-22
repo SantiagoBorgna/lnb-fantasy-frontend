@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Plus, Edit2, RotateCw } from 'lucide-react'
+import { Plus, Edit2, RotateCw, Trash2 } from 'lucide-react'
 import AdminPartidoModal from './AdminPartidoModal'
-import { getPartidos, scrapePartido } from '../../api/adminApi'
+import { getPartidos, scrapePartido, eliminarPartido } from '../../api/adminApi'
 
 export default function AdminPartidosPanel() {
     const queryClient = useQueryClient()
@@ -22,6 +22,17 @@ export default function AdminPartidosPanel() {
     const [filtroEquipo, setFiltroEquipo] = useState('')
 
     const [partidoToScrape, setPartidoToScrape] = useState(null)
+    const [partidoAEliminar, setPartidoAEliminar] = useState(null)
+    const [errorEliminar, setErrorEliminar] = useState('')
+
+    const eliminarMutation = useMutation({
+        mutationFn: eliminarPartido,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['adminPartidos'] })
+            setPartidoAEliminar(null)
+        },
+        onError: (err) => setErrorEliminar(err.response?.data?.mensaje ?? 'No se pudo eliminar el partido.')
+    })
 
     const scrapeMutation = useMutation({
         mutationFn: scrapePartido,
@@ -227,6 +238,13 @@ export default function AdminPartidosPanel() {
                                             >
                                                 <Edit2 size={16} />
                                             </button>
+                                            <button
+                                                onClick={() => { setErrorEliminar(''); setPartidoAEliminar(partido) }}
+                                                className="p-2 text-textMuted hover:text-red-500 transition-colors bg-background rounded-lg"
+                                                title="Eliminar (partido postergado)"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -248,6 +266,42 @@ export default function AdminPartidosPanel() {
                     partido={partidoToEdit}
                     onClose={() => setModalOpen(false)}
                 />
+            )}
+
+            {partidoAEliminar && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+                    <div className="bg-surface border border-border rounded-xl w-full max-w-sm overflow-hidden shadow-2xl p-6 text-center">
+                        <div className="mx-auto w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center mb-4 text-red-500">
+                            <Trash2 size={24} />
+                        </div>
+                        <h3 className="text-xl font-bold text-white mb-2">Eliminar partido</h3>
+                        <p className="text-textMuted mb-2">
+                            J{partidoAEliminar.jornada.numero} · {partidoAEliminar.equipoLocal.nombre} vs {partidoAEliminar.equipoVisitante.nombre}
+                        </p>
+                        <p className="text-textMuted text-sm mb-4">
+                            Para partidos postergados sin fecha. Cuando se reprograme, vuelve a aparecer al sincronizar el fixture de su nueva jornada.
+                        </p>
+                        {errorEliminar && (
+                            <p className="text-red-400 text-sm mb-4">{errorEliminar}</p>
+                        )}
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setPartidoAEliminar(null)}
+                                className="flex-1 py-2 rounded-lg font-bold text-textMuted hover:text-white transition-colors bg-card border border-border"
+                                disabled={eliminarMutation.isPending}
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={() => eliminarMutation.mutate(partidoAEliminar.id)}
+                                disabled={eliminarMutation.isPending}
+                                className="flex-1 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                            >
+                                {eliminarMutation.isPending ? 'Eliminando...' : 'Sí, eliminar'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
 
             {partidoToScrape && (

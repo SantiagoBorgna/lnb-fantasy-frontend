@@ -27,6 +27,7 @@ import MercadoPanel from '../components/mercado/MercadoPanel'
 import ConfirmarTransferenciaModal from '../components/mercado/ConfirmarTransferenciaModal'
 import ConsejeroModal from '../components/premium/ConsejeroModal'
 import { Crown, X, ChevronRight, Share2 } from 'lucide-react'
+import { useEquipoDescansa } from '../hooks/useEquipoDescansa'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 // Se carga recién al tocar "Compartir": trae react-dom/server para dibujar las camisetas
@@ -1180,6 +1181,7 @@ function DtOpcionesModal({ dt, onCerrar, onTransferir, esDraft }) {
 function ListaDtsModal({ dtActualId, onElegir, onCerrar, torneoId }) {
     const [dts, setDts] = useState([])
     const [loading, setLoading] = useState(true)
+    const descansa = useEquipoDescansa()
 
     useEffect(() => {
         getDts(torneoId).then(data => {
@@ -1199,7 +1201,15 @@ function ListaDtsModal({ dtActualId, onElegir, onCerrar, torneoId }) {
                     {loading ? <LoadingSpinner /> : dts.map(dt => (
                         <button key={dt.id} onClick={() => onElegir(dt)} className="w-full flex items-center gap-3 p-3 rounded-2xl bg-surface border border-border hover:border-primary transition-colors text-left active:scale-[0.98]">
                             <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold text-xs shrink-0 shadow-sm">DT</div>
-                            <div className="flex-1 min-w-0"><p className="text-textMain font-semibold text-sm truncate">{dt.nombreCompleto}</p><p className="text-textMuted text-xs">{dt.equipoNombre} · {dt.nacionalidad}</p></div>
+                            <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-1.5 min-w-0">
+                                    <p className="text-textMain font-semibold text-sm truncate">{dt.nombreCompleto}</p>
+                                    {descansa(dt.equipoSigla) && (
+                                        <span className="bg-slate-600 text-white text-[9px] font-black leading-none rounded px-1.5 py-0.5 shrink-0">DESCANSA</span>
+                                    )}
+                                </div>
+                                <p className="text-textMuted text-xs">{dt.equipoNombre} · {dt.nacionalidad}</p>
+                            </div>
                             <span className="text-accent text-sm font-semibold">Contratar</span>
                         </button>
                     ))}
