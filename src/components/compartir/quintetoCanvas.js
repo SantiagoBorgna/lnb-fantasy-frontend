@@ -2,6 +2,7 @@
 // y el quinteto ideal, con el mismo estilo de las placas que se hacían a mano.
 import { BLANCO, fuente } from './canvasUtils'
 import { dibujarCancha, imagenCamiseta } from './canchitaCanvas'
+import { determinarColorNumero } from '../jugador/camisetaUtils'
 
 export const ANCHO_POST = 1080
 export const ALTO_POST = 1350
@@ -71,6 +72,19 @@ async function tarjetaJugador(ctx, j, cx, cy) {
     const img = await imagenCamiseta({ colorPrincipal: j.colorPrincipal, colorSecundario: j.colorSecundario, modelo: j.modeloCamiseta })
     if (img) ctx.drawImage(img, cx - 52, y + 14, 104, 125)
 
+    // Número (mismo criterio de color que la camiseta de la app)
+    const numero = j.numeroCamiseta ? String(j.numeroCamiseta) : ''
+    if (numero) {
+        const colorNumero = determinarColorNumero(j.colorPrincipal, j.colorSecundario)
+        ctx.font = fuente(numero.length > 1 ? 34 : 40, 800)
+        ctx.textAlign = 'center'
+        ctx.lineWidth = 3
+        ctx.strokeStyle = colorNumero === '#FFFFFF' ? '#000000' : '#FFFFFF'
+        ctx.strokeText(numero, cx, y + 110)
+        ctx.fillStyle = colorNumero
+        ctx.fillText(numero, cx, y + 110)
+    }
+
     texto(ctx, nombreCorto(j.nombre), cx, y + 172, 25, BLANCO, { sombra: true, anchoMax: w - 16 })
     texto(ctx, `${puntos(j.puntosFantasy)} pts`, cx, y + 205, 25, OSCURO, { anchoMax: w - 16 })
 
@@ -132,7 +146,7 @@ export async function dibujarQuintetoIdeal(canvas, d, _logo, logoLiga) {
     const inicio = (ANCHO_POST - anchoTitulo - separacion - anchoLogo) / 2
 
     ctx.textAlign = 'left'
-    texto(ctx, titulo, inicio, 140, 84, BLANCO, { sombra: true })
+    texto(ctx, titulo, inicio, 150, 84, BLANCO, { sombra: true })
     if (logoLiga) ctx.drawImage(logoLiga, inicio + anchoTitulo + separacion, 140 - altoLogo + 10, anchoLogo, altoLogo)
     ctx.textAlign = 'center'
 
