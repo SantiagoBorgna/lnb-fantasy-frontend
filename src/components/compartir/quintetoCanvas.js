@@ -124,10 +124,28 @@ function pie(ctx) {
     texto(ctx, 'SEXTO HOMBRE FANTASY', ANCHO_POST / 2, 1262, 19, GRIS_AZUL, { espaciado: 6 })
 }
 
-/** d: { nombreEquipo, jornadaNumero, puntaje, jugadores } */
-export async function dibujarGanadorJornada(canvas, d) {
+// Título con el logo de la liga a la derecha, todo centrado. El logo apoya en la base del
+// texto (la pelota sobresale arriba). Si el título es largo, la letra se achica para que entre.
+function tituloConLogo(ctx, titulo, size, base, logoLiga, altoLogo) {
+    const anchoLogo = logoLiga ? logoLiga.width * altoLogo / logoLiga.height : 0
+    const separacion = logoLiga ? 22 : 0
+    const anchoMax = ANCHO_POST - 120 - anchoLogo - separacion
+    let s = size
+    ctx.font = fuente(s, 800)
+    while (ctx.measureText(titulo).width > anchoMax && s > size * 0.5) ctx.font = fuente(--s, 800)
+    const anchoTitulo = ctx.measureText(titulo).width
+    const inicio = (ANCHO_POST - anchoTitulo - separacion - anchoLogo) / 2
+
+    ctx.textAlign = 'left'
+    texto(ctx, titulo, inicio, base, s, BLANCO, { sombra: true, anchoMax })
+    if (logoLiga) ctx.drawImage(logoLiga, inicio + anchoTitulo + separacion, base - altoLogo, anchoLogo, altoLogo)
+    ctx.textAlign = 'center'
+}
+
+/** d: { nombreEquipo, jornadaNumero, puntaje, jugadores } — logoLiga va a la derecha del nombre */
+export async function dibujarGanadorJornada(canvas, d, _logo, logoLiga) {
     const ctx = fondo(canvas)
-    texto(ctx, (d.nombreEquipo || '').toUpperCase(), ANCHO_POST / 2, 118, 92, BLANCO, { sombra: true })
+    tituloConLogo(ctx, (d.nombreEquipo || '').toUpperCase(), 76, 125, logoLiga, 84)
     texto(ctx, `GANADOR JORNADA ${d.jornadaNumero}`, ANCHO_POST / 2, 205, 38, GRIS_AZUL)
     texto(ctx, `PUNTAJE TOTAL: ${puntos(d.puntaje)}`, ANCHO_POST / 2, 275, 36, BLANCO)
     await cancha(ctx, d.jugadores)
@@ -137,19 +155,7 @@ export async function dibujarGanadorJornada(canvas, d) {
 /** d: { jornadaNumero, jugadores } — logoLiga va a la derecha del título */
 export async function dibujarQuintetoIdeal(canvas, d, _logo, logoLiga) {
     const ctx = fondo(canvas)
-    const titulo = 'QUINTETO IDEAL'
-    ctx.font = fuente(84, 800)
-    const anchoTitulo = ctx.measureText(titulo).width
-    const altoLogo = 96
-    const anchoLogo = logoLiga ? logoLiga.width * altoLogo / logoLiga.height : 0
-    const separacion = logoLiga ? 22 : 0
-    const inicio = (ANCHO_POST - anchoTitulo - separacion - anchoLogo) / 2
-
-    ctx.textAlign = 'left'
-    texto(ctx, titulo, inicio, 150, 84, BLANCO, { sombra: true })
-    if (logoLiga) ctx.drawImage(logoLiga, inicio + anchoTitulo + separacion, 140 - altoLogo + 10, anchoLogo, altoLogo)
-    ctx.textAlign = 'center'
-
+    tituloConLogo(ctx, 'QUINTETO IDEAL', 84, 150, logoLiga, 96)
     texto(ctx, `JORNADA ${d.jornadaNumero}`, ANCHO_POST / 2, 260, 40, GRIS_AZUL)
     await cancha(ctx, d.jugadores)
     pie(ctx)
