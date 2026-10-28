@@ -75,6 +75,7 @@ export default function JugadorStatsModal({ jugador, stats, onCerrar, esDraft, m
                     </div>
                     {/* Puntaje Principal */}
                     <div className="text-right">
+                        {jugoHoy && <SellosBonos stats={stats} />}
                         <p className={clsx("font-black text-3xl md:text-4xl", (jugoHoy || (mostrarPromedios && (statsPromedio || isDT))) ? "text-accent" : "text-textMuted")}>
                             {mostrarPromedios ? (isDT ? (jugador.promedioFantasy?.toFixed(1) ?? '--') : (statsPromedio?.promedioFantasy?.toFixed(1) ?? '--')) : (jugoHoy ? stats.puntajeFantasy?.toFixed(1) : '--')}
                         </p>
@@ -129,6 +130,36 @@ export default function JugadorStatsModal({ jugador, stats, onCerrar, esDraft, m
             </div>
         </>,
         document.body
+    )
+}
+
+// Sellos de los bonos que sumó en la jornada. El triple-doble reemplaza al doble-doble,
+// así que como mucho se ven dos (TD/DD + MVP). Si no sumó ningún bono no se muestra nada.
+function SellosBonos({ stats }) {
+    const { dobleDoble, tripleDoble, fueMvp } = stats
+    if (!dobleDoble && !tripleDoble && !fueMvp) return null
+
+    return (
+        <div className="flex justify-end items-center gap-1.5 mb-1">
+            {tripleDoble && <SelloRedondo texto="TD" titulo="Triple-doble: +15" className="border-violet-400 text-violet-300 bg-violet-400/15" />}
+            {dobleDoble && <SelloRedondo texto="DD" titulo="Doble-doble: +5" className="border-sky-400 text-sky-300 bg-sky-400/15" />}
+            {fueMvp && (
+                <span title="MVP del partido: +10" className="relative inline-flex items-center justify-center w-10 h-10 md:w-11 md:h-11">
+                    <svg viewBox="0 0 24 24" className="absolute inset-0 w-full h-full text-yellow-400 drop-shadow" aria-hidden="true">
+                        <path fill="currentColor" d="M12 1.5l3.1 6.6 7.2.9-5.3 5 1.4 7.1L12 17.6l-6.4 3.5 1.4-7.1-5.3-5 7.2-.9z" />
+                    </svg>
+                    <span className="relative text-[8px] md:text-[9px] font-black text-surface mt-0.5">MVP</span>
+                </span>
+            )}
+        </div>
+    )
+}
+
+function SelloRedondo({ texto, titulo, className }) {
+    return (
+        <span title={titulo} className={clsx("inline-flex items-center justify-center w-8 h-8 md:w-9 md:h-9 rounded-full border-2 text-[11px] md:text-xs font-black", className)}>
+            {texto}
+        </span>
     )
 }
 
