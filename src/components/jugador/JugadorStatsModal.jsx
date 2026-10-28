@@ -141,14 +141,17 @@ function SellosBonos({ stats }) {
 
     return (
         <div className="flex justify-end items-center gap-1.5 mb-1">
-            {tripleDoble && <SelloRedondo texto="TD" titulo="Triple-doble: +15" className="border-violet-400 text-violet-300 bg-violet-400/15" />}
-            {dobleDoble && <SelloRedondo texto="DD" titulo="Doble-doble: +5" className="border-sky-400 text-sky-300 bg-sky-400/15" />}
+            {tripleDoble && <SelloRedondo texto="TD" titulo="Triple-doble: +15" className="border-violet-300 bg-violet-500" />}
+            {dobleDoble && <SelloRedondo texto="DD" titulo="Doble-doble: +5" className="border-sky-300 bg-sky-500" />}
             {fueMvp && (
-                <span title="MVP del partido: +10" className="relative inline-flex items-center justify-center w-10 h-10 md:w-11 md:h-11">
+                <span title="MVP del partido: +10" className="relative inline-flex w-10 h-10 md:w-11 md:h-11">
                     <svg viewBox="0 0 24 24" className="absolute inset-0 w-full h-full text-yellow-400 drop-shadow" aria-hidden="true">
                         <path fill="currentColor" d="M12 1.5l3.1 6.6 7.2.9-5.3 5 1.4 7.1L12 17.6l-6.4 3.5 1.4-7.1-5.3-5 7.2-.9z" />
                     </svg>
-                    <span className="relative text-[8px] md:text-[9px] font-black text-surface mt-0.5">MVP</span>
+                    {/* El centro visual de la estrella queda un poco más abajo que el centro de la caja */}
+                    <span className="absolute inset-0 flex items-center justify-center pt-[3px] text-[9px] md:text-[10px] leading-none font-bold tracking-tighter text-surface">
+                        MVP
+                    </span>
                 </span>
             )}
         </div>
@@ -157,7 +160,7 @@ function SellosBonos({ stats }) {
 
 function SelloRedondo({ texto, titulo, className }) {
     return (
-        <span title={titulo} className={clsx("inline-flex items-center justify-center w-8 h-8 md:w-9 md:h-9 rounded-full border-2 text-[11px] md:text-xs font-black", className)}>
+        <span title={titulo} className={clsx("inline-flex items-center justify-center w-8 h-8 md:w-9 md:h-9 rounded-full border-2 text-xs md:text-[13px] leading-none font-bold tracking-tight text-white", className)}>
             {texto}
         </span>
     )
