@@ -86,6 +86,12 @@ export const recalcularJornadaAdmin = async (jornadaId) => {
     return data;
 };
 
+// Suma el bono de MVP a los partidos ya cargados de una jornada EN_JUEGO
+export const aplicarMvpJornadaAdmin = async (jornadaId) => {
+    const { data } = await api.post(`/admin/utilidades/jornadas/${jornadaId}/aplicar-mvp`);
+    return data;
+};
+
 // Recorre los planteles de GES y carga/actualiza los jugadores (y crea los equipos que falten).
 // El backend lo corre en segundo plano y responde enseguida.
 export const sincronizarJugadoresAdmin = async () => {
