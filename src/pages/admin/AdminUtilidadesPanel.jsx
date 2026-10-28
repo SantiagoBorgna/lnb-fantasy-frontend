@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getConfigLiga } from "../../api/configApi";
-import { correrCronAdmin, recalcularJornadaAdmin, sincronizarFixtureAdmin, sincronizarJugadoresAdmin } from "../../api/adminApi";
+import { aplicarMvpJornadaAdmin, correrCronAdmin, recalcularJornadaAdmin, sincronizarFixtureAdmin, sincronizarJugadoresAdmin } from "../../api/adminApi";
 import { getJornadas } from "../../api/jornadaApi";
 import { Play, Loader2 } from "lucide-react";
 import { useUiStore } from "../../store/uiStore";
@@ -50,6 +50,7 @@ const CRONS = [
 ];
 
 const RECALCULO_KEY = "recalcular-jornada";
+const MVP_KEY = "aplicar-mvp";
 const FIXTURE_KEY = "sincronizar-fixture";
 const JUGADORES_KEY = "sincronizar-jugadores";
 
@@ -65,6 +66,8 @@ export default function AdminUtilidadesPanel() {
     const [ejecutando, setEjecutando] = useState(null);
     const [jornadasCerradas, setJornadasCerradas] = useState([]);
     const [jornadaId, setJornadaId] = useState("");
+    const [jornadasEnJuego, setJornadasEnJuego] = useState([]);
+    const [mvpJornadaId, setMvpJornadaId] = useState("");
     const [jornadas, setJornadas] = useState([]);
     const [fixtureJornadaId, setFixtureJornadaId] = useState("");
     const [fixtureDesde, setFixtureDesde] = useState("");
@@ -95,6 +98,14 @@ export default function AdminUtilidadesPanel() {
                 setJornadasCerradas(cerradas);
                 if (cerradas.length > 0) {
                     setJornadaId(cerradas[cerradas.length - 1].id.toString());
+                }
+
+                const enJuego = lista
+                    .filter(j => j.estado === "EN_JUEGO")
+                    .sort((a, b) => a.numero - b.numero);
+                setJornadasEnJuego(enJuego);
+                if (enJuego.length > 0) {
+                    setMvpJornadaId(enJuego[0].id.toString());
                 }
 
                 // El fixture se carga en jornadas que todavía no se jugaron: por defecto
@@ -160,6 +171,23 @@ export default function AdminUtilidadesPanel() {
         }
     };
 
+    const handleAplicarMvp = async () => {
+        const jornada = jornadasEnJuego.find(j => j.id.toString() === mvpJornadaId);
+        if (!jornada) return;
+        if (!window.confirm(`Se va a sumar el bono de MVP a los partidos ya cargados de la Jornada ${jornada.numero} (se vuelven a leer de GES) y recalcular el puntaje parcial. ¿Continuar?`)) return;
+
+        setEjecutando(MVP_KEY);
+        try {
+            const data = await aplicarMvpJornadaAdmin(jornada.id);
+            showToast(data?.mensaje || `MVP de la Jornada ${jornada.numero} iniciado`, "success");
+        } catch (error) {
+            console.error(error);
+            showToast(error.response?.data?.mensaje || `Error al aplicar el MVP a la Jornada ${jornada.numero}`, "error");
+        } finally {
+            setEjecutando(null);
+        }
+    };
+
     const handleEjecutar = async (cron) => {
         setEjecutando(cron.key);
         try {
@@ -214,6 +242,43 @@ export default function AdminUtilidadesPanel() {
                                 <Play className="w-4 h-4" />
                             )}
                             Recalcular
+                        </button>
+                    </div>
+                </div>
+
+                <div className="bg-surface border border-border rounded-2xl p-5 flex flex-col gap-3 md:col-span-2">
+                    <div>
+                        <h3 className="font-bold text-textMain text-sm">Aplicar MVP a jornada en juego</h3>
+                        <p className="text-xs text-textMuted mt-1">
+                            Suma el bono de MVP (+10 a la valoración más alta de cada partido, a todos si hay empate) a los
+                            partidos ya cargados de una jornada EN_JUEGO, volviendo a leer cada planilla de GES, y
+                            recalcula el puntaje parcial. No borra estadísticas y se puede repetir sin duplicar el bono.
+                            Los partidos que se carguen de ahora en más ya suman el MVP solos.
+                        </p>
+                    </div>
+                    <div className="mt-auto flex flex-wrap items-center gap-3">
+                        <select
+                            value={mvpJornadaId}
+                            onChange={(e) => setMvpJornadaId(e.target.value)}
+                            disabled={jornadasEnJuego.length === 0 || ejecutando !== null}
+                            className="bg-card text-textMain border border-border rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary outline-none disabled:opacity-50"
+                        >
+                            {jornadasEnJuego.length === 0 && <option value="">No hay jornadas en juego</option>}
+                            {jornadasEnJuego.map(j => (
+                                <option key={j.id} value={j.id}>Jornada {j.numero}</option>
+                            ))}
+                        </select>
+                        <button
+                            onClick={handleAplicarMvp}
+                            disabled={!mvpJornadaId || ejecutando !== null}
+                            className="flex items-center gap-2 bg-primary text-black font-bold text-sm px-4 py-2 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {ejecutando === MVP_KEY ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                                <Play className="w-4 h-4" />
+                            )}
+                            Aplicar MVP
                         </button>
                     </div>
                 </div>
