@@ -5,6 +5,7 @@ import React from 'react';
 const sponsors = [
     { id: 'balon-al-aire', name: 'Balón al Aire', logoUrl: '/sponsors/balon-al-aire.png', url: 'https://www.instagram.com/balonalaire/' },
     { id: 'playmoves', name: 'Playmoves', logoUrl: '/sponsors/playmoves.png', url: 'https://www.instagram.com/playmoves/' },
+    { id: 'veta', name: 'Veta', logoUrl: '/sponsors/veta.png', url: 'https://www.instagram.com/vetamates/' },
 ];
 
 const SponsorsBanner = ({ className = '' }) => {
