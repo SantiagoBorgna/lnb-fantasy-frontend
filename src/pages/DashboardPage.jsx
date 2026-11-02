@@ -44,14 +44,15 @@ export default function DashboardPage() {
     
     const { data: rankGlobalRes, isFetching: loadingRank } = useQuery({
         queryKey: ['rankingGlobal', torneoActual?.id],
-        queryFn: () => torneoActual ? getTablaTorneo(torneoActual.id) : getRankingGlobal(100)
+        queryFn: () => torneoActual ? getTablaTorneo(torneoActual.id) : getRankingGlobal(6)
     })
 
     const { data: miPosRes } = useQuery({
         queryKey: ['miPosicion'],
-        queryFn: () => getMiPosicion(),
-        enabled: !torneoActual
+        queryFn: () => getMiPosicion()
     })
+    // Cada usuario tiene un único equipo virtual: identifica mi fila tanto en el ranking global como en las tablas de torneo
+    const miEquipoId = miPosRes?.equipoVirtualId ?? null
 
     const jornadas = useMemo(() => {
         if (!jornadasRes) return [];
@@ -98,19 +99,17 @@ export default function DashboardPage() {
         if (!rankGlobalRes) return [[], null];
         
         if (torneoActual) {
-            const miFila = rankGlobalRes.find(f => f.nombreUsuario === usuario?.nombreDisplay);
+            const miFila = miEquipoId ? rankGlobalRes.find(f => f.equipoVirtualId === miEquipoId) : null;
             return [rankGlobalRes, miFila || null];
         } else {
-            const todos = rankGlobalRes;
-            const top5 = todos.slice(0, 5);
-            const yo = todos.find(f => f.nombreUsuario === usuario?.nombreDisplay);
-            let resultRank = todos.slice(0, 6);
-            if (yo && yo.posicion > 5) {
-                resultRank = [...top5, yo];
-            }
+            // Top 5 + mi fila (de /mi-posicion, que identifica por sesión y no depende del límite de la lista)
+            const top5 = rankGlobalRes.slice(0, 5);
+            const resultRank = miPosRes && miPosRes.posicion > 5
+                ? [...top5, miPosRes]
+                : rankGlobalRes.slice(0, 6);
             return [resultRank, miPosRes || null];
         }
-    }, [rankGlobalRes, miPosRes, torneoActual, usuario]);
+    }, [rankGlobalRes, miPosRes, torneoActual, miEquipoId]);
 
     if (loadingPlantel && !plantel && loadingRank && !rankGlobalRes) {
         return <LoadingSpinner mensaje="Cargando dashboard..." />
@@ -204,6 +203,7 @@ export default function DashboardPage() {
             ) : torneoActual.tipoPuntuacion === 'H2H' ? (
                 <DashboardDraftH2H
                     rankingGlobal={rankingGlobal}
+                    miEquipoId={miEquipoId}
                     contextoActual={torneoActual}
                 />
             ) : (
@@ -211,6 +211,7 @@ export default function DashboardPage() {
                     plantel={plantel}
                     miPosicion={miPosicion}
                     rankingGlobal={rankingGlobal}
+                    miEquipoId={miEquipoId}
                     contextoActual={torneoActual}
                 />
             )}
