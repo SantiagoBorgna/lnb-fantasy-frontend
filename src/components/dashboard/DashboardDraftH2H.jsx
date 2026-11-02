@@ -1,14 +1,12 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getFixtureTorneo } from '../../api/torneoApi'
-import { useAuthStore } from '../../store/authStore'
 import MercadoWidget from './MercadoWidget'
 import LoadingSpinner from '../ui/LoadingSpinner'
 import clsx from 'clsx'
 
-export default function DashboardDraftH2H({ rankingGlobal, contextoActual }) {
+export default function DashboardDraftH2H({ rankingGlobal, miEquipoId, contextoActual }) {
     const navigate = useNavigate()
-    const usuario = useAuthStore(state => state.usuario)
     const [fixture, setFixture] = useState([])
     const [loading, setLoading] = useState(true)
 
@@ -21,8 +19,6 @@ export default function DashboardDraftH2H({ rankingGlobal, contextoActual }) {
             .finally(() => setLoading(false))
     }, [contextoActual])
 
-    const miFila = useMemo(() => rankingGlobal.find(f => f.nombreUsuario === usuario?.nombreDisplay), [rankingGlobal, usuario]);
-    const miEquipoId = miFila?.equipoVirtualId;
 
     const { proximoCruce, ultimoCruce } = useMemo(() => {
         let prox = null

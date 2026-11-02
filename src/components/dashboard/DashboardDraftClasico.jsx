@@ -1,6 +1,4 @@
-import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuthStore } from '../../store/authStore'
 import MercadoWidget from './MercadoWidget'
 import clsx from 'clsx'
 
@@ -13,14 +11,8 @@ function StatCard({ label, valor }) {
     )
 }
 
-export default function DashboardDraftClasico({ plantel, miPosicion, rankingGlobal, contextoActual }) {
+export default function DashboardDraftClasico({ plantel, miPosicion, rankingGlobal, miEquipoId, contextoActual }) {
     const navigate = useNavigate()
-    const usuario = useAuthStore(state => state.usuario)
-
-    const miEquipoId = useMemo(() => {
-        const miFila = rankingGlobal?.find(r => r.usuarioId === usuario?.id || r.nombreUsuario === usuario?.nombreDisplay)
-        return miFila ? miFila.equipoVirtualId : null
-    }, [rankingGlobal, usuario])
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
