@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { getShowdownMercado, participarShowdown } from '../../api/showdownApi'
 import { HelpCircle, X, Loader2, Star, Trash2 } from 'lucide-react'
 import { useUiStore } from '../../store/uiStore'
@@ -112,7 +113,7 @@ export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParti
             showToast("¡Alineación guardada!", "success")
             onParticiparSuccess()
         } catch (error) {
-            showToast(error.response?.data?.message || "Error al guardar la alineación", "error")
+            showToast(error.response?.data?.mensaje || "Error al guardar la alineación", "error")
         } finally {
             setIsSubmitting(false)
         }
@@ -268,6 +269,14 @@ export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParti
                         <button type="submit" className="w-full bg-primary text-bg font-bold rounded-xl py-3.5 mt-6 hover:bg-primary/90 transition-colors shadow-md">
                             Continuar
                         </button>
+                        <p className="text-textMuted text-xs text-center">
+                            Al continuar, aceptás nuestros{' '}
+                            {/* En otra pestaña para no perder los datos ya cargados en el formulario */}
+                            <Link to="/terminos" target="_blank" rel="noopener noreferrer" className="text-textMain hover:underline font-semibold">
+                                Términos y Condiciones
+                            </Link>
+                            {' '}y Política de Privacidad.
+                        </p>
                     </form>
                 </div>
             </div>

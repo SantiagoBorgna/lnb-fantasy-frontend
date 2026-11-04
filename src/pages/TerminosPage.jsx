@@ -23,7 +23,7 @@ export default function TerminosPage() {
 
                 <div className="bg-card border border-border rounded-2xl p-6 md:p-8 space-y-6">
                     <h1 className="text-2xl font-black text-textMain">Términos y Condiciones</h1>
-                    <p className="text-textMuted text-sm">Última actualización: Octubre 2026</p>
+                    <p className="text-textMuted text-sm">Última actualización: Noviembre 2026</p>
 
                     <div className="space-y-4 text-textMain text-sm leading-relaxed">
                         <p>
@@ -32,7 +32,7 @@ export default function TerminosPage() {
 
                         <h2 className="text-lg font-bold text-accent mt-6">1. Naturaleza del Servicio</h2>
                         <p>
-                            La Aplicación es un juego de fantasía deportivo ("Fantasy Sports") no oficial, de carácter lúdico y de entretenimiento, basado en los rendimientos estadísticos reales de jugadores de básquet. <strong>La Aplicación NO es una plataforma de apuestas.</strong> Participar es gratuito y no requiere ninguna compra. Los premios que se entregan se rigen por la sección 5.
+                            La Aplicación es un juego de fantasía deportivo ("Fantasy Sports") no oficial, de carácter lúdico y de entretenimiento, basado en los rendimientos estadísticos reales de jugadores de básquet. <strong>La Aplicación NO es una plataforma de apuestas.</strong> Participar es gratuito y no requiere ninguna compra. Los premios que se entregan se rigen por las secciones 5 y 7.
                         </p>
 
                         <h2 className="text-lg font-bold text-accent mt-6">2. Propiedad Intelectual y Exención de Asociación</h2>
@@ -45,7 +45,7 @@ export default function TerminosPage() {
 
                         <h2 className="text-lg font-bold text-accent mt-6">3. Registro y Cuentas de Usuario</h2>
                         <p>
-                            Para utilizar la Aplicación, el usuario debe registrarse proporcionando una dirección de correo electrónico válida.
+                            Para utilizar la Aplicación, el usuario debe registrarse proporcionando una dirección de correo electrónico válida. El Modo Relámpago no requiere registro y se rige por la sección 7.
                         </p>
                         <ul className="list-disc pl-5 space-y-2 text-textMuted">
                             <li>El usuario es responsable de mantener la confidencialidad de su cuenta.</li>
@@ -63,7 +63,7 @@ export default function TerminosPage() {
 
                         <h2 className="text-lg font-bold text-accent mt-6">5. Premios</h2>
                         <p>
-                            Los premios son aportados por los organizadores de Sexto Hombre Fantasy y por sus sponsors, y pueden consistir en dinero o en productos. Los premios vigentes se anuncian en la Aplicación y en nuestras redes sociales. Por el momento, solo hay premios en el juego de la Liga Nacional.
+                            Los premios son aportados por los organizadores de Sexto Hombre Fantasy y por sus sponsors, y pueden consistir en dinero o en productos. Los premios vigentes se anuncian en la Aplicación y en nuestras redes sociales. Por el momento, en el juego por jornadas y temporada solo hay premios en la Liga Nacional. Los premios del Modo Relámpago se rigen por la sección 7.
                         </p>
                         <ul className="list-disc pl-5 space-y-2 text-textMuted">
                             <li>En cada jornada gana el usuario con más puntos en esa jornada. Al terminar la temporada gana el usuario que encabeza la tabla general.</li>
@@ -83,6 +83,21 @@ export default function TerminosPage() {
                             <li>Podés cancelarla en cualquier momento dando de baja la suscripción desde tu cuenta de Mercado Pago. Al cancelarla no se hacen nuevos cobros y mantenés los beneficios hasta el final del período ya pagado.</li>
                             <li>No se reintegran los períodos ya pagados. Esto no afecta tu derecho a revocar la contratación dentro de los 10 días corridos de haberla hecho (Ley 24.240 de Defensa del Consumidor) desde el <Link to="/arrepentimiento" className="underline text-textMain">Botón de arrepentimiento</Link>, que está al pie de todas las páginas.</li>
                         </ul>
+
+                        <h2 className="text-lg font-bold text-accent mt-6">7. Modo Relámpago</h2>
+                        <p>
+                            El Modo Relámpago es una competencia gratuita sobre un solo partido. Se participa desde el código QR o el link del evento, sin crear una cuenta, ingresando nombre, apellido y correo electrónico reales. Pueden participar personas menores de edad.
+                        </p>
+                        <ul className="list-disc pl-5 space-y-2 text-textMuted">
+                            <li>Armás un equipo de 5 jugadores de los dos equipos del partido (1 Base, 1 Escolta, 1 Alero, 1 Ala Pivot y 1 Pivot) con un presupuesto de 50 créditos, y elegís un capitán que suma 1,5 veces sus puntos. Los puntajes están detallados en "Cómo Jugar", dentro del evento.</li>
+                            <li>La inscripción cierra cuando empieza el partido, y una vez enviado el equipo no se puede cambiar.</li>
+                            <li>Se permite una sola participación por persona en cada evento, y cada correo electrónico se puede usar una sola vez por evento. Podemos descalificar a quien participe más de una vez o use datos falsos.</li>
+                            <li>Gana el equipo con más puntos una vez procesadas las estadísticas del partido. Un jugador que no juega suma 0 puntos. Si hay empate en el primer puesto, el ganador se define por sorteo entre los empatados.</li>
+                            <li>El premio de cada evento se anuncia en el estadio, en la Aplicación o en nuestras redes sociales.</li>
+                            <li>El ganador se confirma por correo electrónico a la dirección que ingresó. Lo que muestra la pantalla al terminar el evento no confirma el premio. También valen las reglas de la sección 5 sobre el plazo para responder, la entrega y la verificación de identidad.</li>
+                            <li>Si el partido se suspende o no se juega, podemos cancelar el evento, sin que esto genere derecho a reclamo.</li>
+                            <li>Tu nombre y apellido aparecen en la tabla de posiciones del evento, que puede ver cualquier persona con el link. Tu correo electrónico no se muestra.</li>
+                        </ul>
                     </div>
 
                     <hr className="border-border my-8" />
@@ -98,13 +113,13 @@ export default function TerminosPage() {
                             <li>Datos de uso y navegación dentro de la Aplicación (estadísticas de juego, equipos armados, puntajes).</li>
                             <li>Datos de analítica de uso del sitio (páginas visitadas, dispositivo, ubicación aproximada) recolectados de forma automática a través de Google Analytics.</li>
                             <li>Si activás las notificaciones, los datos técnicos que tu navegador genera para poder enviártelas.</li>
-                            <li>En el Modo Estadio (que se usa sin iniciar sesión), un identificador anónimo del dispositivo para guardar tu equipo y tu puesto.</li>
+                            <li>En el Modo Relámpago (que se usa sin iniciar sesión), el nombre, apellido y correo electrónico que ingresás, el equipo que armás y un identificador anónimo del dispositivo para guardar tu equipo y tu puesto. Tu nombre y apellido se muestran en la tabla de posiciones del evento.</li>
                             <li>Si contratás Premium, el estado de tu suscripción. Los datos de pago los procesa Mercado Pago: nosotros no vemos ni guardamos tu tarjeta.</li>
                         </ul>
 
                         <h2 className="text-lg font-bold text-accent mt-6">2. Uso de la Información</h2>
                         <p>
-                            Utilizamos estos datos exclusivamente para: identificar su cuenta e iniciar sesión, mantener el progreso de su equipo virtual, mostrarle sus estadísticas dentro del juego, y entender de forma agregada cómo se usa la Aplicación para poder mejorarla. Su correo electrónico no será vendido ni compartido con terceros con fines publicitarios.
+                            Utilizamos estos datos exclusivamente para: identificar su cuenta e iniciar sesión, mantener el progreso de su equipo virtual, mostrarle sus estadísticas dentro del juego, contactar a los ganadores de premios, y entender de forma agregada cómo se usa la Aplicación para poder mejorarla. Su correo electrónico no será vendido ni compartido con terceros con fines publicitarios.
                         </p>
 
                         <h2 className="text-lg font-bold text-accent mt-6">3. Servicios de Terceros</h2>
@@ -123,7 +138,7 @@ export default function TerminosPage() {
 
                         <h2 className="text-lg font-bold text-accent mt-6">4. Conservación de Datos</h2>
                         <p>
-                            Conservamos sus datos mientras su cuenta permanezca activa. Si desea que eliminemos su cuenta y los datos asociados, puede solicitarlo por el medio de contacto indicado más abajo; procesaremos la solicitud en un plazo razonable, salvo que debamos conservar cierta información por obligaciones legales.
+                            Conservamos sus datos mientras su cuenta permanezca activa. Si desea que eliminemos su cuenta y los datos asociados, puede solicitarlo por el medio de contacto indicado más abajo; procesaremos la solicitud en un plazo razonable, salvo que debamos conservar cierta información por obligaciones legales. Si participó en el Modo Relámpago sin cuenta, puede pedir lo mismo indicando el correo electrónico que ingresó.
                         </p>
 
                         <h2 className="text-lg font-bold text-accent mt-6">5. Sus Derechos</h2>

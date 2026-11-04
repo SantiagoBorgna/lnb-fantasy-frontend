@@ -10,6 +10,11 @@ export const getPartidosDisponiblesParaShowdown = async () => {
     return data;
 };
 
+export const getParticipantesShowdown = async (id) => {
+    const { data } = await api.get(`/admin/showdown/${id}/participantes`);
+    return data;
+};
+
 export const crearShowdownManual = async (partidoId) => {
     const { data } = await api.post(`/admin/showdown?partidoId=${partidoId}`);
     return data;
