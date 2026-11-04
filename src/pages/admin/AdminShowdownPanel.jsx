@@ -7,6 +7,7 @@ import { Navigate, useNavigate } from 'react-router-dom'
 import { useUiStore } from '../../store/uiStore'
 import ConfirmModal from '../../components/ui/ConfirmModal'
 import ModalQrShowdown from './ModalQrShowdown'
+import ModalParticipantesShowdown from './ModalParticipantesShowdown'
 
 export default function AdminShowdownPanel() {
     const usuario = useAuthStore(state => state.usuario)
@@ -20,6 +21,7 @@ export default function AdminShowdownPanel() {
     const [creandoId, setCreandoId] = useState(null)
     const [confirmModal, setConfirmModal] = useState({ isOpen: false, id: null })
     const [qrDe, setQrDe] = useState(null)
+    const [inscriptosDe, setInscriptosDe] = useState(null)
 
     useEffect(() => {
         if (usuario?.rol !== 'ADMIN') return;
@@ -115,6 +117,13 @@ export default function AdminShowdownPanel() {
                 />
             )}
 
+            {inscriptosDe && (
+                <ModalParticipantesShowdown
+                    evento={inscriptosDe}
+                    onCerrar={() => setInscriptosDe(null)}
+                />
+            )}
+
             <ConfirmModal
                 isOpen={confirmModal.isOpen}
                 onClose={() => setConfirmModal({ isOpen: false, id: null })}
@@ -194,9 +203,12 @@ export default function AdminShowdownPanel() {
                                                 >
                                                     {s.estado.replace('_', ' ')}
                                                 </span>
-                                                <span className="text-xs text-textMuted font-medium">
+                                                <button
+                                                    onClick={() => setInscriptosDe(s)}
+                                                    className="text-xs text-textMuted font-medium underline hover:text-textMain transition-colors"
+                                                >
                                                     {s.participantesCount} inscriptos
-                                                </span>
+                                                </button>
                                             </div>
                                         </div>
 
