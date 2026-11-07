@@ -73,7 +73,7 @@ async function tarjetaJugador(ctx, j, cx, cy) {
     if (img) ctx.drawImage(img, cx - 52, y + 14, 104, 125)
 
     // Número (mismo criterio de color que la camiseta de la app)
-    const numero = j.numeroCamiseta ? String(j.numeroCamiseta) : ''
+    const numero = j.numeroCamiseta != null ? String(j.numeroCamiseta) : ''
     if (numero) {
         const colorNumero = determinarColorNumero(j.colorPrincipal, j.colorSecundario)
         ctx.font = fuente(numero.length > 1 ? 34 : 40, 800)
