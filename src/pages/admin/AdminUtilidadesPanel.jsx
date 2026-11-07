@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getConfigLiga } from "../../api/configApi";
-import { aplicarMvpJornadaAdmin, correrCronAdmin, recalcularJornadaAdmin, sincronizarFixtureAdmin, sincronizarJugadoresAdmin } from "../../api/adminApi";
+import { aplicarMvpJornadaAdmin, correrCronAdmin, getDiferenciasFixtureAdmin, recalcularJornadaAdmin, sincronizarFixtureAdmin, sincronizarJugadoresAdmin } from "../../api/adminApi";
 import { getJornadas } from "../../api/jornadaApi";
-import { Play, Loader2 } from "lucide-react";
+import { Play, Loader2, RefreshCw } from "lucide-react";
 import { useUiStore } from "../../store/uiStore";
 
 const CRONS = [
@@ -60,6 +60,111 @@ const diaDeLaJornada = (fechaIso) => (fechaIso ? fechaIso.substring(0, 10) : "")
 // La URL base del fixture depende de la liga (la da el backend en /config)
 const armarUrlFixture = (base, desde, hasta) =>
     `${base}?handler=ProximosPartidos&fechaInicio=${desde}&fechaFin=${hasta}`;
+
+const TIPOS_DIFERENCIA = {
+    NUEVO: {
+        etiqueta: "Partido nuevo",
+        ayuda: "No está cargado. Si corresponde, cargalo con Sincronizar fixture en su jornada, usando ese día en Desde y Hasta.",
+    },
+    REPROGRAMADO: {
+        etiqueta: "Cambió de día",
+        ayuda: "Si no tiene estadísticas, eliminá el partido viejo en Partidos y cargá el día nuevo con Sincronizar fixture.",
+    },
+    NO_PUBLICADO: {
+        etiqueta: "Ya no figura",
+        ayuda: "Revisá si se postergó o se cambió el rival. Si no se va a jugar en esa fecha, eliminalo en Partidos.",
+    },
+    HORARIO: {
+        etiqueta: "Cambió la hora",
+        ayuda: "Corregila con Sincronizar fixture, usando ese día en Desde y Hasta.",
+    },
+    NO_RECONOCIDO: {
+        etiqueta: "No se pudo leer",
+        ayuda: "Revisá el nombre de los equipos y la fecha en la web de la liga.",
+    },
+};
+
+// Las fechas llegan como "2026-11-06T21:35:00": se muestran tal cual, sin convertir de zona horaria.
+const formatearFecha = (fechaIso) => (fechaIso
+    ? `${fechaIso.substring(8, 10)}/${fechaIso.substring(5, 7)} ${fechaIso.substring(11, 16)}`
+    : "");
+
+function DiferenciasFixture() {
+    const { data, isLoading, isFetching, isError, refetch } = useQuery({
+        queryKey: ['diferenciasFixture'],
+        queryFn: getDiferenciasFixtureAdmin,
+        staleTime: 5 * 60 * 1000,
+        retry: false,
+    });
+
+    const diferencias = data?.diferencias ?? [];
+    const sinControl = !data?.error && (data?.jornadas ?? []).length === 0;
+
+    return (
+        <div className="bg-surface border border-border rounded-2xl p-5 flex flex-col gap-3 md:col-span-2">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="flex-1 min-w-[200px]">
+                    <h3 className="font-bold text-textMain text-sm">Diferencias con la liga</h3>
+                    <p className="text-xs text-textMuted mt-1">
+                        Compara el fixture oficial con los partidos cargados en las jornadas sin finalizar. Solo muestra
+                        las diferencias: no cambia nada. Los partidos procesados y las jornadas sin partidos cargados no
+                        se controlan. Cada 6 horas se hace este mismo control y los cambios nuevos llegan por notificación.
+                    </p>
+                </div>
+                <button
+                    onClick={() => refetch()}
+                    disabled={isFetching}
+                    className="flex items-center gap-2 bg-card text-textMain border border-border font-bold text-sm px-4 py-2 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    {isFetching ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+                    Comparar
+                </button>
+            </div>
+
+            {isLoading && <p className="text-sm text-textMuted">Comparando con el fixture de la liga...</p>}
+
+            {(isError || data?.error) && (
+                <p className="text-sm text-red-400">
+                    No se pudo hacer la comparación, así que puede haber diferencias que no se ven acá.
+                    {data?.error ? ` ${data.error}` : ""}
+                </p>
+            )}
+
+            {data && !data.error && sinControl && (
+                <p className="text-sm text-textMuted">No hay jornadas sin finalizar con partidos cargados.</p>
+            )}
+
+            {data && !data.error && !sinControl && diferencias.length === 0 && (
+                <p className="text-sm text-textMain">
+                    Sin diferencias en {data.jornadas.length === 1 ? "la jornada" : "las jornadas"} {data.jornadas.join(", ")}.
+                </p>
+            )}
+
+            {diferencias.length > 0 && (
+                <ul className="flex flex-col gap-2">
+                    {diferencias.map((d, i) => {
+                        const tipo = TIPOS_DIFERENCIA[d.tipo];
+                        return (
+                            <li key={`${d.tipo}-${d.local}-${d.visitante}-${i}`} className="bg-card border border-border rounded-xl p-3">
+                                <div className="flex flex-wrap items-center gap-2">
+                                    <span className="text-xs font-bold text-primary">{tipo?.etiqueta ?? d.tipo}</span>
+                                    {d.jornada != null && <span className="text-xs text-textMuted">Jornada {d.jornada}</span>}
+                                </div>
+                                <p className="text-sm font-bold text-textMain mt-1 break-words">{d.local} vs {d.visitante}</p>
+                                <p className="text-xs text-textMuted mt-1">
+                                    {d.fechaBase && `Cargado: ${formatearFecha(d.fechaBase)}`}
+                                    {d.fechaBase && d.fechaLiga && " · "}
+                                    {d.fechaLiga && `Liga: ${formatearFecha(d.fechaLiga)}`}
+                                </p>
+                                {tipo && <p className="text-xs text-textMuted mt-1">{tipo.ayuda}</p>}
+                            </li>
+                        );
+                    })}
+                </ul>
+            )}
+        </div>
+    );
+}
 
 export default function AdminUtilidadesPanel() {
     const showToast = useUiStore(state => state.showToast);
@@ -209,6 +314,8 @@ export default function AdminUtilidadesPanel() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <DiferenciasFixture />
+
                 <div className="bg-surface border border-border rounded-2xl p-5 flex flex-col gap-3 md:col-span-2">
                     <div>
                         <h3 className="font-bold text-textMain text-sm">Recalcular jornada cerrada</h3>
