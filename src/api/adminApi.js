@@ -109,6 +109,12 @@ export const sincronizarFixtureAdmin = async (jornadaId, urlFixture) => {
     return data;
 };
 
+// Compara el fixture de la liga con los partidos cargados. Solo lee.
+export const getDiferenciasFixtureAdmin = async () => {
+    const { data } = await api.get('/admin/utilidades/fixture/diferencias');
+    return data;
+};
+
 
 // ── Comunidad: números de usuarios y notificaciones push ──
 export const getResumenUsuarios = async () => {
