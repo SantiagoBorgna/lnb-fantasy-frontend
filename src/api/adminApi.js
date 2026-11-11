@@ -31,6 +31,13 @@ export const getQuintetosPorJornada = async (id) => {
     return response.data
 }
 
+// --- ADMIN MES ---
+export const getMesesAdmin = async () => (await api.get('/admin/meses')).data
+export const crearMesAdmin = async (mes) => (await api.post('/admin/meses', mes)).data
+export const actualizarMesAdmin = async (id, mes) => (await api.put(`/admin/meses/${id}`, mes)).data
+export const eliminarMesAdmin = async (id) => { await api.delete(`/admin/meses/${id}`) }
+export const getResumenMesAdmin = async (id) => (await api.get(`/admin/meses/${id}/resumen`)).data
+
 // --- ADMIN PARTIDOS ---
 export const getPartidos = async (jornadaId) => {
     const url = jornadaId ? `/admin/partidos?jornadaId=${jornadaId}` : '/admin/partidos'

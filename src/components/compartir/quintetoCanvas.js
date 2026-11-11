@@ -86,7 +86,7 @@ async function tarjetaJugador(ctx, j, cx, cy) {
     }
 
     texto(ctx, nombreCorto(j.nombre), cx, y + 172, 25, BLANCO, { sombra: true, anchoMax: w - 16 })
-    texto(ctx, `${puntos(j.puntosFantasy)} pts`, cx, y + 205, 25, OSCURO, { anchoMax: w - 16 })
+    texto(ctx, `${puntos(j.puntosFantasy)} ${j.sufijoPuntos ?? 'pts'}`, cx, y + 205, 25, OSCURO, { anchoMax: w - 16 })
 
     if (j.esCapitan) {
         const bx = x + w - 11, by = y + 17
@@ -142,21 +142,28 @@ function tituloConLogo(ctx, titulo, size, base, logoLiga, altoLogo) {
     ctx.textAlign = 'center'
 }
 
-/** d: { nombreEquipo, jornadaNumero, puntaje, jugadores } — logoLiga va a la derecha del nombre */
+/**
+ * d: { nombreEquipo, jornadaNumero, puntaje, jugadores, subtitulo?, etiquetaPuntaje? }
+ * logoLiga va a la derecha del nombre. subtitulo/etiquetaPuntaje los usa el resumen del mes
+ * (etiquetaPuntaje: null → solo el número, "612.4 PTS").
+ */
 export async function dibujarGanadorJornada(canvas, d, _logo, logoLiga) {
     const ctx = fondo(canvas)
     tituloConLogo(ctx, (d.nombreEquipo || '').toUpperCase(), 76, 125, logoLiga, 84)
-    texto(ctx, `GANADOR JORNADA ${d.jornadaNumero}`, ANCHO_POST / 2, 205, 38, GRIS_AZUL)
-    texto(ctx, `PUNTAJE TOTAL: ${puntos(d.puntaje)}`, ANCHO_POST / 2, 275, 36, BLANCO)
+    texto(ctx, d.subtitulo ?? `GANADOR JORNADA ${d.jornadaNumero}`, ANCHO_POST / 2, 205, 38, GRIS_AZUL)
+    const lineaPuntaje = d.etiquetaPuntaje === null
+        ? `${puntos(d.puntaje)} PTS`
+        : `${d.etiquetaPuntaje ?? 'PUNTAJE TOTAL'}: ${puntos(d.puntaje)}`
+    texto(ctx, lineaPuntaje, ANCHO_POST / 2, 275, 36, BLANCO)
     await cancha(ctx, d.jugadores)
     pie(ctx)
 }
 
-/** d: { jornadaNumero, jugadores } — logoLiga va a la derecha del título */
+/** d: { jornadaNumero, jugadores, subtitulo? } — logoLiga va a la derecha del título */
 export async function dibujarQuintetoIdeal(canvas, d, _logo, logoLiga) {
     const ctx = fondo(canvas)
     tituloConLogo(ctx, 'QUINTETO IDEAL', 84, 150, logoLiga, 96)
-    texto(ctx, `JORNADA ${d.jornadaNumero}`, ANCHO_POST / 2, 260, 40, GRIS_AZUL)
+    texto(ctx, d.subtitulo ?? `JORNADA ${d.jornadaNumero}`, ANCHO_POST / 2, 260, 40, GRIS_AZUL)
     await cancha(ctx, d.jugadores)
     pie(ctx)
 }
