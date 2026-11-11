@@ -28,6 +28,7 @@ export default function AdminMesPanel() {
     const [mesElegido, setMesId] = useState('')
     const [editor, setEditor] = useState(null) // { id?, nombre, jornadaIds: Set }
     const [imagen, setImagen] = useState(null) // 'tabla' | 'puntero' | 'ideal'
+    const [confirmarEliminar, setConfirmarEliminar] = useState(false)
 
     const { data: meses = [], isLoading: cargandoMeses } = useQuery({
         queryKey: ['adminMeses'],
@@ -71,6 +72,7 @@ export default function AdminMesPanel() {
         mutationFn: eliminarMesAdmin,
         onSuccess: () => {
             setMesId('')
+            setConfirmarEliminar(false)
             queryClient.invalidateQueries({ queryKey: ['adminMeses'] })
             showToast('Mes eliminado')
         },
@@ -89,11 +91,6 @@ export default function AdminMesPanel() {
         return { ...e, jornadaIds: ids }
     })
 
-    const handleEliminar = () => {
-        if (mesActual && window.confirm(`¿Eliminar el mes "${mesActual.nombre}"? Las jornadas no se tocan.`)) {
-            eliminar.mutate(mesActual.id)
-        }
-    }
 
     return (
         <div className="flex flex-col gap-6 animate-fade-in">
@@ -116,7 +113,7 @@ export default function AdminMesPanel() {
                                 className="p-2 rounded-xl border border-border text-textMuted hover:text-textMain">
                                 <Pencil className="w-4 h-4" />
                             </button>
-                            <button onClick={handleEliminar} title="Eliminar mes" disabled={eliminar.isPending}
+                            <button onClick={() => setConfirmarEliminar(true)} title="Eliminar mes" disabled={eliminar.isPending}
                                 className="p-2 rounded-xl border border-border text-textMuted hover:text-red-400">
                                 <Trash2 className="w-4 h-4" />
                             </button>
@@ -190,6 +187,36 @@ export default function AdminMesPanel() {
 
             {resumen && imagen && (
                 <ModalesImagen resumen={resumen} tipo={imagen} onCerrar={() => setImagen(null)} />
+            )}
+
+            {confirmarEliminar && mesActual && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+                    <div className="bg-surface border border-border rounded-xl w-full max-w-sm overflow-hidden shadow-2xl p-6 text-center">
+                        <div className="mx-auto w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center mb-4 text-red-500">
+                            <Trash2 size={24} />
+                        </div>
+                        <h3 className="text-xl font-bold text-white mb-2 capitalize">Eliminar {mesActual.nombre}</h3>
+                        <p className="text-textMuted mb-6">
+                            ¿Estás seguro de que querés eliminar este mes? Las jornadas no se tocan.
+                        </p>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setConfirmarEliminar(false)}
+                                className="flex-1 py-2 rounded-lg font-bold text-textMuted hover:text-white transition-colors bg-card border border-border"
+                                disabled={eliminar.isPending}
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={() => eliminar.mutate(mesActual.id)}
+                                disabled={eliminar.isPending}
+                                className="flex-1 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                            >
+                                {eliminar.isPending ? 'Eliminando...' : 'Sí, eliminar'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     )
@@ -385,7 +412,7 @@ function ModalesImagen({ resumen, tipo, onCerrar }) {
     const datosPuntero = useMemo(() => resumen.puntero ? {
         nombreEquipo: resumen.puntero.nombreEquipo,
         subtitulo: `PUNTAJE DE ${mes.toUpperCase()}`,
-        etiquetaPuntaje: null,
+        puntajeEnSubtitulo: true,
         puntaje: resumen.puntero.puntajeMes,
         jugadores: resumen.puntero.jugadores,
     } : null, [resumen.puntero, mes])

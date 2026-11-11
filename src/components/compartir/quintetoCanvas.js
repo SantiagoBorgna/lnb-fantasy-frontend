@@ -143,18 +143,20 @@ function tituloConLogo(ctx, titulo, size, base, logoLiga, altoLogo) {
 }
 
 /**
- * d: { nombreEquipo, jornadaNumero, puntaje, jugadores, subtitulo?, etiquetaPuntaje? }
- * logoLiga va a la derecha del nombre. subtitulo/etiquetaPuntaje los usa el resumen del mes
- * (etiquetaPuntaje: null → solo el número, "612.4 PTS").
+ * d: { nombreEquipo, jornadaNumero, puntaje, jugadores, subtitulo?, puntajeEnSubtitulo? }
+ * logoLiga va a la derecha del nombre. subtitulo/puntajeEnSubtitulo los usa el resumen del mes.
  */
 export async function dibujarGanadorJornada(canvas, d, _logo, logoLiga) {
     const ctx = fondo(canvas)
-    tituloConLogo(ctx, (d.nombreEquipo || '').toUpperCase(), 76, 125, logoLiga, 84)
-    texto(ctx, d.subtitulo ?? `GANADOR JORNADA ${d.jornadaNumero}`, ANCHO_POST / 2, 205, 38, GRIS_AZUL)
-    const lineaPuntaje = d.etiquetaPuntaje === null
-        ? `${puntos(d.puntaje)} PTS`
-        : `${d.etiquetaPuntaje ?? 'PUNTAJE TOTAL'}: ${puntos(d.puntaje)}`
-    texto(ctx, lineaPuntaje, ANCHO_POST / 2, 275, 36, BLANCO)
+    if (d.puntajeEnSubtitulo) {
+        // Resumen del mes: "PUNTAJE DE NOVIEMBRE: 612.4" en una sola línea, todo en gris
+        tituloConLogo(ctx, (d.nombreEquipo || '').toUpperCase(), 76, 145, logoLiga, 84)
+        texto(ctx, `${d.subtitulo}: ${puntos(d.puntaje)}`, ANCHO_POST / 2, 245, 40, GRIS_AZUL)
+    } else {
+        tituloConLogo(ctx, (d.nombreEquipo || '').toUpperCase(), 76, 125, logoLiga, 84)
+        texto(ctx, d.subtitulo ?? `GANADOR JORNADA ${d.jornadaNumero}`, ANCHO_POST / 2, 205, 38, GRIS_AZUL)
+        texto(ctx, `PUNTAJE TOTAL: ${puntos(d.puntaje)}`, ANCHO_POST / 2, 275, 36, BLANCO)
+    }
     await cancha(ctx, d.jugadores)
     pie(ctx)
 }
