@@ -1,9 +1,10 @@
 import { Fragment, useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Plus, Edit2, Trash2, Users, ImageDown } from 'lucide-react'
+import { Plus, Edit2, Trash2, Users, ImageDown, Trophy } from 'lucide-react'
 import AdminJornadaModal from './AdminJornadaModal'
 import EquiposQueNoJuegan from './EquiposQueNoJuegan'
 import ModalFixtureJornada from './ModalFixtureJornada'
+import ModalTop5Jornada from './ModalTop5Jornada'
 import api from '../../api/axiosClient'
 
 const fetchJornadas = async () => {
@@ -27,6 +28,7 @@ export default function AdminJornadasPanel() {
     const [jornadaToDelete, setJornadaToDelete] = useState(null)
     const [jornadaConEquipos, setJornadaConEquipos] = useState(null)
     const [jornadaFixture, setJornadaFixture] = useState(null)
+    const [jornadaTop5, setJornadaTop5] = useState(null)
 
     const deleteMutation = useMutation({
         mutationFn: deleteJornada,
@@ -105,6 +107,13 @@ export default function AdminJornadasPanel() {
                                                 <ImageDown size={16} />
                                             </button>
                                             <button
+                                                onClick={() => setJornadaTop5(jornada)}
+                                                className="p-2 text-textMuted hover:text-white transition-colors bg-background rounded-lg"
+                                                title="Imagen del top 5"
+                                            >
+                                                <Trophy size={16} />
+                                            </button>
+                                            <button
                                                 onClick={() => {
                                                     setJornadaToEdit(jornada)
                                                     setModalOpen(true)
@@ -147,6 +156,10 @@ export default function AdminJornadasPanel() {
 
             {jornadaFixture && (
                 <ModalFixtureJornada jornada={jornadaFixture} onCerrar={() => setJornadaFixture(null)} />
+            )}
+
+            {jornadaTop5 && (
+                <ModalTop5Jornada jornada={jornadaTop5} onCerrar={() => setJornadaTop5(null)} />
             )}
 
             {modalOpen && (
