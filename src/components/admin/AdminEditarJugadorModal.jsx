@@ -80,6 +80,7 @@ export default function AdminEditarJugadorModal({ isOpen, onClose, jugador, equi
                                 <option value="ALERO" className="bg-card text-textMain">ALERO</option>
                                 <option value="ALA_PIVOT" className="bg-card text-textMain">ALA PIVOT</option>
                                 <option value="PIVOT" className="bg-card text-textMain">PIVOT</option>
+                                <option value="DESCONOCIDO" className="bg-card text-textMain">DESCONOCIDO</option>
                             </select>
                         </div>
 

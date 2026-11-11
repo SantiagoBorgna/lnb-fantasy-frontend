@@ -150,6 +150,7 @@ export default function AdminJugadoresPanel() {
                         <option value="ALERO" className="bg-card text-textMain">Alero</option>
                         <option value="ALA_PIVOT" className="bg-card text-textMain">Ala-Pivot</option>
                         <option value="PIVOT" className="bg-card text-textMain">Pivot</option>
+                        <option value="DESCONOCIDO" className="bg-card text-textMain">Desconocido</option>
                     </select>
                     <select
                         value={filtroEstado}
