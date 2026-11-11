@@ -33,8 +33,7 @@ function medalla(ctx, posicion, cx, cy, r) {
     ctx.fillText(String(posicion), cx, cy + 16)
 }
 
-/** d: { jornadaNumero, filas: [{ posicion, nombreEquipo, puntos }] } */
-export async function dibujarTop5(canvas, d, _logo, logoLiga) {
+function lienzo(canvas) {
     canvas.width = ANCHO_POST
     canvas.height = ALTO_POST
     const ctx = canvas.getContext('2d')
@@ -44,29 +43,57 @@ export async function dibujarTop5(canvas, d, _logo, logoLiga) {
     ctx.fillStyle = g
     ctx.fillRect(0, 0, ANCHO_POST, ALTO_POST)
     ctx.textBaseline = 'alphabetic'
+    return ctx
+}
 
-    // Título + logo de la liga, centrados como un bloque
-    const titulo = 'LOS 5 MEJORES'
-    ctx.font = fuente(76, 800)
-    const anchoTitulo = ctx.measureText(titulo).width
-    const altoLogo = 92, separacion = 32
+// Título + logo de la liga, centrados como un bloque. Si no entra, la letra se achica.
+function tituloConLogo(ctx, titulo, size, base, logoLiga, altoLogo, separacion) {
     const anchoLogo = logoLiga ? logoLiga.width * altoLogo / logoLiga.height : 0
+    const anchoMax = ANCHO_POST - 120 - (logoLiga ? separacion + anchoLogo : 0)
+    let s = size
+    ctx.font = fuente(s, 800)
+    while (ctx.measureText(titulo).width > anchoMax && s > size * 0.5) ctx.font = fuente(--s, 800)
+    const anchoTitulo = ctx.measureText(titulo).width
     const anchoBloque = anchoTitulo + (logoLiga ? separacion + anchoLogo : 0)
     const x0 = (ANCHO_POST - anchoBloque) / 2
     ctx.fillStyle = BLANCO
     ctx.textAlign = 'left'
-    ctx.fillText(titulo, x0, 158)
-    if (logoLiga) ctx.drawImage(logoLiga, x0 + anchoTitulo + separacion, 70, anchoLogo, altoLogo)
+    ctx.fillText(titulo, x0, base)
+    if (logoLiga) ctx.drawImage(logoLiga, x0 + anchoTitulo + separacion, base - 88, anchoLogo, altoLogo)
+    return s
+}
 
+function subtitulo(ctx, texto, base) {
     ctx.fillStyle = GRIS_AZUL
     ctx.font = fuente(42, 700)
     ctx.textAlign = 'center'
-    ctx.fillText(`JORNADA ${d.jornadaNumero}`, ANCHO_POST / 2, 258)
+    ctx.fillText(texto, ANCHO_POST / 2, base)
+}
 
-    // Tarjetas
+/** d: { jornadaNumero, filas: [{ posicion, nombreEquipo, puntos }] } */
+export async function dibujarTop5(canvas, d, _logo, logoLiga) {
+    const ctx = lienzo(canvas)
+    tituloConLogo(ctx, 'LOS 5 MEJORES', 76, 158, logoLiga, 92, 32)
+    subtitulo(ctx, `JORNADA ${d.jornadaNumero}`, 258)
+    tarjetas(ctx, d.filas, { altoTarjeta: 158, paso: 181.5, arriba: 310 })
+    pie(ctx)
+}
+
+/**
+ * Top 10 del mes ("TOP 10 NOVIEMBRE", 5 puestos por imagen), con el mismo formato que el top 5 de la jornada.
+ * d: { mes, fecha: 'dd/mm', filas: [{ posicion, nombreEquipo, puntos }] }
+ */
+export async function dibujarTablaMes(canvas, d, _logo, logoLiga) {
+    const ctx = lienzo(canvas)
+    tituloConLogo(ctx, `TOP 10 ${(d.mes || '').toUpperCase()}`, 76, 158, logoLiga, 92, 32)
+    subtitulo(ctx, `AL ${d.fecha}`, 258)
+    tarjetas(ctx, d.filas, { altoTarjeta: 158, paso: 181.5, arriba: 310 })
+    pie(ctx)
+}
+
+function tarjetas(ctx, filas, { altoTarjeta, paso, arriba }) {
     const izquierda = 108, derecha = ANCHO_POST - 108
-    const altoTarjeta = 158, paso = 181.5, arriba = 310
-    d.filas.forEach((fila, i) => {
+    filas.forEach((fila, i) => {
         const y = arriba + i * paso
         const cy = y + altoTarjeta / 2
         ctx.fillStyle = TARJETA
@@ -89,7 +116,9 @@ export async function dibujarTop5(canvas, d, _logo, logoLiga) {
         textoAjustado(ctx, (fila.nombreEquipo || '').toUpperCase(), xNombre, cy + 13,
             xPuntos - anchoPuntos - 36 - xNombre, 36, 700, 26)
     })
+}
 
+function pie(ctx) {
     ctx.fillStyle = GRIS_AZUL
     ctx.font = fuente(20, 800)
     ctx.letterSpacing = '8px'

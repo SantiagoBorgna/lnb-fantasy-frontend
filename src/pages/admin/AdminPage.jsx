@@ -9,6 +9,7 @@ import { ChevronLeft } from 'lucide-react'
 
 import AdminShowdownPanel from './AdminShowdownPanel'
 import AdminQuintetosPanel from './AdminQuintetosPanel'
+import AdminMesPanel from './AdminMesPanel'
 import AdminJugadoresPanel from './AdminJugadoresPanel'
 import AdminDtsPanel from './AdminDtsPanel'
 import AdminJornadasPanel from './AdminJornadasPanel'
@@ -88,6 +89,15 @@ export default function AdminPage() {
                             Quintetos
                         </button>
                         <button
+                            onClick={() => setTab('MES')}
+                            className={clsx(
+                                "flex-1 md:w-32 py-2 text-sm font-bold rounded-lg transition-all",
+                                tab === 'MES' ? "bg-card text-textMain shadow-sm border border-border" : "text-textMuted hover:text-textMain"
+                            )}
+                        >
+                            Mes
+                        </button>
+                        <button
                             onClick={() => setTab('JUGADORES')}
                             className={clsx(
                                 "flex-1 md:w-32 py-2 text-sm font-bold rounded-lg transition-all",
@@ -131,6 +141,7 @@ export default function AdminPage() {
                         {tab === 'PARTIDOS' && <AdminPartidosPanel />}
                         {tab === 'RELAMPAGOS' && <AdminShowdownPanel />}
                         {tab === 'QUINTETOS' && <AdminQuintetosPanel />}
+                        {tab === 'MES' && <AdminMesPanel />}
                         {tab === 'JUGADORES' && <AdminJugadoresPanel />}
                         {tab === 'DTS' && <AdminDtsPanel />}
                         {tab === 'UTILIDADES' && <AdminUtilidadesPanel />}
