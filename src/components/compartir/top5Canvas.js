@@ -6,6 +6,7 @@ import { ANCHO_POST, ALTO_POST } from './quintetoCanvas'
 const GRIS_AZUL = '#8EA3C0'
 const TARJETA = '#1E2A3B'
 const NEGRO = '#111111'
+const ALTO_HISTORIA = 1920
 
 export const formatoPuntosTop5 = (n) => `${Number(n ?? 0).toFixed(1)} pts`
 
@@ -27,21 +28,22 @@ function medalla(ctx, posicion, cx, cy, r) {
     ctx.arc(cx, cy, r, 0, Math.PI * 2)
     ctx.fill()
 
+    // Mismas proporciones que la medalla original (radio 46, número de 44px)
     ctx.fillStyle = colorNumero
-    ctx.font = fuente(44, 700)
+    ctx.font = fuente(Math.round(r * 44 / 46), 700)
     ctx.textAlign = 'center'
-    ctx.fillText(String(posicion), cx, cy + 16)
+    ctx.fillText(String(posicion), cx, cy + r * 16 / 46)
 }
 
-function lienzo(canvas) {
+function lienzo(canvas, alto = ALTO_POST) {
     canvas.width = ANCHO_POST
-    canvas.height = ALTO_POST
+    canvas.height = alto
     const ctx = canvas.getContext('2d')
-    const g = ctx.createLinearGradient(0, 0, ANCHO_POST * 0.6, ALTO_POST)
+    const g = ctx.createLinearGradient(0, 0, ANCHO_POST * 0.6, alto)
     g.addColorStop(0, '#0E1828')
     g.addColorStop(1, '#1C3C6E')
     ctx.fillStyle = g
-    ctx.fillRect(0, 0, ANCHO_POST, ALTO_POST)
+    ctx.fillRect(0, 0, ANCHO_POST, alto)
     ctx.textBaseline = 'alphabetic'
     return ctx
 }
@@ -91,17 +93,30 @@ export async function dibujarTablaMes(canvas, d, _logo, logoLiga) {
     pie(ctx)
 }
 
-function tarjetas(ctx, filas, { altoTarjeta, paso, arriba }) {
+/**
+ * Top 10 del mes en formato historia (1080x1920): mismo título, subtítulo y pie que las placas
+ * de post, con los 10 puestos en una sola imagen.
+ * d: { mes, fecha: 'dd/mm', filas: [{ posicion, nombreEquipo, puntos }] }
+ */
+export async function dibujarTablaMesHistoria(canvas, d, _logo, logoLiga) {
+    const ctx = lienzo(canvas, ALTO_HISTORIA)
+    tituloConLogo(ctx, `TOP 10 ${(d.mes || '').toUpperCase()}`, 76, 250, logoLiga, 92, 32)
+    subtitulo(ctx, `AL ${d.fecha}`, 350)
+    tarjetas(ctx, d.filas, { altoTarjeta: 118, paso: 132, arriba: 405, radioMedalla: 40, radioTarjeta: 40 })
+    pie(ctx, 1800)
+}
+
+function tarjetas(ctx, filas, { altoTarjeta, paso, arriba, radioMedalla = 46, radioTarjeta = 48 }) {
     const izquierda = 108, derecha = ANCHO_POST - 108
     filas.forEach((fila, i) => {
         const y = arriba + i * paso
         const cy = y + altoTarjeta / 2
         ctx.fillStyle = TARJETA
         ctx.beginPath()
-        ctx.roundRect(izquierda, y, derecha - izquierda, altoTarjeta, 48)
+        ctx.roundRect(izquierda, y, derecha - izquierda, altoTarjeta, radioTarjeta)
         ctx.fill()
 
-        medalla(ctx, fila.posicion, 194, cy, 46)
+        medalla(ctx, fila.posicion, 194, cy, radioMedalla)
 
         const puntos = formatoPuntosTop5(fila.puntos)
         ctx.fillStyle = BLANCO
@@ -118,11 +133,11 @@ function tarjetas(ctx, filas, { altoTarjeta, paso, arriba }) {
     })
 }
 
-function pie(ctx) {
+function pie(ctx, base = 1268) {
     ctx.fillStyle = GRIS_AZUL
     ctx.font = fuente(20, 800)
     ctx.letterSpacing = '8px'
     ctx.textAlign = 'center'
-    ctx.fillText('SEXTO HOMBRE FANTASY', ANCHO_POST / 2, 1268)
+    ctx.fillText('SEXTO HOMBRE FANTASY', ANCHO_POST / 2, base)
     ctx.letterSpacing = '0px'
 }
