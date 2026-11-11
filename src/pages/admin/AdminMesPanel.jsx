@@ -10,7 +10,7 @@ import { useUiStore } from '../../store/uiStore'
 import CamisetaSVG from '../../components/jugador/CamisetaSVG'
 import ModalImagenCompartible from '../../components/compartir/ModalImagenCompartible'
 import { dibujarGanadorJornada, dibujarQuintetoIdeal } from '../../components/compartir/quintetoCanvas'
-import { dibujarTablaMes } from '../../components/compartir/top5Canvas'
+import { dibujarTablaMes, dibujarTablaMesHistoria } from '../../components/compartir/top5Canvas'
 
 const POSICIONES = { BASE: 'Base', ESCOLTA: 'Escolta', ALERO: 'Alero', ALA_PIVOT: 'Ala Pivot', PIVOT: 'Pivot' }
 const FILAS_POR_IMAGEN = 5
@@ -289,7 +289,12 @@ function ResumenMes({ resumen, onImagen }) {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Tabla */}
-                <Tarjeta titulo="Tabla de posiciones" accion={tabla.length > 0 && <BotonImagen onClick={() => onImagen('tabla')}>Imágenes</BotonImagen>}>
+                <Tarjeta titulo="Tabla de posiciones" accion={tabla.length > 0 && (
+                    <div className="flex flex-wrap gap-2 justify-end">
+                        <BotonImagen onClick={() => onImagen('tabla')}>Post</BotonImagen>
+                        <BotonImagen onClick={() => onImagen('historia')}>Historia</BotonImagen>
+                    </div>
+                )}>
                     {tabla.length === 0 ? sinDatos : (
                         <div className="flex flex-col gap-1.5">
                             {tabla.map(f => (
@@ -321,7 +326,7 @@ function ResumenMes({ resumen, onImagen }) {
                                 <p>Puntaje del mes: <span className="text-textMain font-bold">{fmt(puntero.puntajeMes)}</span> · Jornada {puntero.jornadaNumero}: <span className="text-textMain font-bold">{fmt(puntero.puntajeJornada)}</span></p>
                             </div>
                             <div className="flex flex-col gap-2">
-                                {puntero.jugadores.map(j => <FilaJugador key={j.id} jugador={j} valor={j.puntosFantasy} />)}
+                                {puntero.jugadores.map(j => <FilaJugador key={j.id} jugador={j} valor={j.puntosFantasy} sufijo="prom mes" />)}
                             </div>
                         </>
                     )}
@@ -409,6 +414,11 @@ function ModalesImagen({ resumen, tipo, onCerrar }) {
         filas: paginas[pagina].map(f => ({ posicion: f.posicion, nombreEquipo: f.nombreEquipo, puntos: f.puntos })),
     } : null, [paginas, pagina, mes, fecha])
 
+    const datosHistoria = useMemo(() => resumen.tabla.length > 0 ? {
+        mes, fecha,
+        filas: resumen.tabla.map(f => ({ posicion: f.posicion, nombreEquipo: f.nombreEquipo, puntos: f.puntos })),
+    } : null, [resumen.tabla, mes, fecha])
+
     const datosPuntero = useMemo(() => resumen.puntero ? {
         nombreEquipo: resumen.puntero.nombreEquipo,
         subtitulo: `PUNTAJE DE ${mes.toUpperCase()}`,
@@ -419,8 +429,23 @@ function ModalesImagen({ resumen, tipo, onCerrar }) {
 
     const datosIdeal = useMemo(() => resumen.quintetoIdeal.length > 0 ? {
         subtitulo: mes.toUpperCase(),
-        jugadores: resumen.quintetoIdeal.map(p => ({ ...p.jugador, puntosFantasy: p.promedio, sufijoPuntos: 'prom' })),
+        jugadores: resumen.quintetoIdeal.map(p => ({ ...p.jugador, puntosFantasy: p.promedio })),
     } : null, [resumen.quintetoIdeal, mes])
+
+    if (tipo === 'historia') {
+        return (
+            <ModalImagenCompartible
+                titulo={`Top 10 ${mes} (historia)`}
+                mensajeSinDatos="Todavía no hay posiciones."
+                datos={datosHistoria}
+                dibujar={dibujarTablaMesHistoria}
+                nombreArchivo={`top10-${slug}-historia.png`}
+                contentType="historia_tabla_mes"
+                altImagen={`Top 10 ${mes}`}
+                onCerrar={onCerrar}
+            />
+        )
+    }
 
     if (tipo === 'tabla') {
         const sufijo = paginas.length > 1 ? `-${pagina + 1}` : ''
