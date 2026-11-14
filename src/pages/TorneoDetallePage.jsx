@@ -378,12 +378,12 @@ export default function TorneoDetallePage() {
                                             {e.equipoLocalNombre}
                                         </span>
                                     </div>
-                                      <div className="w-24 md:w-32 shrink-0">
+                                      <div className="w-28 md:w-36 shrink-0">
                                           {e.procesado ? (
                                               <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1 md:gap-2 w-full">
-                                                  <span className={clsx("text-right text-sm font-black", ganaLocal ? "text-accent" : "text-textMain")}>{Math.round(e.puntajeLocal)}</span>
-                                                  <span className="text-center text-textMuted text-xs font-semibold mx-1">-</span>
-                                                  <span className={clsx("text-left text-sm font-black", ganaVisita ? "text-accent" : "text-textMain")}>{e.equipoVisitanteId ? Math.round(e.puntajeVisitante) : '0'}</span>
+                                                  <span className={clsx("text-right text-sm font-black tabular-nums", ganaLocal ? "text-accent" : "text-textMain")}>{(e.puntajeLocal ?? 0).toFixed(1)}</span>
+                                                  <span className="text-center text-textMuted text-xs font-semibold">-</span>
+                                                  <span className={clsx("text-left text-sm font-black tabular-nums", ganaVisita ? "text-accent" : "text-textMain")}>{e.equipoVisitanteId ? (e.puntajeVisitante ?? 0).toFixed(1) : '0.0'}</span>
                                               </div>
                                           ) : (
                                               <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-1 md:gap-2 w-full">
