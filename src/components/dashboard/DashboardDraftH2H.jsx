@@ -94,10 +94,10 @@ export default function DashboardDraftH2H({ rankingGlobal, miEquipoId, contextoA
                                 ) : (
                                     <div className="flex items-center justify-between">
                                         <span className={clsx("flex-1 text-sm font-semibold text-right line-clamp-2 leading-tight", miLocalUlt ? "text-primary" : "text-textMain")}>{ultimoCruce.equipoLocalNombre}</span>
-                                        <div className="w-24 shrink-0 grid grid-cols-[1fr_auto_1fr] items-center gap-1 mx-2">
-                                            <span className={clsx("text-right text-sm font-black", ganaLocal ? "text-accent" : "text-textMain")}>{Math.round(ultimoCruce.puntajeLocal)}</span>
-                                            <span className="text-center text-textMuted text-xs font-semibold mx-1">-</span>
-                                            <span className={clsx("text-left text-sm font-black", ganaVisita ? "text-accent" : "text-textMain")}>{Math.round(ultimoCruce.puntajeVisitante)}</span>
+                                        <div className="w-28 shrink-0 grid grid-cols-[1fr_auto_1fr] items-center gap-1 mx-2">
+                                            <span className={clsx("text-right text-sm font-black tabular-nums", ganaLocal ? "text-accent" : "text-textMain")}>{(ultimoCruce.puntajeLocal ?? 0).toFixed(1)}</span>
+                                            <span className="text-center text-textMuted text-xs font-semibold">-</span>
+                                            <span className={clsx("text-left text-sm font-black tabular-nums", ganaVisita ? "text-accent" : "text-textMain")}>{(ultimoCruce.puntajeVisitante ?? 0).toFixed(1)}</span>
                                         </div>
                                         <span className={clsx("flex-1 text-sm font-semibold text-left line-clamp-2 leading-tight", !miLocalUlt ? "text-primary" : "text-textMain")}>{ultimoCruce.equipoVisitanteNombre}</span>
                                     </div>
