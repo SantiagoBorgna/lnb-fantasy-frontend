@@ -61,7 +61,7 @@ export default function JugadorModal({
 
                 {isDT && jugador.promedioPuntosUltimas3 > 0 && (
                     <div className="bg-surface rounded-2xl p-3 text-center border border-border">
-                        <p className="text-textMuted text-xs mb-1">Promedio Fantasy (últ. 3 partidos)</p>
+                        <p className="text-textMuted text-xs mb-1">Promedio Fantasy (últ. 6 partidos)</p>
                         <p className="text-accent font-bold text-2xl">{jugador.promedioPuntosUltimas3?.toFixed(1)}</p>
                         <p className="text-textMuted text-xs">puntos</p>
                     </div>
@@ -78,24 +78,33 @@ export default function JugadorModal({
                                 <p className="font-medium text-xs">Todavía no tiene estadísticas.</p>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-[13px]">
-                                <div className="col-span-2 text-center pb-2 border-b border-border mb-1">
-                                    <p className="text-textMuted text-[10px] uppercase font-bold tracking-wider">
-                                        Promedios ({statsPromedio.partidosJugados} {statsPromedio.partidosJugados === 1 ? 'partido' : 'partidos'})
-                                    </p>
-                                </div>
-                                <StatRow label="Puntos" value={statsPromedio.promedioPuntos?.toFixed(1)} />
-                                <StatRow label="Asistencias" value={statsPromedio.promedioAsistencias?.toFixed(1)} />
-                                <StatRow label="Reb. Def." value={statsPromedio.promedioRebotesDefensivos?.toFixed(1)} />
-                                <StatRow label="Reb. Of." value={statsPromedio.promedioRebotesOfensivos?.toFixed(1)} />
-                                <StatRow label="Recuperos" value={statsPromedio.promedioRobos?.toFixed(1)} />
-                                <StatRow label="Tapones" value={statsPromedio.promedioTaponesRealizados?.toFixed(1)} />
-                                <StatRow label="Faltas Recib." value={statsPromedio.promedioFaltasRecibidas?.toFixed(1)} />
-                                <StatRow label="Pérdidas" value={statsPromedio.promedioPerdidas?.toFixed(1)} warning />
-                                <StatRow label="Tap. Recib." value={statsPromedio.promedioTaponesRecibidos?.toFixed(1)} warning />
-                                <StatRow label="Faltas Com." value={statsPromedio.promedioFaltasCometidas?.toFixed(1)} warning />
-                                <StatRow label="TC Fallados" value={statsPromedio.promedioTirosCampoFallados?.toFixed(1)} warning />
-                                <StatRow label="TL Fallados" value={statsPromedio.promedioTirosLibresFallados?.toFixed(1)} warning />
+                            <div className="space-y-4">
+                                {statsPromedio.promedioFantasy != null && (
+                                    <div className="text-center pb-3 border-b border-border">
+                                        <p className="text-textMuted text-xs mb-1">Promedio Fantasy (temporada)</p>
+                                        <p className="text-accent font-bold text-2xl tabular-nums">{statsPromedio.promedioFantasy.toFixed(1)}</p>
+                                        <p className="text-textMuted text-xs">puntos</p>
+                                    </div>
+                                )}
+                                <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-[13px]">
+                                    <div className="col-span-2 text-center pb-2 border-b border-border mb-1">
+                                        <p className="text-textMuted text-[10px] uppercase font-bold tracking-wider">
+                                            Promedios ({statsPromedio.partidosJugados} {statsPromedio.partidosJugados === 1 ? 'partido' : 'partidos'})
+                                        </p>
+                                    </div>
+                                    <StatRow label="Puntos" value={statsPromedio.promedioPuntos?.toFixed(1)} />
+                                    <StatRow label="Asistencias" value={statsPromedio.promedioAsistencias?.toFixed(1)} />
+                                    <StatRow label="Reb. Def." value={statsPromedio.promedioRebotesDefensivos?.toFixed(1)} />
+                                    <StatRow label="Reb. Of." value={statsPromedio.promedioRebotesOfensivos?.toFixed(1)} />
+                                    <StatRow label="Recuperos" value={statsPromedio.promedioRobos?.toFixed(1)} />
+                                    <StatRow label="Tapones" value={statsPromedio.promedioTaponesRealizados?.toFixed(1)} />
+                                    <StatRow label="Faltas Recib." value={statsPromedio.promedioFaltasRecibidas?.toFixed(1)} />
+                                    <StatRow label="Pérdidas" value={statsPromedio.promedioPerdidas?.toFixed(1)} warning />
+                                    <StatRow label="Tap. Recib." value={statsPromedio.promedioTaponesRecibidos?.toFixed(1)} warning />
+                                    <StatRow label="Faltas Com." value={statsPromedio.promedioFaltasCometidas?.toFixed(1)} warning />
+                                    <StatRow label="TC Fallados" value={statsPromedio.promedioTirosCampoFallados?.toFixed(1)} warning />
+                                    <StatRow label="TL Fallados" value={statsPromedio.promedioTirosLibresFallados?.toFixed(1)} warning />
+                            </div>
                             </div>
                         )}
                     </div>
