@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { getShowdownMercado, participarShowdown } from '../../api/showdownApi'
+import { showdownApi } from '../../api/showdownApi'
 import { HelpCircle, X, Loader2, Star, Trash2 } from 'lucide-react'
 import { useUiStore } from '../../store/uiStore'
 import ShowdownCanchita from '../../components/showdown/ShowdownCanchita'
@@ -10,7 +10,7 @@ import CamisetaSVG from '../../components/jugador/CamisetaSVG'
 
 const POSICIONES = ['Base', 'Escolta', 'Alero', 'AlaPivot', 'Pivot']
 
-export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParticiparSuccess }) {
+export default function ShowdownDraft({ api = showdownApi, evento, codigo, uuidDispositivo, onParticiparSuccess }) {
     const showToast = useUiStore(state => state.showToast)
     const [nombre, setNombre] = useState('')
     const [apellido, setApellido] = useState('')
@@ -41,12 +41,12 @@ export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParti
     useEffect(() => {
         if (step === 2 && mercado.length === 0) {
             setLoadingMercado(true)
-            getShowdownMercado(codigo)
+            api.getMercado(codigo)
                 .then(setMercado)
                 .catch(console.error)
                 .finally(() => setLoadingMercado(false))
         }
-    }, [step, codigo, mercado.length])
+    }, [step, codigo, mercado.length, api])
 
     const handleContinuar = (e) => {
         e.preventDefault()
@@ -98,7 +98,7 @@ export default function ShowdownDraft({ evento, codigo, uuidDispositivo, onParti
 
         setIsSubmitting(true)
         try {
-            await participarShowdown(codigo, {
+            await api.participar(codigo, {
                 nombre,
                 apellido,
                 email,
