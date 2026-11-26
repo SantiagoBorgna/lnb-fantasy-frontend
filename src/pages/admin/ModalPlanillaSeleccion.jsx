@@ -60,7 +60,7 @@ export default function ModalPlanillaSeleccion({ evento, onCerrar, onGuardada })
         setGuardando(true)
         try {
             // Solo viajan los que jugaron (alguna stat o titular): el resto suma 0
-            const jugaron = planilla.jugadores.filter(f => f.titular || COLUMNAS.some(c => f[c.key] > 0))
+            const jugaron = planilla.jugadores.filter(f => f.titular || f.valoracionManual != null || COLUMNAS.some(c => f[c.key] > 0))
             const guardada = await guardarPlanillaSeleccion(evento.id, {
                 puntosLocal: Number(planilla.puntosLocal),
                 puntosVisitante: Number(planilla.puntosVisitante),
@@ -89,7 +89,8 @@ export default function ModalPlanillaSeleccion({ evento, onCerrar, onGuardada })
                     <div>
                         <h3 className="text-textMain font-bold text-lg">Planilla {evento.localSigla} vs {evento.visitanteSigla}</h3>
                         <p className="text-textMuted text-xs">
-                            Copiá el box score oficial. TCF = tiros de campo fallados (dobles + triples). Los que no jugaron se dejan en 0.
+                            Copiá el box score oficial. TCF = tiros de campo fallados (dobles + triples). VAL = valoración oficial (EFF de FIBA):
+                            define el MVP; si la dejás vacía se calcula sola. Los que no jugaron se dejan en 0.
                         </p>
                     </div>
                     {planilla && (
@@ -121,7 +122,7 @@ export default function ModalPlanillaSeleccion({ evento, onCerrar, onGuardada })
                                     <th className="text-left py-2 pr-2 sticky left-0 bg-card">{eq.nombre}</th>
                                     <th className="px-1" title="Titular">Tit</th>
                                     {COLUMNAS.map(c => <th key={c.key} className="px-1" title={c.ayuda}>{c.label}</th>)}
-                                    <th className="px-1" title="Valoración (calculada)">VAL</th>
+                                    <th className="px-1" title="Valoración oficial (EFF de FIBA). Vacía = se calcula">VAL</th>
                                     <th className="px-1" title="Puntaje fantasy (calculado)">FAN</th>
                                 </tr>
                             </thead>
@@ -150,7 +151,21 @@ export default function ModalPlanillaSeleccion({ evento, onCerrar, onGuardada })
                                                 />
                                             </td>
                                         ))}
-                                        <td className="px-1 text-center text-textMuted tabular-nums">{f.valoracion ?? '-'}</td>
+                                        <td className="px-1 text-center">
+                                            {/* Puede ser negativa. Vacía: se usa la calculada (se ve de placeholder) */}
+                                            <input
+                                                type="number"
+                                                inputMode="numeric"
+                                                value={f.valoracionManual ?? ''}
+                                                placeholder={f.valoracion != null ? String(f.valoracion) : 'auto'}
+                                                onChange={e => {
+                                                    const n = parseInt(e.target.value, 10)
+                                                    setFila(f.jugadorId, { valoracionManual: Number.isNaN(n) ? null : n })
+                                                }}
+                                                onFocus={e => e.target.select()}
+                                                className={`${celda} border-accent/40`}
+                                            />
+                                        </td>
                                         <td className="px-1 text-center text-accent font-bold tabular-nums">{f.puntajeFantasy != null ? f.puntajeFantasy.toFixed(1) : '-'}</td>
                                     </tr>
                                 ))}
