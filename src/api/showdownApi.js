@@ -14,3 +14,12 @@ export const getShowdownRanking = (codigo, uuidDispositivo) =>
 
 export const getShowdownMiEquipo = (codigo, uuidDispositivo) => 
     axiosClient.get(`/showdown/${codigo}/mi-equipo`, { params: { uuidDispositivo } }).then(r => r.data);
+
+// Las pantallas del Relámpago reciben el API por prop: el de la liga o el de la Selección (seleccionApi)
+export const showdownApi = {
+    getEvento: getShowdownEvento,
+    getMercado: getShowdownMercado,
+    participar: participarShowdown,
+    getRanking: getShowdownRanking,
+    getMiEquipo: getShowdownMiEquipo,
+};

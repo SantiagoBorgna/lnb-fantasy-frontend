@@ -4,15 +4,16 @@ import { Loader2 } from 'lucide-react'
 import { getParticipantesShowdown } from '../../api/adminApi'
 
 /** Inscriptos de un Relámpago con su email, para avisarle al ganador. Solo para admins. */
-export default function ModalParticipantesShowdown({ evento, onCerrar }) {
+// cargar: de dónde salen los inscriptos (por defecto, los del Relámpago de la liga)
+export default function ModalParticipantesShowdown({ evento, onCerrar, cargar = getParticipantesShowdown }) {
     const [participantes, setParticipantes] = useState(null)
     const [error, setError] = useState(false)
 
     useEffect(() => {
-        getParticipantesShowdown(evento.id)
+        cargar(evento.id)
             .then(setParticipantes)
             .catch(() => setError(true))
-    }, [evento.id])
+    }, [evento.id, cargar])
 
     // Con empate en el primer puesto, el ganador se define por sorteo (términos, sección 7)
     const finalizado = evento.estado === 'FINALIZADO'
