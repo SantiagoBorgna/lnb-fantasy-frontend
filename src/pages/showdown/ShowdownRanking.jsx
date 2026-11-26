@@ -32,12 +32,20 @@ export default function ShowdownRanking({ evento, ranking, miEquipo, conSponsors
         }
     }
 
-    // Con el mismo puntaje se comparte la posición (1, 1, 3...)
-    const posiciones = ranking.map((p, i) => ranking.findIndex(o => o.puntosTotales === p.puntosTotales) + 1)
+    // El backend ordena por puntos y, a igualdad, por orden de inscripción.
+    // Antes del resultado (todos en 0) la posición es ese orden; con el resultado final,
+    // el mismo puntaje comparte la posición (1, 1, 3...) y el empate en el 1º se sortea
+    const finalizado = evento.estado === 'FINALIZADO'
+    const posiciones = ranking.map((p, i) =>
+        finalizado ? ranking.findIndex(o => o.puntosTotales === p.puntosTotales) + 1 : i + 1)
     const myRankIndex = ranking.findIndex(p => p.esMio)
     const myRank = myRankIndex !== -1 ? posiciones[myRankIndex] : '-'
     // Empate en el primer puesto: el premio se sortea entre los empatados (términos, sección 7)
     const empateEnPrimero = posiciones.filter(pos => pos === 1).length > 1
+
+    // Tabla de 10: el top 10, o el top 9 y vos al final si estás más abajo
+    const filas = ranking.map((p, i) => ({ ...p, posicion: posiciones[i] }))
+    const filasVisibles = myRankIndex >= 10 ? [...filas.slice(0, 9), filas[myRankIndex]] : filas.slice(0, 10)
 
     return (
         <div className="min-h-screen bg-bg dark flex flex-col items-center p-4">
@@ -124,8 +132,8 @@ export default function ShowdownRanking({ evento, ranking, miEquipo, conSponsors
                     </h2>
                     
                     <div className="space-y-1">
-                        {ranking.slice(0, 10).map((p, index) => {
-                            const posicion = posiciones[index]
+                        {filasVisibles.map((p) => {
+                            const posicion = p.posicion
                             const isMe = p.esMio
                             return (
                                 <div key={p.id} className={`flex items-center gap-3 px-3 py-2 rounded-xl transition-colors ${isMe ? 'bg-white/5 border border-white/10' : ''}`}>
