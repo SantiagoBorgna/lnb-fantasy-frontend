@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Loader2, Copy, CheckCircle, Trash2, QrCode, Pencil, ClipboardList, Plus, X } from 'lucide-react'
+import { Loader2, Copy, CheckCircle, Trash2, QrCode, Pencil, ClipboardList, Plus, X, Eye, EyeOff } from 'lucide-react'
 import { useUiStore } from '../../store/uiStore'
 import ConfirmModal from '../../components/ui/ConfirmModal'
 import CamisetaSVG from '../../components/jugador/CamisetaSVG'
@@ -9,7 +9,7 @@ import ModalPlanillaSeleccion from './ModalPlanillaSeleccion'
 import {
     getEquiposSeleccion, guardarEquipoSeleccion, eliminarEquipoSeleccion,
     getJugadoresSeleccion, guardarJugadorSeleccion, eliminarJugadorSeleccion,
-    getEventosSeleccion, crearEventoSeleccion, editarEventoSeleccion, eliminarEventoSeleccion,
+    getEventosSeleccion, crearEventoSeleccion, editarEventoSeleccion, eliminarEventoSeleccion, cambiarBannerSeleccion,
     getParticipantesSeleccion, linkSeleccion, mensajeDeError,
 } from '../../api/seleccionApi'
 
@@ -158,6 +158,21 @@ function SeccionEventos({ equipos, eventos, copiadoId, onCopiar, onQr, onInscrip
     const [form, setForm] = useState(EVENTO_VACIO)
     const [guardando, setGuardando] = useState(false)
     const [editandoId, setEditandoId] = useState(null)
+    const [bannerCambiando, setBannerCambiando] = useState(null)
+
+    // El banner del inicio sigue después del partido (para ver resultados) hasta apagarlo acá
+    const cambiarBanner = async (e) => {
+        setBannerCambiando(e.id)
+        try {
+            await cambiarBannerSeleccion(e.id, !e.mostrarBanner)
+            showToast(e.mostrarBanner ? 'Banner oculto del inicio' : 'Banner visible en el inicio', 'success')
+            onCambio()
+        } catch (error) {
+            showToast(mensajeDeError(error, 'No se pudo cambiar el banner'), 'error')
+        } finally {
+            setBannerCambiando(null)
+        }
+    }
 
     const crear = async (ev) => {
         ev.preventDefault()
@@ -239,6 +254,15 @@ function SeccionEventos({ equipos, eventos, copiadoId, onCopiar, onQr, onInscrip
                                 className={botonGris}
                             >
                                 <ClipboardList className="w-4 h-4" /> Planilla
+                            </button>
+                            <button
+                                onClick={() => cambiarBanner(e)}
+                                disabled={bannerCambiando === e.id}
+                                className={botonGris}
+                                title={e.mostrarBanner ? 'Ocultar el banner del inicio' : 'Mostrar el banner en el inicio'}
+                            >
+                                {e.mostrarBanner ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4 text-textMuted" />}
+                                {e.mostrarBanner ? 'Banner' : 'Sin banner'}
                             </button>
                             <button onClick={() => setEditandoId(e.id)} className={botonGris} title="Editar"><Pencil className="w-4 h-4" /></button>
                             <button onClick={() => onBorrar(e)} className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg" title="Eliminar">
