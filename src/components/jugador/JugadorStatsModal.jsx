@@ -135,7 +135,7 @@ export default function JugadorStatsModal({ jugador, stats, onCerrar, esDraft, m
 
 // Sellos de los bonos que sumó en la jornada. El triple-doble reemplaza al doble-doble,
 // así que como mucho se ven dos (TD/DD + MVP). Si no sumó ningún bono no se muestra nada.
-function SellosBonos({ stats }) {
+export function SellosBonos({ stats }) {
     const { dobleDoble, tripleDoble, fueMvp } = stats
     if (!dobleDoble && !tripleDoble && !fueMvp) return null
 

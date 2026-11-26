@@ -22,7 +22,7 @@ export default function ShowdownRanking({ evento, ranking, miEquipo, uuidDisposi
                 return (
                     <div className="flex items-center gap-2 text-primary bg-primary/10 px-4 py-2 rounded-full text-sm font-medium">
                         <div className="w-2 h-2 bg-primary rounded-full animate-ping" />
-                        <span>Partido en curso - Calculando puntos...</span>
+                        <span>Partido en curso</span>
                     </div>
                 )
             case 'FINALIZADO':
@@ -50,9 +50,12 @@ export default function ShowdownRanking({ evento, ranking, miEquipo, uuidDisposi
                             </p>
                         )}
                     </div>
-                    <div className="flex justify-center">
-                        {renderEstado()}
-                    </div>
+                    {/* Finalizado no muestra estado: sin el contenedor vacío no queda el hueco */}
+                    {evento.estado !== 'FINALIZADO' && (
+                        <div className="flex justify-center">
+                            {renderEstado()}
+                        </div>
+                    )}
                 </div>
 
                 {/* Winner Banner */}
@@ -85,8 +88,8 @@ export default function ShowdownRanking({ evento, ranking, miEquipo, uuidDisposi
                     <>
                         {/* Resumen Usuario */}
                         {myRankIndex !== -1 && (
-                    <div className="bg-surface text-textMain rounded-2xl p-6 shadow-xl flex items-center justify-between border border-border">
-                        <div className="flex items-center gap-4">
+                    <div className="bg-surface text-textMain rounded-2xl p-6 shadow-xl grid grid-cols-2 items-center border border-border">
+                        <div className="flex justify-center">
                             <div className="flex flex-col items-center">
                                 <div className="text-textMuted font-medium text-[11px] mb-1.5 uppercase tracking-widest">Tu Posición</div>
                                 <span className={`w-10 h-10 rounded-full flex items-center justify-center text-lg font-black shrink-0 ${myRank === 1 ? 'bg-yellow-500 text-white' : myRank === 2 ? 'bg-gray-400 text-white' : myRank === 3 ? 'bg-amber-700 text-white' : 'bg-border text-textMuted'}`}>
@@ -94,7 +97,7 @@ export default function ShowdownRanking({ evento, ranking, miEquipo, uuidDisposi
                                 </span>
                             </div>
                         </div>
-                        <div className="text-right flex flex-col items-end">
+                        <div className="flex flex-col items-center">
                             <div className="text-textMuted font-medium text-[11px] mb-1.5 uppercase tracking-widest">Tus Puntos</div>
                             <div className="text-3xl font-black text-accent tabular-nums">{ranking[myRankIndex].puntosTotales.toFixed(1)}</div>
                         </div>
@@ -149,6 +152,13 @@ export default function ShowdownRanking({ evento, ranking, miEquipo, uuidDisposi
             </>
         ) : (
             <div className="animate-fade-in space-y-4">
+                        {/* Total del equipo arriba de la canchita */}
+                        {miEquipo && (
+                            <div className="bg-surface border border-border rounded-2xl px-6 py-4 flex items-center justify-between">
+                                <span className="text-textMuted font-medium text-[11px] uppercase tracking-widest">Mi equipo: total</span>
+                                <span className="text-2xl font-black text-accent tabular-nums">{(miEquipo.puntosTotales ?? 0).toFixed(1)}</span>
+                            </div>
+                        )}
                         {/* Mi Equipo Tab */}
                         {miEquipo && (() => {
                             const plantel = {};
