@@ -6,7 +6,7 @@ import ShowdownRanking from './ShowdownRanking'
 import { Loader2 } from 'lucide-react'
 
 // api: el del Relámpago de la liga (por defecto) o el de la Selección
-// conSponsors: muestra los sponsors del juego (por ahora solo en el Relámpago Selección)
+// conSponsors: muestra los sponsors en el ranking y en Mi Equipo (por ahora solo en el Relámpago Selección)
 // conPremio: textos de premio (el Relámpago Selección por ahora no tiene)
 export default function ShowdownPage({ api = showdownApi, conSponsors = false, conPremio = true }) {
     const { codigo } = useParams()
@@ -88,7 +88,6 @@ export default function ShowdownPage({ api = showdownApi, conSponsors = false, c
     // Si el evento está abierto y aún no participó
     return <ShowdownDraft 
                 api={api}
-                conSponsors={conSponsors}
                 conPremio={conPremio}
                 evento={evento} 
                 codigo={codigo} 
