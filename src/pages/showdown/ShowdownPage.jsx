@@ -7,7 +7,8 @@ import { Loader2 } from 'lucide-react'
 
 // api: el del Relámpago de la liga (por defecto) o el de la Selección
 // conSponsors: muestra los sponsors del juego (por ahora solo en el Relámpago Selección)
-export default function ShowdownPage({ api = showdownApi, conSponsors = false }) {
+// conPremio: textos de premio (el Relámpago Selección por ahora no tiene)
+export default function ShowdownPage({ api = showdownApi, conSponsors = false, conPremio = true }) {
     const { codigo } = useParams()
     const [evento, setEvento] = useState(null)
     const [loading, setLoading] = useState(true)
@@ -75,6 +76,7 @@ export default function ShowdownPage({ api = showdownApi, conSponsors = false })
     if (yaParticipo || evento.estado !== 'ABIERTO') {
         return <ShowdownRanking 
                     conSponsors={conSponsors}
+                    conPremio={conPremio}
                     evento={evento} 
                     ranking={ranking} 
                     miEquipo={miEquipo}
@@ -87,6 +89,7 @@ export default function ShowdownPage({ api = showdownApi, conSponsors = false })
     return <ShowdownDraft 
                 api={api}
                 conSponsors={conSponsors}
+                conPremio={conPremio}
                 evento={evento} 
                 codigo={codigo} 
                 uuidDispositivo={uuidDispositivo} 

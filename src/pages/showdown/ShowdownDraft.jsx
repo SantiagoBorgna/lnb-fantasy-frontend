@@ -11,7 +11,7 @@ import SponsorsBanner from '../../components/ui/SponsorsBanner'
 
 const POSICIONES = ['Base', 'Escolta', 'Alero', 'AlaPivot', 'Pivot']
 
-export default function ShowdownDraft({ api = showdownApi, conSponsors = false, evento, codigo, uuidDispositivo, onParticiparSuccess }) {
+export default function ShowdownDraft({ api = showdownApi, conSponsors = false, conPremio = true, evento, codigo, uuidDispositivo, onParticiparSuccess }) {
     const showToast = useUiStore(state => state.showToast)
     const [nombre, setNombre] = useState('')
     const [apellido, setApellido] = useState('')
@@ -243,7 +243,7 @@ export default function ShowdownDraft({ api = showdownApi, conSponsors = false, 
                         Sexto Hombre Fantasy
                     </h1>
                     <p className="text-textMuted text-center mb-10 text-sm">
-                        Ingresá tus datos para participar. ¡El mejor equipo de la noche tiene premio!
+                        Ingresá tus datos para participar.{conPremio && ' ¡El mejor equipo de la noche tiene premio!'}
                     </p>
 
                     <form onSubmit={handleContinuar} className="space-y-5">
