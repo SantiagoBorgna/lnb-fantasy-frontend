@@ -41,10 +41,12 @@ export default function ShowdownRanking({ evento, ranking, miEquipo, conSponsors
 
     return (
         <div className="min-h-screen bg-bg dark flex flex-col items-center p-4">
-            <div className="w-full max-w-md flex flex-col gap-6 pt-4 pb-12">
-                
+            <div className="w-full max-w-md flex flex-col gap-3 pt-1 pb-8">
+                {/* Sponsors arriba de todo: al final de la página no se veían */}
+                {conSponsors && <SponsorsBanner className="!py-1" />}
+
                 {/* Header */}
-                <div className="text-center space-y-4">
+                <div className="text-center space-y-2">
                     <div>
                         <h1 className="text-xl font-black text-textMain tracking-tight">
                             {evento.localNombre?.replace(' (O)', '') || evento.localSigla} vs {evento.visitanteNombre?.replace(' (O)', '') || evento.visitanteSigla}
@@ -65,9 +67,9 @@ export default function ShowdownRanking({ evento, ranking, miEquipo, conSponsors
 
                 {/* Winner Banner */}
                 {evento.estado === 'FINALIZADO' && myRank === 1 && (
-                    <div className="bg-green-500/10 border border-green-500/20 text-green-500 rounded-xl p-4 text-center mb-[-1rem]">
+                    <div className="bg-green-500/10 border border-green-500/20 text-green-500 rounded-xl px-4 py-2.5 text-center">
                         <p className="font-bold text-lg">{empateEnPrimero ? '¡Estás empatado en el primer puesto!' : '¡Ganaste!'}</p>
-                        <p className="text-sm mt-1">
+                        <p className="text-sm mt-0.5">
                             {empateEnPrimero ? 'El premio se sortea entre los empatados. ' : ''}Nos vamos a comunicar con vos muy pronto.
                         </p>
                     </div>
@@ -95,7 +97,7 @@ export default function ShowdownRanking({ evento, ranking, miEquipo, conSponsors
                     <>
                         {/* Resumen Usuario */}
                         {myRankIndex !== -1 && (
-                    <div className="bg-surface text-textMain rounded-2xl p-6 shadow-xl grid grid-cols-2 items-center border border-border">
+                    <div className="bg-surface text-textMain rounded-2xl px-4 py-3 shadow-xl grid grid-cols-2 items-center border border-border">
                         <div className="flex justify-center">
                             <div className="flex flex-col items-center">
                                 <div className="text-textMuted font-medium text-[11px] mb-1.5 uppercase tracking-widest">Tu Posición</div>
@@ -112,18 +114,18 @@ export default function ShowdownRanking({ evento, ranking, miEquipo, conSponsors
                 )}
 
                 {/* Leaderboard */}
-                <div className="bg-surface rounded-2xl border border-border overflow-hidden p-6 space-y-4">
+                <div className="bg-surface rounded-2xl border border-border overflow-hidden px-4 py-3 space-y-2">
                     <h2 className="font-bold text-textMain flex items-center gap-2 text-lg">
                         <Trophy className="w-5 h-5 text-warning" />
                         Tabla de Posiciones
                     </h2>
                     
-                    <div className="space-y-3 mt-4">
+                    <div className="space-y-1">
                         {ranking.slice(0, 10).map((p, index) => {
                             const posicion = posiciones[index]
                             const isMe = p.esMio
                             return (
-                                <div key={p.id} className={`flex items-center gap-3 p-3 rounded-xl transition-colors ${isMe ? 'bg-white/5 border border-white/10' : ''}`}>
+                                <div key={p.id} className={`flex items-center gap-3 px-3 py-2 rounded-xl transition-colors ${isMe ? 'bg-white/5 border border-white/10' : ''}`}>
                                     <span className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-black shrink-0 ${posicion === 1 ? 'bg-yellow-500 text-white' : posicion === 2 ? 'bg-gray-400 text-white' : posicion === 3 ? 'bg-amber-700 text-white' : 'bg-border text-textMuted'}`}>
                                         {posicion}
                                     </span>
@@ -144,9 +146,9 @@ export default function ShowdownRanking({ evento, ranking, miEquipo, conSponsors
                     </div>
                 </div>
 
-                <div className="bg-gradient-to-r from-primary/20 to-accent/20 border border-primary/30 rounded-2xl p-6 text-center mt-4">
+                <div className="bg-gradient-to-r from-primary/20 to-accent/20 border border-primary/30 rounded-2xl px-4 py-4 text-center">
                     <h3 className="text-lg font-black text-textMain mb-2">¿Querés seguir jugando?</h3>
-                    <p className="text-sm text-textMuted mb-4">
+                    <p className="text-sm text-textMuted mb-3">
                         Registrate en Sexto Hombre Fantasy y competí todas las semanas por grandes premios. ¡Es gratis!
                     </p>
                     <button 
@@ -158,12 +160,12 @@ export default function ShowdownRanking({ evento, ranking, miEquipo, conSponsors
                 </div>
             </>
         ) : (
-            <div className="animate-fade-in space-y-4">
+            <div className="animate-fade-in space-y-3">
                         {/* Total del equipo arriba de la canchita */}
                         {miEquipo && (
-                            <div className="bg-surface border border-border rounded-2xl px-6 py-4 flex items-center justify-between">
-                                <span className="text-textMuted font-medium text-[11px] uppercase tracking-widest">Mi equipo: total</span>
-                                <span className="text-2xl font-black text-accent tabular-nums">{(miEquipo.puntosTotales ?? 0).toFixed(1)}</span>
+                            <div className="bg-surface border border-border rounded-2xl px-4 py-3 flex flex-col items-center">
+                                <span className="text-textMuted font-medium text-[11px] mb-1 uppercase tracking-widest">Tus Puntos</span>
+                                <span className="text-3xl font-black text-accent tabular-nums">{(miEquipo.puntosTotales ?? 0).toFixed(1)}</span>
                             </div>
                         )}
                         {/* Mi Equipo Tab */}
@@ -195,7 +197,6 @@ export default function ShowdownRanking({ evento, ranking, miEquipo, conSponsors
                         })()}
                     </div>
                 )}
-                {conSponsors && <SponsorsBanner className="rounded-2xl" />}
             </div>
 
             <ShowdownStatsModal
