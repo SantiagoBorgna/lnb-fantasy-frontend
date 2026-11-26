@@ -135,7 +135,7 @@ export default function AppRouter() {
                 {/* ── Showdown (Modo Estadio) ────────────────────────────── */}
                 <Route path="/showdown/:codigo" element={<ShowdownPage />} />
                 {/* Relámpago Selección: mismas pantallas, datos aparte (tablas seleccion_*) */}
-                <Route path="/seleccion/:codigo" element={<ShowdownPage api={seleccionApi} conSponsors />} />
+                <Route path="/seleccion/:codigo" element={<ShowdownPage api={seleccionApi} conSponsors conPremio={false} />} />
 
 
                 {/* ── App principal — solo usuarios ACTIVOS ──────────────── */}

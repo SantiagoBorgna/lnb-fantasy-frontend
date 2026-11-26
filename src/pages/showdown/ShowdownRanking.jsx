@@ -4,7 +4,7 @@ import ShowdownCanchita from '../../components/showdown/ShowdownCanchita'
 import ShowdownStatsModal from '../../components/showdown/ShowdownStatsModal'
 import SponsorsBanner from '../../components/ui/SponsorsBanner'
 
-export default function ShowdownRanking({ evento, ranking, miEquipo, conSponsors = false }) {
+export default function ShowdownRanking({ evento, ranking, miEquipo, conSponsors = false, conPremio = true }) {
     const [activeTab, setActiveTab] = useState('ranking')
     const [selectedJugador, setSelectedJugador] = useState(null)
 
@@ -69,9 +69,12 @@ export default function ShowdownRanking({ evento, ranking, miEquipo, conSponsors
                 {evento.estado === 'FINALIZADO' && myRank === 1 && (
                     <div className="bg-green-500/10 border border-green-500/20 text-green-500 rounded-xl px-4 py-2.5 text-center">
                         <p className="font-bold text-lg">{empateEnPrimero ? '¡Estás empatado en el primer puesto!' : '¡Ganaste!'}</p>
-                        <p className="text-sm mt-0.5">
-                            {empateEnPrimero ? 'El premio se sortea entre los empatados. ' : ''}Nos vamos a comunicar con vos muy pronto.
-                        </p>
+                        {/* Sin premio no hay nada que coordinar: queda solo el título */}
+                        {conPremio && (
+                            <p className="text-sm mt-0.5">
+                                {empateEnPrimero ? 'El premio se sortea entre los empatados. ' : ''}Nos vamos a comunicar con vos muy pronto.
+                            </p>
+                        )}
                     </div>
                 )}
 
