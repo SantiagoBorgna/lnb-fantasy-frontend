@@ -2,8 +2,9 @@ import { Trophy, Clock, CheckCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import ShowdownCanchita from '../../components/showdown/ShowdownCanchita'
 import ShowdownStatsModal from '../../components/showdown/ShowdownStatsModal'
+import SponsorsBanner from '../../components/ui/SponsorsBanner'
 
-export default function ShowdownRanking({ evento, ranking, miEquipo, uuidDispositivo }) {
+export default function ShowdownRanking({ evento, ranking, miEquipo, conSponsors = false }) {
     const [activeTab, setActiveTab] = useState('ranking')
     const [selectedJugador, setSelectedJugador] = useState(null)
 
@@ -31,8 +32,12 @@ export default function ShowdownRanking({ evento, ranking, miEquipo, uuidDisposi
         }
     }
 
+    // Con el mismo puntaje se comparte la posición (1, 1, 3...)
+    const posiciones = ranking.map((p, i) => ranking.findIndex(o => o.puntosTotales === p.puntosTotales) + 1)
     const myRankIndex = ranking.findIndex(p => p.esMio)
-    const myRank = myRankIndex !== -1 ? myRankIndex + 1 : '-'
+    const myRank = myRankIndex !== -1 ? posiciones[myRankIndex] : '-'
+    // Empate en el primer puesto: el premio se sortea entre los empatados (términos, sección 7)
+    const empateEnPrimero = posiciones.filter(pos => pos === 1).length > 1
 
     return (
         <div className="min-h-screen bg-bg dark flex flex-col items-center p-4">
@@ -61,8 +66,10 @@ export default function ShowdownRanking({ evento, ranking, miEquipo, uuidDisposi
                 {/* Winner Banner */}
                 {evento.estado === 'FINALIZADO' && myRank === 1 && (
                     <div className="bg-green-500/10 border border-green-500/20 text-green-500 rounded-xl p-4 text-center mb-[-1rem]">
-                        <p className="font-bold text-lg">¡Ganaste!</p>
-                        <p className="text-sm mt-1">Nos vamos a comunicar con vos muy pronto.</p>
+                        <p className="font-bold text-lg">{empateEnPrimero ? '¡Estás empatado en el primer puesto!' : '¡Ganaste!'}</p>
+                        <p className="text-sm mt-1">
+                            {empateEnPrimero ? 'El premio se sortea entre los empatados. ' : ''}Nos vamos a comunicar con vos muy pronto.
+                        </p>
                     </div>
                 )}
 
@@ -113,7 +120,7 @@ export default function ShowdownRanking({ evento, ranking, miEquipo, uuidDisposi
                     
                     <div className="space-y-3 mt-4">
                         {ranking.slice(0, 10).map((p, index) => {
-                            const posicion = index + 1
+                            const posicion = posiciones[index]
                             const isMe = p.esMio
                             return (
                                 <div key={p.id} className={`flex items-center gap-3 p-3 rounded-xl transition-colors ${isMe ? 'bg-white/5 border border-white/10' : ''}`}>
@@ -188,6 +195,7 @@ export default function ShowdownRanking({ evento, ranking, miEquipo, uuidDisposi
                         })()}
                     </div>
                 )}
+                {conSponsors && <SponsorsBanner className="rounded-2xl" />}
             </div>
 
             <ShowdownStatsModal

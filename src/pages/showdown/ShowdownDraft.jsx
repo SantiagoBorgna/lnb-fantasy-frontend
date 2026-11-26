@@ -7,10 +7,11 @@ import ShowdownCanchita from '../../components/showdown/ShowdownCanchita'
 import ShowdownSlotAccionesModal from '../../components/showdown/ShowdownSlotAccionesModal'
 import ShowdownReglasModal from '../../components/showdown/ShowdownReglasModal'
 import CamisetaSVG from '../../components/jugador/CamisetaSVG'
+import SponsorsBanner from '../../components/ui/SponsorsBanner'
 
 const POSICIONES = ['Base', 'Escolta', 'Alero', 'AlaPivot', 'Pivot']
 
-export default function ShowdownDraft({ api = showdownApi, evento, codigo, uuidDispositivo, onParticiparSuccess }) {
+export default function ShowdownDraft({ api = showdownApi, conSponsors = false, evento, codigo, uuidDispositivo, onParticiparSuccess }) {
     const showToast = useUiStore(state => state.showToast)
     const [nombre, setNombre] = useState('')
     const [apellido, setApellido] = useState('')
@@ -289,6 +290,7 @@ export default function ShowdownDraft({ api = showdownApi, evento, codigo, uuidD
                             {' '}y Política de Privacidad.
                         </p>
                     </form>
+                    {conSponsors && <SponsorsBanner className="mt-8" />}
                 </div>
             </div>
         )
@@ -395,6 +397,7 @@ export default function ShowdownDraft({ api = showdownApi, evento, codigo, uuidD
                     >
                         {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin" /> : "Guardar equipo"}
                     </button>
+                    {conSponsors && <SponsorsBanner className="bg-transparent" />}
                 </div>
             </div>
         </div>
