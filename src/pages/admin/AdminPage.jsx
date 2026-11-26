@@ -52,11 +52,11 @@ export default function AdminPage() {
                     </div>
 
                     {/* Tabs */}
-                    <div className="flex p-1 bg-surface rounded-xl border border-border w-full md:w-max mx-auto md:mx-0 flex-wrap">
+                    <div className="flex p-1 bg-surface rounded-xl border border-border w-full flex-wrap gap-1">
                         <button
                             onClick={() => setTab('JORNADAS')}
                             className={clsx(
-                                "flex-1 md:w-32 py-2 text-sm font-bold rounded-lg transition-all",
+                                "flex-1 md:w-32 px-2 py-2 text-sm font-bold rounded-lg transition-all whitespace-nowrap",
                                 tab === 'JORNADAS' ? "bg-card text-textMain shadow-sm border border-border" : "text-textMuted hover:text-textMain"
                             )}
                         >
@@ -65,7 +65,7 @@ export default function AdminPage() {
                         <button
                             onClick={() => setTab('PARTIDOS')}
                             className={clsx(
-                                "flex-1 md:w-32 py-2 text-sm font-bold rounded-lg transition-all",
+                                "flex-1 md:w-32 px-2 py-2 text-sm font-bold rounded-lg transition-all whitespace-nowrap",
                                 tab === 'PARTIDOS' ? "bg-card text-textMain shadow-sm border border-border" : "text-textMuted hover:text-textMain"
                             )}
                         >
@@ -74,7 +74,7 @@ export default function AdminPage() {
                         <button
                             onClick={() => setTab('RELAMPAGOS')}
                             className={clsx(
-                                "flex-1 md:w-40 py-2 text-sm font-bold rounded-lg transition-all",
+                                "flex-1 md:w-40 px-2 py-2 text-sm font-bold rounded-lg transition-all whitespace-nowrap",
                                 tab === 'RELAMPAGOS' ? "bg-card text-textMain shadow-sm border border-border" : "text-textMuted hover:text-textMain"
                             )}
                         >
@@ -83,7 +83,7 @@ export default function AdminPage() {
                         <button
                             onClick={() => setTab('SELECCION')}
                             className={clsx(
-                                "flex-1 md:w-40 py-2 text-sm font-bold rounded-lg transition-all",
+                                "flex-1 md:w-40 px-2 py-2 text-sm font-bold rounded-lg transition-all whitespace-nowrap",
                                 tab === 'SELECCION' ? "bg-card text-textMain shadow-sm border border-border" : "text-textMuted hover:text-textMain"
                             )}
                         >
@@ -92,7 +92,7 @@ export default function AdminPage() {
                         <button
                             onClick={() => setTab('QUINTETOS')}
                             className={clsx(
-                                "flex-1 md:w-32 py-2 text-sm font-bold rounded-lg transition-all",
+                                "flex-1 md:w-32 px-2 py-2 text-sm font-bold rounded-lg transition-all whitespace-nowrap",
                                 tab === 'QUINTETOS' ? "bg-card text-textMain shadow-sm border border-border" : "text-textMuted hover:text-textMain"
                             )}
                         >
@@ -101,7 +101,7 @@ export default function AdminPage() {
                         <button
                             onClick={() => setTab('MES')}
                             className={clsx(
-                                "flex-1 md:w-32 py-2 text-sm font-bold rounded-lg transition-all",
+                                "flex-1 md:w-32 px-2 py-2 text-sm font-bold rounded-lg transition-all whitespace-nowrap",
                                 tab === 'MES' ? "bg-card text-textMain shadow-sm border border-border" : "text-textMuted hover:text-textMain"
                             )}
                         >
@@ -110,7 +110,7 @@ export default function AdminPage() {
                         <button
                             onClick={() => setTab('JUGADORES')}
                             className={clsx(
-                                "flex-1 md:w-32 py-2 text-sm font-bold rounded-lg transition-all",
+                                "flex-1 md:w-32 px-2 py-2 text-sm font-bold rounded-lg transition-all whitespace-nowrap",
                                 tab === 'JUGADORES' ? "bg-card text-textMain shadow-sm border border-border" : "text-textMuted hover:text-textMain"
                             )}
                         >
@@ -119,7 +119,7 @@ export default function AdminPage() {
                         <button
                             onClick={() => setTab('DTS')}
                             className={clsx(
-                                "flex-1 md:w-32 py-2 text-sm font-bold rounded-lg transition-all",
+                                "flex-1 md:w-32 px-2 py-2 text-sm font-bold rounded-lg transition-all whitespace-nowrap",
                                 tab === 'DTS' ? "bg-card text-textMain shadow-sm border border-border" : "text-textMuted hover:text-textMain"
                             )}
                         >
@@ -128,7 +128,7 @@ export default function AdminPage() {
                         <button
                             onClick={() => setTab('UTILIDADES')}
                             className={clsx(
-                                "flex-1 md:w-32 py-2 text-sm font-bold rounded-lg transition-all",
+                                "flex-1 md:w-32 px-2 py-2 text-sm font-bold rounded-lg transition-all whitespace-nowrap",
                                 tab === 'UTILIDADES' ? "bg-card text-textMain shadow-sm border border-border" : "text-textMuted hover:text-textMain"
                             )}
                         >
@@ -137,7 +137,7 @@ export default function AdminPage() {
                         <button
                             onClick={() => setTab('COMUNIDAD')}
                             className={clsx(
-                                "flex-1 md:w-32 py-2 text-sm font-bold rounded-lg transition-all",
+                                "flex-1 md:w-32 px-2 py-2 text-sm font-bold rounded-lg transition-all whitespace-nowrap",
                                 tab === 'COMUNIDAD' ? "bg-card text-textMain shadow-sm border border-border" : "text-textMuted hover:text-textMain"
                             )}
                         >

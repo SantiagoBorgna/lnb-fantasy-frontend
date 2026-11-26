@@ -10,6 +10,8 @@ export const seleccionApi = {
     getEvento: (codigo) => axiosClient.get(`/seleccion/${codigo}`, conf()).then(r => r.data),
     getMercado: (codigo) => axiosClient.get(`/seleccion/${codigo}/mercado`, conf()).then(r => r.data),
     participar: (codigo, payload) => axiosClient.post(`/seleccion/${codigo}/participar`, payload, conf()).then(r => r.data),
+    verificarInscripcion: (codigo, email, uuidDispositivo) =>
+        axiosClient.get(`/seleccion/${codigo}/verificar-inscripcion`, conf({ params: { email, uuidDispositivo } })),
     getRanking: (codigo, uuidDispositivo) =>
         axiosClient.get(`/seleccion/${codigo}/ranking`, conf({ params: { uuidDispositivo } })).then(r => r.data),
     getMiEquipo: (codigo, uuidDispositivo) =>

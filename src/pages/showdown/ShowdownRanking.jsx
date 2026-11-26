@@ -1,11 +1,14 @@
 import { Trophy, Clock, CheckCircle } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import ShowdownCanchita from '../../components/showdown/ShowdownCanchita'
 import ShowdownStatsModal from '../../components/showdown/ShowdownStatsModal'
 
 export default function ShowdownRanking({ evento, ranking, miEquipo, uuidDispositivo }) {
     const [activeTab, setActiveTab] = useState('ranking')
     const [selectedJugador, setSelectedJugador] = useState(null)
+
+    // Al llegar desde el armado del equipo la página quedaba scrolleada abajo
+    useEffect(() => { window.scrollTo(0, 0) }, [])
     const renderEstado = () => {
         switch (evento.estado) {
             case 'ABIERTO':

@@ -156,27 +156,19 @@ export default function AdminSeleccionPanel() {
 function SeccionEventos({ equipos, eventos, copiadoId, onCopiar, onQr, onInscriptos, onPlanilla, onBorrar, onCambio }) {
     const showToast = useUiStore(state => state.showToast)
     const [form, setForm] = useState(EVENTO_VACIO)
-    const [editandoId, setEditandoId] = useState(null)
     const [guardando, setGuardando] = useState(false)
+    const [editandoId, setEditandoId] = useState(null)
 
-    const editar = (e) => {
-        setEditandoId(e.id)
-        setForm({ localId: e.localId, visitanteId: e.visitanteId, fechaHora: e.fecha.slice(0, 16) })
-    }
-    const cancelar = () => { setEditandoId(null); setForm(EVENTO_VACIO) }
-
-    const guardar = async (ev) => {
+    const crear = async (ev) => {
         ev.preventDefault()
         setGuardando(true)
         try {
-            const payload = { localId: Number(form.localId), visitanteId: Number(form.visitanteId), fechaHora: form.fechaHora }
-            if (editandoId) await editarEventoSeleccion(editandoId, payload)
-            else await crearEventoSeleccion(payload)
-            showToast(editandoId ? 'Partido actualizado' : '¡Relámpago creado!', 'success')
-            cancelar()
+            await crearEventoSeleccion(aPayload(form))
+            showToast('¡Relámpago creado!', 'success')
+            setForm(EVENTO_VACIO)
             onCambio()
         } catch (error) {
-            showToast(mensajeDeError(error, 'No se pudo guardar el partido'), 'error')
+            showToast(mensajeDeError(error, 'No se pudo crear el partido'), 'error')
         } finally {
             setGuardando(false)
         }
@@ -192,31 +184,11 @@ function SeccionEventos({ equipos, eventos, copiadoId, onCopiar, onQr, onInscrip
                 </p>
             </div>
 
-            <form onSubmit={guardar} className="bg-surface border border-border rounded-xl p-4 grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
-                <label className="text-xs text-textMuted font-semibold space-y-1">
-                    <span>Local</span>
-                    <select required value={form.localId} onChange={e => setForm({ ...form, localId: e.target.value })} className={input}>
-                        <option value="">Elegir…</option>
-                        {equipos.map(e => <option key={e.id} value={e.id}>{e.nombre}</option>)}
-                    </select>
-                </label>
-                <label className="text-xs text-textMuted font-semibold space-y-1">
-                    <span>Visitante</span>
-                    <select required value={form.visitanteId} onChange={e => setForm({ ...form, visitanteId: e.target.value })} className={input}>
-                        <option value="">Elegir…</option>
-                        {equipos.map(e => <option key={e.id} value={e.id}>{e.nombre}</option>)}
-                    </select>
-                </label>
-                <label className="text-xs text-textMuted font-semibold space-y-1">
-                    <span>Inicio (hora argentina)</span>
-                    <input required type="datetime-local" value={form.fechaHora} onChange={e => setForm({ ...form, fechaHora: e.target.value })} className={input} />
-                </label>
-                <div className="flex gap-2">
-                    <button type="submit" disabled={guardando} className={`${boton} flex-1`}>
-                        {guardando ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : editandoId ? 'Guardar' : 'Crear Relámpago'}
-                    </button>
-                    {editandoId && <button type="button" onClick={cancelar} className={botonGris}><X className="w-4 h-4" /></button>}
-                </div>
+            <form onSubmit={crear} className="bg-surface border border-border rounded-xl p-4 grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
+                <CamposEvento form={form} setForm={setForm} equipos={equipos} />
+                <button type="submit" disabled={guardando} className={boton}>
+                    {guardando ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Crear Relámpago'}
+                </button>
             </form>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -225,7 +197,15 @@ function SeccionEventos({ equipos, eventos, copiadoId, onCopiar, onQr, onInscrip
                         Todavía no hay partidos. Primero cargá las selecciones y sus jugadores (más abajo).
                     </div>
                 )}
-                {eventos.map(e => (
+                {eventos.map(e => editandoId === e.id ? (
+                    <EdicionEvento
+                        key={e.id}
+                        evento={e}
+                        equipos={equipos}
+                        onCancelar={() => setEditandoId(null)}
+                        onGuardado={() => { setEditandoId(null); onCambio() }}
+                    />
+                ) : (
                     <div key={e.id} className="bg-surface border border-border rounded-xl p-4 shadow-sm space-y-3">
                         <div className="flex justify-between items-start gap-3">
                             <div>
@@ -260,7 +240,7 @@ function SeccionEventos({ equipos, eventos, copiadoId, onCopiar, onQr, onInscrip
                             >
                                 <ClipboardList className="w-4 h-4" /> Planilla
                             </button>
-                            <button onClick={() => editar(e)} className={botonGris} title="Editar"><Pencil className="w-4 h-4" /></button>
+                            <button onClick={() => setEditandoId(e.id)} className={botonGris} title="Editar"><Pencil className="w-4 h-4" /></button>
                             <button onClick={() => onBorrar(e)} className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg" title="Eliminar">
                                 <Trash2 className="w-4 h-4" />
                             </button>
@@ -269,6 +249,69 @@ function SeccionEventos({ equipos, eventos, copiadoId, onCopiar, onQr, onInscrip
                 ))}
             </div>
         </section>
+    )
+}
+
+const aPayload = (form) => ({ localId: Number(form.localId), visitanteId: Number(form.visitanteId), fechaHora: form.fechaHora })
+
+function CamposEvento({ form, setForm, equipos }) {
+    return (
+        <>
+            <label className="text-xs text-textMuted font-semibold space-y-1">
+                <span>Local</span>
+                <select required value={form.localId} onChange={e => setForm({ ...form, localId: e.target.value })} className={input}>
+                    <option value="">Elegir…</option>
+                    {equipos.map(e => <option key={e.id} value={e.id}>{e.nombre}</option>)}
+                </select>
+            </label>
+            <label className="text-xs text-textMuted font-semibold space-y-1">
+                <span>Visitante</span>
+                <select required value={form.visitanteId} onChange={e => setForm({ ...form, visitanteId: e.target.value })} className={input}>
+                    <option value="">Elegir…</option>
+                    {equipos.map(e => <option key={e.id} value={e.id}>{e.nombre}</option>)}
+                </select>
+            </label>
+            <label className="text-xs text-textMuted font-semibold space-y-1">
+                <span>Inicio (hora argentina)</span>
+                <input required type="datetime-local" value={form.fechaHora} onChange={e => setForm({ ...form, fechaHora: e.target.value })} className={input} />
+            </label>
+        </>
+    )
+}
+
+// Edición en la misma tarjeta (ej. si se posterga el partido). Con inscriptos no se pueden cambiar los equipos.
+function EdicionEvento({ evento, equipos, onCancelar, onGuardado }) {
+    const showToast = useUiStore(state => state.showToast)
+    const [form, setForm] = useState({ localId: evento.localId, visitanteId: evento.visitanteId, fechaHora: evento.fecha.slice(0, 16) })
+    const [guardando, setGuardando] = useState(false)
+
+    const guardar = async (ev) => {
+        ev.preventDefault()
+        setGuardando(true)
+        try {
+            await editarEventoSeleccion(evento.id, aPayload(form))
+            showToast('Partido actualizado', 'success')
+            onGuardado()
+        } catch (error) {
+            showToast(mensajeDeError(error, 'No se pudo guardar el partido'), 'error')
+        } finally {
+            setGuardando(false)
+        }
+    }
+
+    return (
+        <form onSubmit={guardar} className="bg-surface border border-primary rounded-xl p-4 shadow-sm space-y-3">
+            <p className="font-black text-textMain">Editar {evento.localSigla} vs {evento.visitanteSigla}</p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <CamposEvento form={form} setForm={setForm} equipos={equipos} />
+            </div>
+            <div className="flex gap-2 justify-end">
+                <button type="button" onClick={onCancelar} className={botonGris}>Cancelar</button>
+                <button type="submit" disabled={guardando} className={boton}>
+                    {guardando ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Guardar'}
+                </button>
+            </div>
+        </form>
     )
 }
 
