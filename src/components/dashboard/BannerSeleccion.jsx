@@ -28,8 +28,8 @@ function Rayo({ className }) {
 }
 
 /**
- * Banner del Relámpago Selección: aparece solo mientras hay un partido de la selección
- * con la inscripción abierta y lleva directo a armar el quinteto.
+ * Banner del Relámpago Selección: con la inscripción abierta lleva a armar el quinteto; una vez
+ * que empezó el partido sigue visible para ir a ver los resultados, hasta que el admin lo apaga.
  * Mismo estilo que las historias de Instagram: fondo azul, etiqueta celeste y el cruce en grande.
  */
 export default function BannerSeleccion() {
@@ -41,6 +41,13 @@ export default function BannerSeleccion() {
     })
 
     if (!evento) return null
+
+    const abierto = evento.estado === 'ABIERTO'
+    const detalle = abierto
+        ? 'Gratis · Sin registrarte · Cierra al inicio del partido'
+        : evento.estado === 'FINALIZADO'
+            ? 'Partido finalizado · Ya están los resultados'
+            : 'Partido en curso · Los puntos se cargan al terminar'
 
     return (
         <Link
@@ -68,7 +75,7 @@ export default function BannerSeleccion() {
                             {cuando(evento.fecha)}
                         </span>
                         <span className="text-[#A9BCD0] text-xs md:text-sm font-semibold">
-                            Gratis · Sin registrarte · Cierra al inicio del partido
+                            {detalle}
                         </span>
                     </div>
                 </div>
@@ -77,7 +84,7 @@ export default function BannerSeleccion() {
                     className="inline-flex items-center justify-center gap-1 rounded-xl px-5 py-3 text-[#0E1828] text-sm md:text-base font-black tracking-wide shrink-0 group-hover:brightness-110 transition"
                     style={{ backgroundColor: CELESTE }}
                 >
-                    ARMÁ TU QUINTETO
+                    {abierto ? 'ARMÁ TU QUINTETO' : 'MIRÁ LOS RESULTADOS'}
                     <ChevronRight className="w-5 h-5" />
                 </span>
             </div>

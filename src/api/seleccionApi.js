@@ -42,6 +42,8 @@ export const eliminarJugadorSeleccion = (id) => axiosClient.delete(`${admin}/jug
 export const getEventosSeleccion = () => axiosClient.get(`${admin}/eventos`, conf()).then(r => r.data);
 export const crearEventoSeleccion = (evento) => axiosClient.post(`${admin}/eventos`, evento, conf()).then(r => r.data);
 export const editarEventoSeleccion = (id, evento) => axiosClient.put(`${admin}/eventos/${id}`, evento, conf()).then(r => r.data);
+export const cambiarBannerSeleccion = (id, mostrar) =>
+    axiosClient.put(`${admin}/eventos/${id}/banner`, null, conf({ params: { mostrar } })).then(r => r.data);
 export const eliminarEventoSeleccion = (id) => axiosClient.delete(`${admin}/eventos/${id}`, conf());
 export const getParticipantesSeleccion = (id) => axiosClient.get(`${admin}/eventos/${id}/participantes`, conf()).then(r => r.data);
 export const getPlanillaSeleccion = (id) => axiosClient.get(`${admin}/eventos/${id}/planilla`, conf()).then(r => r.data);
