@@ -25,6 +25,7 @@ import ArrepentimientoPage from '../pages/ArrepentimientoPage'
 import RedirectTorneo from '../components/ui/RedirectTorneo'
 import AdminPage from '../pages/admin/AdminPage'
 import ShowdownPage from '../pages/showdown/ShowdownPage'
+import { seleccionApi } from '../api/seleccionApi'
 import MaintenancePage from '../pages/MaintenancePage'
 import PreLaunchPage from '../pages/PreLaunchPage'
 
@@ -133,6 +134,8 @@ export default function AppRouter() {
 
                 {/* ── Showdown (Modo Estadio) ────────────────────────────── */}
                 <Route path="/showdown/:codigo" element={<ShowdownPage />} />
+                {/* Relámpago Selección: mismas pantallas, datos aparte (tablas seleccion_*) */}
+                <Route path="/seleccion/:codigo" element={<ShowdownPage api={seleccionApi} />} />
 
 
                 {/* ── App principal — solo usuarios ACTIVOS ──────────────── */}

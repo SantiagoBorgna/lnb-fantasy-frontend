@@ -21,6 +21,7 @@ import DashboardClasicoGlobal from '../components/dashboard/DashboardClasicoGlob
 import DashboardDraftClasico from '../components/dashboard/DashboardDraftClasico'
 import DashboardDraftH2H from '../components/dashboard/DashboardDraftH2H'
 import SponsorsBanner from '../components/ui/SponsorsBanner'
+import BannerSeleccion from '../components/dashboard/BannerSeleccion'
 
 export default function DashboardPage() {
     const usuario = useAuthStore(state => state.usuario)
@@ -154,6 +155,9 @@ export default function DashboardPage() {
                     <BotonAyuda onClick={abrir} />
                 </div>
             </div>
+
+            {/* ── Relámpago Selección (solo si hay uno con la inscripción abierta) ── */}
+            <BannerSeleccion />
 
             {/* ── Jornada + Countdown (Full Width) ── */}
             {jornada ? (

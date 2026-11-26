@@ -8,6 +8,7 @@ import clsx from 'clsx'
 import { ChevronLeft } from 'lucide-react'
 
 import AdminShowdownPanel from './AdminShowdownPanel'
+import AdminSeleccionPanel from './AdminSeleccionPanel'
 import AdminQuintetosPanel from './AdminQuintetosPanel'
 import AdminMesPanel from './AdminMesPanel'
 import AdminJugadoresPanel from './AdminJugadoresPanel'
@@ -80,6 +81,15 @@ export default function AdminPage() {
                             Modo Relámpago
                         </button>
                         <button
+                            onClick={() => setTab('SELECCION')}
+                            className={clsx(
+                                "flex-1 md:w-40 py-2 text-sm font-bold rounded-lg transition-all",
+                                tab === 'SELECCION' ? "bg-card text-textMain shadow-sm border border-border" : "text-textMuted hover:text-textMain"
+                            )}
+                        >
+                            Relámpago Selección
+                        </button>
+                        <button
                             onClick={() => setTab('QUINTETOS')}
                             className={clsx(
                                 "flex-1 md:w-32 py-2 text-sm font-bold rounded-lg transition-all",
@@ -140,6 +150,7 @@ export default function AdminPage() {
                         {tab === 'JORNADAS' && <AdminJornadasPanel />}
                         {tab === 'PARTIDOS' && <AdminPartidosPanel />}
                         {tab === 'RELAMPAGOS' && <AdminShowdownPanel />}
+                        {tab === 'SELECCION' && <AdminSeleccionPanel />}
                         {tab === 'QUINTETOS' && <AdminQuintetosPanel />}
                         {tab === 'MES' && <AdminMesPanel />}
                         {tab === 'JUGADORES' && <AdminJugadoresPanel />}

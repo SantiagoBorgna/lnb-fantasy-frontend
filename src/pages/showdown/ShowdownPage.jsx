@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { getShowdownEvento, getShowdownRanking, getShowdownMiEquipo } from '../../api/showdownApi'
+import { showdownApi } from '../../api/showdownApi'
 import ShowdownDraft from './ShowdownDraft'
 import ShowdownRanking from './ShowdownRanking'
 import { Loader2 } from 'lucide-react'
 
-export default function ShowdownPage() {
+// api: el del Relámpago de la liga (por defecto) o el de la Selección
+export default function ShowdownPage({ api = showdownApi }) {
     const { codigo } = useParams()
     const [evento, setEvento] = useState(null)
     const [loading, setLoading] = useState(true)
@@ -23,21 +24,21 @@ export default function ShowdownPage() {
         setUuidDispositivo(uuid)
 
         cargarEvento(uuid)
-    }, [codigo])
+    }, [codigo, api])
 
     const cargarEvento = async (uuid) => {
         try {
-            const ev = await getShowdownEvento(codigo)
+            const ev = await api.getEvento(codigo)
             setEvento(ev)
 
             // Buscar si ya participó cargando el ranking
-            const rk = await getShowdownRanking(codigo, uuid)
+            const rk = await api.getRanking(codigo, uuid)
             setRanking(rk)
             
             if (rk.some(p => p.esMio)) {
                 setYaParticipo(true)
                 try {
-                    const equipo = await getShowdownMiEquipo(codigo, uuid)
+                    const equipo = await api.getMiEquipo(codigo, uuid)
                     setMiEquipo(equipo)
                 } catch (e) {
                     console.error("Error cargando equipo", e)
@@ -82,6 +83,7 @@ export default function ShowdownPage() {
 
     // Si el evento está abierto y aún no participó
     return <ShowdownDraft 
+                api={api}
                 evento={evento} 
                 codigo={codigo} 
                 uuidDispositivo={uuidDispositivo} 
