@@ -48,10 +48,21 @@ export default function ShowdownDraft({ api = showdownApi, evento, codigo, uuidD
         }
     }, [step, codigo, mercado.length, api])
 
-    const handleContinuar = (e) => {
+    const [verificando, setVerificando] = useState(false)
+
+    // El email se valida acá (inscripción abierta y email sin usar) para no dejar armar el equipo en vano
+    const handleContinuar = async (e) => {
         e.preventDefault()
-        if (nombre.trim() && apellido.trim()) {
+        if (!nombre.trim() || !apellido.trim()) return
+        setVerificando(true)
+        try {
+            await api.verificarInscripcion(codigo, email, uuidDispositivo)
             setStep(2)
+            window.scrollTo(0, 0)
+        } catch (error) {
+            showToast(error.response?.data?.mensaje || "No pudimos verificar tus datos, probá de nuevo", "error")
+        } finally {
+            setVerificando(false)
         }
     }
 
@@ -266,8 +277,8 @@ export default function ShowdownDraft({ api = showdownApi, evento, codigo, uuidD
                                 placeholder="tu@email.com"
                             />
                         </div>
-                        <button type="submit" className="w-full bg-primary text-bg font-bold rounded-xl py-3.5 mt-6 hover:bg-primary/90 transition-colors shadow-md">
-                            Continuar
+                        <button type="submit" disabled={verificando} className="w-full bg-primary text-bg font-bold rounded-xl py-3.5 mt-6 hover:bg-primary/90 transition-colors shadow-md disabled:opacity-60 flex items-center justify-center">
+                            {verificando ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Continuar'}
                         </button>
                         <p className="text-textMuted text-xs text-center">
                             Al continuar, aceptás nuestros{' '}
