@@ -46,6 +46,7 @@ export const cambiarBannerSeleccion = (id, mostrar) =>
     axiosClient.put(`${admin}/eventos/${id}/banner`, null, conf({ params: { mostrar } })).then(r => r.data);
 export const eliminarEventoSeleccion = (id) => axiosClient.delete(`${admin}/eventos/${id}`, conf());
 export const getParticipantesSeleccion = (id) => axiosClient.get(`${admin}/eventos/${id}/participantes`, conf()).then(r => r.data);
+export const getResumenSeleccion = (id) => axiosClient.get(`${admin}/eventos/${id}/resumen`, conf()).then(r => r.data);
 export const getPlanillaSeleccion = (id) => axiosClient.get(`${admin}/eventos/${id}/planilla`, conf()).then(r => r.data);
 export const guardarPlanillaSeleccion = (id, planilla) =>
     axiosClient.put(`${admin}/eventos/${id}/planilla`, planilla, conf()).then(r => r.data);

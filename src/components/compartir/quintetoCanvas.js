@@ -25,7 +25,7 @@ export function nombreCorto(nombreCompleto = '') {
 }
 
 // 27 → "27", 79.5 → "79.5" (con punto, como en las placas)
-const puntos = (n) => {
+export const puntos = (n) => {
     const r = Math.round(Number(n ?? 0) * 10) / 10
     return Number.isInteger(r) ? String(r) : r.toFixed(1)
 }
@@ -44,7 +44,7 @@ function fondo(canvas) {
     return ctx
 }
 
-function texto(ctx, t, x, y, size, color, { sombra = false, anchoMax = ANCHO_POST - 120, espaciado = 0 } = {}) {
+export function texto(ctx, t, x, y, size, color, { sombra = false, anchoMax = ANCHO_POST - 120, espaciado = 0 } = {}) {
     let s = size
     ctx.font = fuente(s, 800)
     while (ctx.measureText(t).width > anchoMax && s > size * 0.5) ctx.font = fuente(--s, 800)
@@ -104,16 +104,17 @@ async function tarjetaJugador(ctx, j, cx, cy) {
     }
 }
 
-async function cancha(ctx, jugadores) {
-    dibujarCancha(ctx, CANCHA)
+// area: dónde va la cancha (por defecto la del post 4:5; las historias la ubican más abajo)
+export async function cancha(ctx, jugadores, area = CANCHA) {
+    dibujarCancha(ctx, area)
     const filas = [[], [], []]
     for (const j of jugadores) filas[FILA_DE[j.posicion] ?? 1].push(j)
 
-    const cx = CANCHA.x + CANCHA.w / 2
+    const cx = area.x + area.w / 2
     for (let f = 0; f < 3; f++) {
         const fila = filas[f]
         const paso = fila.length > 2 ? 226 : 292
-        const cy = CANCHA.y + CANCHA.h * ALTURA_FILA[f]
+        const cy = area.y + area.h * ALTURA_FILA[f]
         for (let k = 0; k < fila.length; k++) {
             await tarjetaJugador(ctx, fila[k], cx + (k - (fila.length - 1) / 2) * paso, cy)
         }

@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Loader2, Copy, CheckCircle, Trash2, QrCode, Pencil, ClipboardList, Plus, X, Eye, EyeOff } from 'lucide-react'
+import { Loader2, Copy, CheckCircle, Trash2, QrCode, Pencil, ClipboardList, Plus, X, Eye, EyeOff, Trophy, Star } from 'lucide-react'
 import { useUiStore } from '../../store/uiStore'
 import ConfirmModal from '../../components/ui/ConfirmModal'
 import CamisetaSVG from '../../components/jugador/CamisetaSVG'
 import ModalQrShowdown from './ModalQrShowdown'
 import ModalParticipantesShowdown from './ModalParticipantesShowdown'
 import ModalPlanillaSeleccion from './ModalPlanillaSeleccion'
+import ModalHistoriaSeleccion from './ModalHistoriaSeleccion'
 import {
     getEquiposSeleccion, guardarEquipoSeleccion, eliminarEquipoSeleccion,
     getJugadoresSeleccion, guardarJugadorSeleccion, eliminarJugadorSeleccion,
@@ -45,6 +46,7 @@ export default function AdminSeleccionPanel() {
     const [qrDe, setQrDe] = useState(null)
     const [inscriptosDe, setInscriptosDe] = useState(null)
     const [planillaDe, setPlanillaDe] = useState(null)
+    const [historia, setHistoria] = useState(null) // { evento, tipo: 'ganador' | 'ideal' }
     const [copiadoId, setCopiadoId] = useState(null)
     const [aBorrar, setABorrar] = useState(null) // { tipo, id, titulo, mensaje }
 
@@ -106,6 +108,13 @@ export default function AdminSeleccionPanel() {
                     onGuardada={cargar}
                 />
             )}
+            {historia && (
+                <ModalHistoriaSeleccion
+                    evento={historia.evento}
+                    tipo={historia.tipo}
+                    onCerrar={() => setHistoria(null)}
+                />
+            )}
             <ConfirmModal
                 isOpen={!!aBorrar}
                 onClose={() => setABorrar(null)}
@@ -122,6 +131,7 @@ export default function AdminSeleccionPanel() {
                 onQr={setQrDe}
                 onInscriptos={setInscriptosDe}
                 onPlanilla={setPlanillaDe}
+                onHistoria={(evento, tipo) => setHistoria({ evento, tipo })}
                 onBorrar={(e) => setABorrar({
                     tipo: 'evento', id: e.id, titulo: 'Eliminar Relámpago',
                     mensaje: `¿Eliminar ${e.localSigla} vs ${e.visitanteSigla}? Se borran también los ${e.participantesCount} inscriptos y la planilla. No se puede deshacer.`,
@@ -153,7 +163,7 @@ export default function AdminSeleccionPanel() {
 
 // ── Partidos ─────────────────────────────────────────────────────────────────
 
-function SeccionEventos({ equipos, eventos, copiadoId, onCopiar, onQr, onInscriptos, onPlanilla, onBorrar, onCambio }) {
+function SeccionEventos({ equipos, eventos, copiadoId, onCopiar, onQr, onInscriptos, onPlanilla, onHistoria, onBorrar, onCambio }) {
     const showToast = useUiStore(state => state.showToast)
     const [form, setForm] = useState(EVENTO_VACIO)
     const [guardando, setGuardando] = useState(false)
@@ -269,6 +279,18 @@ function SeccionEventos({ equipos, eventos, copiadoId, onCopiar, onQr, onInscrip
                                 <Trash2 className="w-4 h-4" />
                             </button>
                         </div>
+                        {/* Con la planilla cargada: historias del resultado para Instagram */}
+                        {e.estado === 'FINALIZADO' && (
+                            <div className="flex flex-wrap items-center gap-2">
+                                <span className="text-xs text-textMuted font-semibold">Historias:</span>
+                                <button onClick={() => onHistoria(e, 'ganador')} className={`${botonGris} flex-1`}>
+                                    <Trophy className="w-4 h-4" /> Quinteto del ganador
+                                </button>
+                                <button onClick={() => onHistoria(e, 'ideal')} className={`${botonGris} flex-1`}>
+                                    <Star className="w-4 h-4" /> Quinteto ideal
+                                </button>
+                            </div>
+                        )}
                     </div>
                 ))}
             </div>
