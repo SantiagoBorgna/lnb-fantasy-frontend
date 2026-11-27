@@ -202,7 +202,8 @@ async function dibujarJugador(ctx, j, cx, top, { ancho, conPuntos, tamTexto, anc
 /**
  * @param {object} d nombreEquipo, jornadaNumero, formacion, conPuntos, total,
  *   filas [[jugador]], banco [jugador], dt { nombreCompleto, equipoSigla, puntos }
- *   Opcionales (Modo Relámpago): etiqueta (reemplaza "JORNADA N"), sinInvitacion (pie sin "¿Te animás?").
+ *   Opcionales (Modo Relámpago): etiqueta (reemplaza "JORNADA N"), sinInvitacion (pie sin "¿Te animás?"),
+ *   sinPremio (pie sin "Gratis · Premio todas las jornadas").
  *   Sin banco ni DT la cancha se estira hasta el pie.
  *   jugador: { nombre, numero, colorPrincipal, colorSecundario, modelo, rol, puntos }
  */
@@ -290,5 +291,5 @@ export async function dibujarCanchita(canvas, d, logo, logoLiga) {
         }
     }
 
-    dibujarPie(ctx, { invitacion: !d.sinInvitacion })
+    dibujarPie(ctx, { invitacion: !d.sinInvitacion, premio: !d.sinPremio })
 }

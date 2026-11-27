@@ -79,6 +79,7 @@ export default function ShowdownRanking({ evento, ranking, miEquipo, conSponsors
                 .map(aDibujo)),
             banco: [],
             sinInvitacion: true,
+            sinPremio: true,
         })
     }
 
