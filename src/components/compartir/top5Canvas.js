@@ -82,6 +82,18 @@ export async function dibujarTop5(canvas, d, _logo, logoLiga) {
 }
 
 /**
+ * Top 5 con título y subtítulo libres (ej. el Relámpago Selección), mismo formato que el de la jornada.
+ * d: { titulo, subtitulo, filas: [{ posicion, nombreEquipo, puntos }] }
+ */
+export async function dibujarTop5Libre(canvas, d, _logo, logoLiga) {
+    const ctx = lienzo(canvas)
+    tituloConLogo(ctx, d.titulo, 76, 158, logoLiga, 92, 32)
+    subtitulo(ctx, d.subtitulo, 258)
+    tarjetas(ctx, d.filas, { altoTarjeta: 158, paso: 181.5, arriba: 310 })
+    pie(ctx)
+}
+
+/**
  * Top 10 del mes ("TOP 10 NOVIEMBRE", 5 puestos por imagen), con el mismo formato que el top 5 de la jornada.
  * d: { mes, fecha: 'dd/mm', filas: [{ posicion, nombreEquipo, puntos }] }
  */
@@ -106,7 +118,7 @@ export async function dibujarTablaMesHistoria(canvas, d, _logo, logoLiga) {
     pie(ctx, 1800)
 }
 
-function tarjetas(ctx, filas, { altoTarjeta, paso, arriba, radioMedalla = 46, radioTarjeta = 48 }) {
+export function tarjetas(ctx, filas, { altoTarjeta, paso, arriba, radioMedalla = 46, radioTarjeta = 48 }) {
     const izquierda = 108, derecha = ANCHO_POST - 108
     filas.forEach((fila, i) => {
         const y = arriba + i * paso

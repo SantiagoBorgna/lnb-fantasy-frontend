@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Loader2, Copy, CheckCircle, Trash2, QrCode, Pencil, ClipboardList, Plus, X, Eye, EyeOff, Trophy, Star } from 'lucide-react'
+import { Loader2, Copy, CheckCircle, Trash2, QrCode, Pencil, ClipboardList, Plus, X, Eye, EyeOff, Trophy, Star, ListOrdered } from 'lucide-react'
 import { useUiStore } from '../../store/uiStore'
 import ConfirmModal from '../../components/ui/ConfirmModal'
 import CamisetaSVG from '../../components/jugador/CamisetaSVG'
@@ -279,15 +279,18 @@ function SeccionEventos({ equipos, eventos, copiadoId, onCopiar, onQr, onInscrip
                                 <Trash2 className="w-4 h-4" />
                             </button>
                         </div>
-                        {/* Con la planilla cargada: historias del resultado para Instagram */}
+                        {/* Con la planilla cargada: imágenes del resultado para Instagram (historia o post) */}
                         {e.estado === 'FINALIZADO' && (
                             <div className="flex flex-wrap items-center gap-2">
-                                <span className="text-xs text-textMuted font-semibold">Historias:</span>
+                                <span className="text-xs text-textMuted font-semibold">Imágenes:</span>
                                 <button onClick={() => onHistoria(e, 'ganador')} className={`${botonGris} flex-1`}>
-                                    <Trophy className="w-4 h-4" /> Quinteto del ganador
+                                    <Trophy className="w-4 h-4" /> Ganador
                                 </button>
                                 <button onClick={() => onHistoria(e, 'ideal')} className={`${botonGris} flex-1`}>
                                     <Star className="w-4 h-4" /> Quinteto ideal
+                                </button>
+                                <button onClick={() => onHistoria(e, 'tabla')} className={`${botonGris} flex-1`}>
+                                    <ListOrdered className="w-4 h-4" /> Tabla
                                 </button>
                             </div>
                         )}
