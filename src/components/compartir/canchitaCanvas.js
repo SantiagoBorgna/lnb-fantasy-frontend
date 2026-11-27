@@ -210,45 +210,53 @@ async function dibujarJugador(ctx, j, cx, top, { ancho, conPuntos, tamTexto, anc
 export async function dibujarCanchita(canvas, d, logo, logoLiga) {
     const ctx = iniciarLienzo(canvas, null)
 
+    // Sin banco ni DT (Modo Relámpago): más aire arriba, logo más grande y la cancha con
+    // camisetas más grandes ocupando el espacio que en el juego usan el banco y el DT
+    const banco = d.banco ?? []
+    const soloCancha = banco.length === 0 && !d.dt?.nombreCompleto
+    const dy = soloCancha ? 70 : 0
+    const ladoLogo = soloCancha ? 190 : 150
+    const xTexto = 70 + ladoLogo + 30
+
     // ── Encabezado: logo + equipo ──
-    dibujarLogo(ctx, logo, 70, 60, 150, 36)
-    const anchoLiga = dibujarLogoLiga(ctx, logoLiga, ANCHO - 70, 62, 64)
+    dibujarLogo(ctx, logo, 70, 60 + dy, ladoLogo, 36)
+    const anchoLiga = dibujarLogoLiga(ctx, logoLiga, ANCHO - 70, 62 + dy, 64)
+    const yTexto = 60 + dy + (ladoLogo - 150) / 2
     ctx.textAlign = 'left'
     ctx.fillStyle = NARANJA
     ctx.font = fuente(34, 700)
     const etiquetaJornada = d.etiqueta ?? (d.jornadaNumero ? `JORNADA ${d.jornadaNumero}` : '')
-    ctx.fillText(d.conPuntos ? etiquetaJornada : ['MI EQUIPO', etiquetaJornada].filter(Boolean).join(' · '), 250, 100)
+    ctx.fillText(d.conPuntos ? etiquetaJornada : ['MI EQUIPO', etiquetaJornada].filter(Boolean).join(' · '), xTexto, yTexto + 40)
     ctx.fillStyle = BLANCO
-    textoAjustado(ctx, d.nombreEquipo || 'Mi equipo', 250, 168, ANCHO - 250 - 70 - (anchoLiga ? anchoLiga + 24 : 0), 60, 700, 40)
+    textoAjustado(ctx, d.nombreEquipo || 'Mi equipo', xTexto, yTexto + 108, ANCHO - xTexto - 70 - (anchoLiga ? anchoLiga + 24 : 0), 60, 700, 40)
     if (d.conPuntos) {
         ctx.fillStyle = BLANCO
         ctx.font = fuente(46, 700)
-        ctx.fillText(`${formatoPuntos(d.total)} pts`, 250, 226)
+        ctx.fillText(`${formatoPuntos(d.total)} pts`, xTexto, yTexto + 166)
     } else if (d.formacion) {
         ctx.fillStyle = GRIS
         ctx.font = fuente(32, 600)
-        ctx.fillText(`Formación ${d.formacion}`, 250, 222)
+        ctx.fillText(`Formación ${d.formacion}`, xTexto, yTexto + 162)
     }
 
-    // ── Cancha con los titulares (sin banco ni DT ocupa también ese espacio) ──
-    const banco = d.banco ?? []
-    const soloCancha = banco.length === 0 && !d.dt?.nombreCompleto
-    const area = soloCancha ? { ...CANCHA, h: 1360 } : CANCHA
+    // ── Cancha con los titulares ──
+    const area = soloCancha ? { ...CANCHA, y: CANCHA.y + dy + 40, h: 1220 } : CANCHA
     dibujarCancha(ctx, area)
     const filas = (d.filas ?? []).filter(f => f.length > 0)
     // Con puntos cada jugador lleva una etiqueta más: camisetas un poco más chicas para que entre
-    const anchoCamiseta = d.conPuntos ? 130 : 150
-    const altoBloque = anchoCamiseta * 1.2 + (d.conPuntos ? 112 : 56)
+    const anchoCamiseta = soloCancha ? (d.conPuntos ? 175 : 190) : (d.conPuntos ? 130 : 150)
+    const tamTexto = soloCancha ? 38 : 30
+    const altoBloque = anchoCamiseta * 1.2 + (d.conPuntos ? 112 : 56) * tamTexto / 30
     const margen = 36
     const altoFila = (area.h - margen * 2) / Math.max(filas.length, 1)
     for (let i = 0; i < filas.length; i++) {
         const fila = filas[i]
         const top = area.y + margen + altoFila * i + (altoFila - altoBloque) / 2
-        const paso = Math.min(300, (area.w - 80) / fila.length)
+        const paso = Math.min(soloCancha ? 380 : 300, (area.w - 80) / fila.length)
         for (let k = 0; k < fila.length; k++) {
             const cx = ANCHO / 2 + (k - (fila.length - 1) / 2) * paso
             await dibujarJugador(ctx, fila[k], cx, top, {
-                ancho: anchoCamiseta, conPuntos: d.conPuntos, tamTexto: 30, anchoTexto: paso - 16,
+                ancho: anchoCamiseta, conPuntos: d.conPuntos, tamTexto, anchoTexto: paso - 16,
             })
         }
     }
