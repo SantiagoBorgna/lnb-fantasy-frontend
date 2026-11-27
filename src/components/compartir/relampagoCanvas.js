@@ -2,7 +2,8 @@
 // quinteto ideal del partido. Usan el fondo de las historias de Instagram (con el logo y
 // "SEXTO HOMBRE FANTASY" abajo) y la misma canchita que las placas de la liga.
 import { BLANCO, fuente, cargarImagen } from './canvasUtils'
-import { cancha, texto, puntos } from './quintetoCanvas'
+import { cancha, texto, puntos, dibujarGanadorJornada, dibujarQuintetoIdeal } from './quintetoCanvas'
+import { tarjetas, dibujarTop5Libre } from './top5Canvas'
 
 const ANCHO = 1080
 const ALTO = 1920
@@ -86,4 +87,35 @@ export async function dibujarQuintetoIdealRelampago(canvas, d) {
     texto(ctx, 'QUINTETO IDEAL', ANCHO / 2, 470, 96, BLANCO, { sombra: true })
     texto(ctx, cruce(d), ANCHO / 2, 570, 38, GRIS_AZUL)
     await cancha(ctx, d.jugadores, CANCHA)
+}
+
+/** d: { ..., top10: [{ posicion, nombre, apellido, puntosTotales }] } — tabla final en historia */
+export async function dibujarTablaRelampago(canvas, d) {
+    const ctx = await fondo(canvas)
+    etiqueta(ctx, 270)
+    texto(ctx, 'TOP 10', ANCHO / 2, 450, 96, BLANCO, { sombra: true })
+    texto(ctx, cruce(d), ANCHO / 2, 530, 38, GRIS_AZUL)
+    // Diez tarjetas entre el subtítulo y el logo del fondo
+    tarjetas(ctx, filasTabla(d.top10), { altoTarjeta: 86, paso: 97, arriba: 590, radioMedalla: 32, radioTarjeta: 30 })
+}
+
+const filasTabla = (top) => top.map(f => ({ posicion: f.posicion, nombreEquipo: `${f.nombre} ${f.apellido}`, puntos: f.puntosTotales }))
+
+// ── Posts 4:5 (1080x1350): las mismas placas que el juego base, sin logo de liga ─────────────
+
+export function dibujarGanadorRelampagoPost(canvas, d) {
+    return dibujarGanadorJornada(canvas, {
+        nombreEquipo: `${d.ganador.nombre} ${d.ganador.apellido}`,
+        subtitulo: `GANADOR RELÁMPAGO · ${cruce(d)}`,
+        puntaje: d.ganador.puntosTotales,
+        jugadores: d.ganador.jugadores,
+    }, null, null)
+}
+
+export function dibujarQuintetoIdealRelampagoPost(canvas, d) {
+    return dibujarQuintetoIdeal(canvas, { subtitulo: `RELÁMPAGO · ${cruce(d)}`, jugadores: d.jugadores }, null, null)
+}
+
+export function dibujarTablaRelampagoPost(canvas, d) {
+    return dibujarTop5Libre(canvas, { titulo: 'LOS 5 MEJORES', subtitulo: `RELÁMPAGO · ${cruce(d)}`, filas: filasTabla(d.top10.slice(0, 5)) }, null, null)
 }
