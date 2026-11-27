@@ -1,12 +1,19 @@
-import { Trophy, Clock, CheckCircle } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { Trophy, Clock, CheckCircle, Share2 } from 'lucide-react'
+import { useEffect, useState, lazy, Suspense } from 'react'
 import ShowdownCanchita from '../../components/showdown/ShowdownCanchita'
 import ShowdownStatsModal from '../../components/showdown/ShowdownStatsModal'
 import SponsorsBanner from '../../components/ui/SponsorsBanner'
 
+// Se carga recién al tocar "Compartir": trae react-dom/server para dibujar las camisetas
+const RelampagoCompartirModal = lazy(() => import('../../components/compartir/RelampagoCompartirModal'))
+
+// Filas de la imagen igual que la canchita del Relámpago: bases/escoltas, aleros/ala pívots, pívot
+const FILAS_IMAGEN = [['BASE', 'ESCOLTA'], ['ALERO', 'ALA_PIVOT'], ['PIVOT']]
+
 export default function ShowdownRanking({ evento, ranking, miEquipo, conSponsors = false, conPremio = true }) {
     const [activeTab, setActiveTab] = useState('ranking')
     const [selectedJugador, setSelectedJugador] = useState(null)
+    const [datosCompartir, setDatosCompartir] = useState(null)
 
     // Al llegar desde el armado del equipo la página quedaba scrolleada abajo
     useEffect(() => { window.scrollTo(0, 0) }, [])
@@ -46,6 +53,34 @@ export default function ShowdownRanking({ evento, ranking, miEquipo, conSponsors
     // Tabla de 10: el top 10, o el top 9 y vos al final si estás más abajo
     const filas = ranking.map((p, i) => ({ ...p, posicion: posiciones[i] }))
     const filasVisibles = myRankIndex >= 10 ? [...filas.slice(0, 9), filas[myRankIndex]] : filas.slice(0, 10)
+
+    // Imagen de "Compartir mi equipo" (la misma del juego base, sin banco ni DT)
+    const partido = `${evento.localSigla} vs ${evento.visitanteSigla}`
+    const abrirCompartir = () => {
+        const conPuntos = evento.estado === 'FINALIZADO'
+        const yo = ranking[myRankIndex]
+        const aDibujo = (j) => ({
+            nombre: j.nombreCompleto,
+            numero: j.numeroCamiseta,
+            colorPrincipal: j.equipoColorPrincipal,
+            colorSecundario: j.equipoColorSecundario,
+            modelo: j.equipoModeloCamiseta,
+            rol: j.esCapitan ? 'CAPITAN' : 'TITULAR',
+            puntos: conPuntos ? j.puntosAportados : null,
+        })
+        setDatosCompartir({
+            nombreEquipo: yo ? `${yo.nombre} ${yo.apellido}` : 'Mi equipo',
+            etiqueta: `RELÁMPAGO · ${partido.toUpperCase()}`,
+            conPuntos,
+            total: miEquipo.puntosTotales ?? 0,
+            filas: FILAS_IMAGEN.map(fila => fila
+                .map(pos => miEquipo.jugadores.find(j => j.posicion === pos))
+                .filter(Boolean)
+                .map(aDibujo)),
+            banco: [],
+            sinInvitacion: true,
+        })
+    }
 
     return (
         <div className="min-h-screen bg-bg dark flex flex-col items-center p-4">
@@ -174,9 +209,19 @@ export default function ShowdownRanking({ evento, ranking, miEquipo, conSponsors
             <div className="animate-fade-in space-y-3">
                         {/* Total del equipo arriba de la canchita */}
                         {miEquipo && (
-                            <div className="bg-surface border border-border rounded-2xl px-4 py-3 flex flex-col items-center">
+                            <div className="relative bg-surface border border-border rounded-2xl px-4 py-3 flex flex-col items-center">
                                 <span className="text-textMuted font-medium text-[11px] mb-1 uppercase tracking-widest">Tus Puntos</span>
                                 <span className="text-3xl font-black text-accent tabular-nums">{(miEquipo.puntosTotales ?? 0).toFixed(1)}</span>
+                                {/* Mismo botón que "Compartir mi equipo" del juego base */}
+                                <button
+                                    onClick={abrirCompartir}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-white rounded-full
+                                        bg-gradient-to-r from-[#F5862E] to-accent active:scale-95 transition-transform"
+                                    aria-label="Compartir mi equipo"
+                                    title="Compartir mi equipo"
+                                >
+                                    <Share2 size={18} />
+                                </button>
                             </div>
                         )}
                         {/* Mi Equipo Tab */}
@@ -209,6 +254,12 @@ export default function ShowdownRanking({ evento, ranking, miEquipo, conSponsors
                     </div>
                 )}
             </div>
+
+            {datosCompartir && (
+                <Suspense fallback={null}>
+                    <RelampagoCompartirModal datos={datosCompartir} partido={partido} onCerrar={() => setDatosCompartir(null)} />
+                </Suspense>
+            )}
 
             <ShowdownStatsModal
                 isOpen={!!selectedJugador}

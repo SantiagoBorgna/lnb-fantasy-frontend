@@ -202,6 +202,8 @@ async function dibujarJugador(ctx, j, cx, top, { ancho, conPuntos, tamTexto, anc
 /**
  * @param {object} d nombreEquipo, jornadaNumero, formacion, conPuntos, total,
  *   filas [[jugador]], banco [jugador], dt { nombreCompleto, equipoSigla, puntos }
+ *   Opcionales (Modo Relámpago): etiqueta (reemplaza "JORNADA N"), sinInvitacion (pie sin "¿Te animás?").
+ *   Sin banco ni DT la cancha se estira hasta el pie.
  *   jugador: { nombre, numero, colorPrincipal, colorSecundario, modelo, rol, puntos }
  */
 export async function dibujarCanchita(canvas, d, logo, logoLiga) {
@@ -213,7 +215,7 @@ export async function dibujarCanchita(canvas, d, logo, logoLiga) {
     ctx.textAlign = 'left'
     ctx.fillStyle = NARANJA
     ctx.font = fuente(34, 700)
-    const etiquetaJornada = d.jornadaNumero ? `JORNADA ${d.jornadaNumero}` : ''
+    const etiquetaJornada = d.etiqueta ?? (d.jornadaNumero ? `JORNADA ${d.jornadaNumero}` : '')
     ctx.fillText(d.conPuntos ? etiquetaJornada : ['MI EQUIPO', etiquetaJornada].filter(Boolean).join(' · '), 250, 100)
     ctx.fillStyle = BLANCO
     textoAjustado(ctx, d.nombreEquipo || 'Mi equipo', 250, 168, ANCHO - 250 - 70 - (anchoLiga ? anchoLiga + 24 : 0), 60, 700, 40)
@@ -227,18 +229,21 @@ export async function dibujarCanchita(canvas, d, logo, logoLiga) {
         ctx.fillText(`Formación ${d.formacion}`, 250, 222)
     }
 
-    // ── Cancha con los titulares ──
-    dibujarCancha(ctx)
+    // ── Cancha con los titulares (sin banco ni DT ocupa también ese espacio) ──
+    const banco = d.banco ?? []
+    const soloCancha = banco.length === 0 && !d.dt?.nombreCompleto
+    const area = soloCancha ? { ...CANCHA, h: 1360 } : CANCHA
+    dibujarCancha(ctx, area)
     const filas = (d.filas ?? []).filter(f => f.length > 0)
     // Con puntos cada jugador lleva una etiqueta más: camisetas un poco más chicas para que entre
     const anchoCamiseta = d.conPuntos ? 130 : 150
     const altoBloque = anchoCamiseta * 1.2 + (d.conPuntos ? 112 : 56)
     const margen = 36
-    const altoFila = (CANCHA.h - margen * 2) / Math.max(filas.length, 1)
+    const altoFila = (area.h - margen * 2) / Math.max(filas.length, 1)
     for (let i = 0; i < filas.length; i++) {
         const fila = filas[i]
-        const top = CANCHA.y + margen + altoFila * i + (altoFila - altoBloque) / 2
-        const paso = Math.min(300, (CANCHA.w - 80) / fila.length)
+        const top = area.y + margen + altoFila * i + (altoFila - altoBloque) / 2
+        const paso = Math.min(300, (area.w - 80) / fila.length)
         for (let k = 0; k < fila.length; k++) {
             const cx = ANCHO / 2 + (k - (fila.length - 1) / 2) * paso
             await dibujarJugador(ctx, fila[k], cx, top, {
@@ -248,19 +253,20 @@ export async function dibujarCanchita(canvas, d, logo, logoLiga) {
     }
 
     // ── Banco ──
-    const banco = d.banco ?? []
-    ctx.textAlign = 'center'
-    ctx.fillStyle = GRIS
-    ctx.font = fuente(28, 700)
-    ctx.letterSpacing = '6px'
-    ctx.fillText('BANCO', ANCHO / 2, 1232)
-    ctx.letterSpacing = '0px'
-    const pasoBanco = (ANCHO - 120) / Math.max(banco.length, 1)
-    for (let k = 0; k < banco.length; k++) {
-        const cx = 60 + pasoBanco * (k + 0.5)
-        await dibujarJugador(ctx, banco[k], cx, 1256, {
-            ancho: 112, conPuntos: d.conPuntos, tamTexto: 24, anchoTexto: pasoBanco - 8,
-        })
+    if (banco.length > 0) {
+        ctx.textAlign = 'center'
+        ctx.fillStyle = GRIS
+        ctx.font = fuente(28, 700)
+        ctx.letterSpacing = '6px'
+        ctx.fillText('BANCO', ANCHO / 2, 1232)
+        ctx.letterSpacing = '0px'
+        const pasoBanco = (ANCHO - 120) / Math.max(banco.length, 1)
+        for (let k = 0; k < banco.length; k++) {
+            const cx = 60 + pasoBanco * (k + 0.5)
+            await dibujarJugador(ctx, banco[k], cx, 1256, {
+                ancho: 112, conPuntos: d.conPuntos, tamTexto: 24, anchoTexto: pasoBanco - 8,
+            })
+        }
     }
 
     // ── DT ──
@@ -284,5 +290,5 @@ export async function dibujarCanchita(canvas, d, logo, logoLiga) {
         }
     }
 
-    dibujarPie(ctx)
+    dibujarPie(ctx, { invitacion: !d.sinInvitacion })
 }

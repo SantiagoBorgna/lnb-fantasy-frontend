@@ -93,13 +93,15 @@ export function dibujarLogoLiga(ctx, logoLiga, xDerecha, y, alto) {
     return ancho
 }
 
-// Cierre común: invitación a jugar + URL
-export function dibujarPie(ctx) {
+// Cierre común: invitación a jugar + URL (el Relámpago la usa sin la invitación)
+export function dibujarPie(ctx, { invitacion = true } = {}) {
     const cx = ANCHO / 2
     ctx.textAlign = 'center'
-    ctx.fillStyle = BLANCO
-    ctx.font = fuente(54, 700)
-    ctx.fillText('¿Te animás a ganarme?', cx, 1745)
+    if (invitacion) {
+        ctx.fillStyle = BLANCO
+        ctx.font = fuente(54, 700)
+        ctx.fillText('¿Te animás a ganarme?', cx, 1745)
+    }
     ctx.fillStyle = NARANJA
     ctx.font = fuente(42, 700)
     ctx.fillText('sextohombrefantasy.com.ar', cx, 1810)
