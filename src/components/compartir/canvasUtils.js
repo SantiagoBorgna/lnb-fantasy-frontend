@@ -93,8 +93,8 @@ export function dibujarLogoLiga(ctx, logoLiga, xDerecha, y, alto) {
     return ancho
 }
 
-// Cierre común: invitación a jugar + URL (el Relámpago la usa sin la invitación)
-export function dibujarPie(ctx, { invitacion = true } = {}) {
+// Cierre común: invitación a jugar + URL + premio (el Relámpago lo usa sin invitación ni premio)
+export function dibujarPie(ctx, { invitacion = true, premio = true } = {}) {
     const cx = ANCHO / 2
     ctx.textAlign = 'center'
     if (invitacion) {
@@ -105,9 +105,11 @@ export function dibujarPie(ctx, { invitacion = true } = {}) {
     ctx.fillStyle = NARANJA
     ctx.font = fuente(42, 700)
     ctx.fillText('sextohombrefantasy.com.ar', cx, 1810)
-    ctx.fillStyle = GRIS
-    ctx.font = fuente(32, 500)
-    ctx.fillText('Gratis · Premio todas las jornadas', cx, 1862)
+    if (premio) {
+        ctx.fillStyle = GRIS
+        ctx.font = fuente(32, 500)
+        ctx.fillText('Gratis · Premio todas las jornadas', cx, 1862)
+    }
 }
 
 export const cargarImagen = (src) =>
